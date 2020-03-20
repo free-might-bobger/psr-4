@@ -1,0 +1,11 @@
+{
+    "autoload": {
+        "files": ["mylibrary/functions.php"],
+        "classmap": [
+        "classmap"
+        ],
+		"psr-4": {
+            "Acme\\":"src/"
+        }
+    }
+}
