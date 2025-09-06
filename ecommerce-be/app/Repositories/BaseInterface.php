@@ -1,0 +1,25 @@
+<?php 
+
+namespace App\Repositories;
+use Illuminate\Database\Eloquent\Builder;
+interface BaseInterface {
+
+	public function filterQuery(array $parameters):self;
+	public function setParameters(array $parameters):self;
+	public function where(string $column, string $value):Builder;
+
+
+
+	public function get();
+	public function columns();
+	public function with();
+	public function relation();
+	public function like($column, $value);
+	public function first();
+
+	/**
+	 * GLOBAL METHODS
+	 */
+	public function pregSplit(string $pattern, string $value):array;
+
+}
