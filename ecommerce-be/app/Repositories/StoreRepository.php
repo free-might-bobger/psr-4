@@ -18,4 +18,9 @@ class StoreRepository extends BaseRepository implements BaseInterface
         $this->model = $this->model->withinKm($this->params['latitude'], $this->params['longitude'], $this->params['radius']);
         return $this->model->get();
     }
+
+    public function setParameters(array $parameters):self{
+        $this->params = $parameters;
+        return $this;
+     }
 }

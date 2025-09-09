@@ -6,7 +6,7 @@ const useUser = useUserStore();
 const { profile } = storeToRefs(useUser);
 const checkDevProduction = (): string => {
   const live = 'https://shaischool.net/api/';
-  const test = 'http://127.0.0.1:8000/api/';
+  const test = 'http://127.0.0.1:8080/api/';
   if (window.location.href.includes('shaischool')) {
     return live;
   }

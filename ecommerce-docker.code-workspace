@@ -1,0 +1,14 @@
+{
+	"folders": [
+		{
+			"path": "ecommerce-docker"
+		},
+		{
+			"path": "ecommerce-be"
+		},
+		{
+			"path": "ecommerce-web"
+		}
+	],
+	"settings": {}
+}

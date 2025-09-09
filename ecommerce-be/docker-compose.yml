@@ -7,10 +7,10 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: my_secret_password
       MYSQL_DATABASE: ecommercedb
-      MYSQL_USER: db_user
+      MYSQL_USER: root
       MYSQL_PASSWORD: db_user_pass
     ports:
-      - "6033:3306"
+      - "3307:3306"
     volumes:
       - ecommercedata:/var/lib/mysql
   phpmyadmin:

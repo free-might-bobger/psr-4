@@ -7,6 +7,7 @@ use App\Repositories\StoreRepository;
 use App\Http\Requests\BaseIndexRequest;
 use App\Http\Requests\Store\StoreRequest;
 use Illuminate\Support\Arr;
+use App\Http\Resources\BaseResource;
 
 class PublicStoreController extends ApiController
 {
@@ -17,17 +18,17 @@ class PublicStoreController extends ApiController
         $this->storeRequest = StoreRequest::class;
     }
 
-    public function index()
+    public function index(): BaseResource
     {
 
         $this->params = app($this->indexRequest)->all();
-        $this->result = $this->repository->setParams($this->params)->getWithinKm();
+        $this->result = $this->repository->setParameters($this->params)->getWithinKm();
         return $this->getResource();
     }
 
     public function getResource()
     {
-        return new PublicStoreResource($this->result);
+        return new BaseResource($this->result);
     }
 
     public function isPublicRoute(string $routeName): Bool
@@ -46,4 +47,5 @@ class PublicStoreController extends ApiController
     {
         return preg_split($pattern, $value, 0, PREG_SPLIT_NO_EMPTY);
     }
+
 }
