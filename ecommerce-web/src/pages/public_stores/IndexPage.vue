@@ -8,60 +8,30 @@
         }]" />
       </div>
       <div class="col">
-        <q-select
-          outlined
-          v-model="selectedCategory"
-          :options="categories"
-          label="Select Category"
-          hide-bottom-space
-          use-input
-          dense
-        >
+        <q-select outlined v-model="selectedCategory" :options="categories" label="Select Category" hide-bottom-space
+          use-input dense>
           <template v-slot:append>
-            <q-icon
-              v-if="selectedCategory !== ''"
-              name="close"
-              @click.stop.prevent="selectedCategory = ''"
-              class="cursor-pointer"
-            />
+            <q-icon v-if="selectedCategory !== ''" name="close" @click.stop.prevent="selectedCategory = ''"
+              class="cursor-pointer" />
           </template>
         </q-select>
       </div>
       <div class="col">
-        <q-input
-          outlined
-          dense
-          v-model="searchString"
-          placeholder="Search Item..."
-          debounce="800"
-        >
+        <q-input outlined dense v-model="searchString" placeholder="Search Item..." debounce="800">
           <template v-slot:prepend>
             <q-icon v-if="searchString === ''" name="search" />
-            <q-icon
-              v-else
-              name="clear"
-              class="cursor-pointer"
-              @click="searchString = ''"
-            />
+            <q-icon v-else name="clear" class="cursor-pointer" @click="searchString = ''" />
           </template>
         </q-input>
       </div>
     </div>
     <div class="wrapper">
       <div class="flex-container">
-        <router-link
-          :to="`/public_stores/${route.params.id}/item/${val.optimus_id}`"
-          class="generic-box"
-          v-for="val in result"
-          :key="val.id"
-        >
+        <router-link :to="`/public_stores/${route.params.id}/item/${val.optimus_id}`" class="generic-box"
+          v-for="val in result" :key="val.id">
           <div class="row">
             <div class="col-4">
-              <img
-                :src="val.primary_img?.path_thumbnail"
-                width="100"
-                class="item-image"
-              />
+              <img :src="val.primary_img?.path_thumbnail" width="100" class="item-image" />
             </div>
             <div class="col">
               <div class="item-wrapper">
@@ -74,22 +44,20 @@
                 </span>
               </div>
             </div>
-           
+
           </div>
         </router-link>
       </div>
     </div>
     <br />
     <div class="q-pa-sm flex flex-center" v-if="result.length > 0" outline>
-      <q-pagination
-        v-model="pagination.page"
-        :max="pagination.lastPage"
-        boundary-links
-      />
+      <q-pagination v-model="pagination.page" :max="pagination.lastPage" boundary-links />
     </div>
   </div>
 </template>
 <script setup lang="ts">
+import { GOOGLE_MAP_API_KEY, GOOGLE_MAP_ID } from 'src/boot/constant';
+import { GoogleMap, AdvancedMarker, InfoWindow } from 'vue3-google-map';
 import { useItemStore } from 'src/stores/item';
 import { storeToRefs } from 'pinia';
 import { useRoute } from 'vue-router';
@@ -100,9 +68,12 @@ import { getPriceRange } from 'src/boot/utilities';
 import BreadCrumbsWrapper from 'src/components/BreadCrumbsWrapper.vue'
 import { truncateString } from 'src/boot/common';
 
+const showInfoWindow = ref(true);
 const useItem = useItemStore();
 const { searchString, selectedCategory } = storeToRefs(useItem);
 const useCommon = useCommonStore();
+const { lat, lng, mobile } = storeToRefs(useCommon);
+
 const { pagination, result } = storeToRefs(useCommon);
 const store = ref({
   name: '',
@@ -111,6 +82,10 @@ const store = ref({
     complete_address: '',
   },
 });
+const markerDrag = (e: { latLng: google.maps.LatLng }) => {
+  lat.value = e.latLng.lat();
+  lng.value = e.latLng.lng();
+};
 
 const storeId = ref();
 const route = useRoute();
@@ -173,17 +148,17 @@ const onRequest = async () => {
 };
 
 onMounted(() => {
-  onRequest();
-  showStore();
+  // onRequest();
+  // showStore();
 });
 
-useCommon.$subscribe(async (mutation, state) => {
-  if (mutation.events) {
-    if (mutation.events?.key == 'page') {
-      onRequest();
-    }
-  }
-});
+// useCommon.$subscribe(async (mutation, state) => {
+//   if (mutation.events) {
+//     if (mutation.events?.key == 'page') {
+//       onRequest();
+//     }
+//   }
+// });
 
 watch(selectedCategory, () => {
   onRequest();

@@ -168,9 +168,12 @@ export interface UpdateInterface {
   query?: GetQuery
 }
 
-interface StoreInterface {
+export interface StoreInterface {
+  id: number
   name: string
-
+  latitude: number
+  longitude: number
+  distance: number
 }
 interface OrderInterface {
   id: string

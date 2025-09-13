@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "description": "Rocee shop",
   "productName": "Rocee shop",
-  "author": "Bobby Gerez <bobby.gerez@yahoo.com>",
+  "author": "Bobby Gerez <ugerez@yahoo.com>",
   "private": true,
   "scripts": {
     "lint": "eslint --ext .js,.ts,.vue ./",
