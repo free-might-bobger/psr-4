@@ -26,30 +26,10 @@ class PublicStoreController extends ApiController
         return $this->getResource();
     }
 
-    public function getResource()
-    {
-        return new BaseResource($this->result);
-    }
-
-    public function isPublicRoute(string $routeName): Bool
-    {
-        $publicRoute = [
-            'index', 'view'
-        ];
-        if (in_array($routeName, $publicRoute)) {
-            return true;
-        }
-
-        return false;
-    }
-
-    public function pregSplit(string $pattern, $value)
-    {
-        return preg_split($pattern, $value, 0, PREG_SPLIT_NO_EMPTY);
-    }
+   
 
     public function show( int $id ) : BaseResource {
-        $this->result = $this->repository->where( 'id', $id )->first();
+        $this->result = $this->repository->where( 'id', (int) $id )->first();
         return $this->getResource();
     }
 

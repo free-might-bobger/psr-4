@@ -3,7 +3,7 @@
 namespace App\Repositories;
 
 use Illuminate\Database\Eloquent\Builder;
-use App\Repositories\Support\FieldSupport;
+use App\Repositories\Support\SearchFieldSupport;
 use App\Traits\Obfuscate\OptimusRequiredToModel;
 use Illuminate\Support\Arr;
 use App\Traits\Support\BaseSupportRepository;
@@ -11,22 +11,85 @@ use App\Models\Image;
 use App\Traits\UtilsTrait;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
+
 class BaseRepository implements BaseInterface
 {
-    use UtilsTrait, FieldSupport, OptimusRequiredToModel, BaseSupportRepository;
+    use UtilsTrait, SearchFieldSupport, OptimusRequiredToModel, BaseSupportRepository;
 
-    protected $model, $params, $cacheKey;
+    protected $model, $params, $cacheKey, $fillable;
 
-    public function setModel($model): self{
+    /**
+     * Set the model
+     * @param Model $model
+     * @return self
+     */
+    public function setModel(Model $model): self
+    {
         $this->model = $model;
         return $this;
     }
 
+     /**
+     * Set the fillable
+     * @return void
+     */
+    public function setFillable(): void
+    {
+        $this->fillable = $this->model->getFillable();
+    }
+
+    /**
+     * Like the resource
+     * @param string $column
+     * @param string $value
+     * @return self
+     */
+    public function like(string $column, string $value): self
+    {
+        $this->model = $this->model->where($column, 'LIKE', '%' . $value . '%');
+        return $this;
+    }
+
+    /**
+     * First the resource
+     * @return Model
+     */
+    public function first(): Model
+    {
+        return $this->model->first();
+    }
+
+    /**
+     * Find the resource or fail
+     * @param int $id
+     * @return Model
+     */
+    public function findOrFail(int $id): Model
+    {
+        $this->model = $this->model->findOrFail($this->optimus()->decode($id));
+        return $this->model;
+    }
+
+    /**
+     * Create the resource
+     * @return Model
+     */
+    public function create(): Model
+    {
+        return $this->model->create($this->params);
+    }
+
     //filters=id:1,name:as
-    public function filterQuery(array $parameters):self
+    /**
+     * Filter the resource
+     * @param array $parameters
+     * @return self
+     */
+    public function filterQuery(array $parameters): self
     {
         $this->setParameters($parameters);
-        $filters = $this->pregSplit('@,@', Arr::get( $parameters, 'filters', ''));
+        $filters = $this->pregSplit('@,@', Arr::get($parameters, 'filters', ''));
         foreach ($filters as $filterKeys => $filterValues) {
             [$column, $value] = $this->pregSplit('@:@', $filterValues);
             if (method_exists($this, $column)) {
@@ -37,37 +100,49 @@ class BaseRepository implements BaseInterface
         return $this;
     }
 
-     //type=listing
-     public function getResults(): LengthAwarePaginator|Collection
-     {
-         $limit = Arr::get($this->params, 'limit', 12);
-         $type  = Arr::get($this->params, 'type', false);
-         if ($type) {
-             return $this->model->take($limit)->get();
-         }
-         return $this->model->paginate($limit);
-     }
+    //type=listing
+    /**
+     * Get the results
+     * @return LengthAwarePaginator|Collection
+     */
+    public function getResults(): LengthAwarePaginator|Collection
+    {
+        $limit = Arr::get($this->params, 'limit', 12);
+        $type  = Arr::get($this->params, 'type', false);
+        if ($type) {
+            return $this->model->take($limit)->get();
+        }
+        return $this->model->paginate($limit);
+    }
 
-     public function setParameters(array $parameters):self{
+    /**
+     * Set the parameters
+     * @param array $parameters
+     * @return self
+     */
+    public function setParameters(array $parameters): self
+    {
         $this->params = $parameters;
         return $this;
-     }
-
-     public function where(int $optimusId) {
-        return $this->model->where($this->optimus()->decode($optimusId))->first();
     }
 
-    public function setFillable(): void
+    /**
+     * Where the resource
+     * @param string $field
+     * @param int $optimusId
+     * @return Model
+     */
+    public function where(string $field, int $optimusId): Model
     {
-        $this->fillable = $this->model->getFillable();
+        return $this->model->where($field, $this->optimus()->decode($optimusId))->first();
     }
 
 
-     /***
-      * NOT YET REWRITTEN BELOW
+    /***
+     * NOT YET REWRITTEN BELOW
       NOT YET REWRITTEN BELOW
       NOT YET REWRITTEN BELOW
-      */
+     */
 
     /**
      * Filters query parameters by invoking methods named after each key in the parameter array.
@@ -97,14 +172,23 @@ class BaseRepository implements BaseInterface
     // }
 
     //orderBy=name:asc
-    public function orderBy($param)
+    /**
+     * Order the resource
+     * @param string $param
+     * @return self
+     */
+    public function orderBy(string $param): self
     {
         [$column, $value] = $this->pregSplit('@:@', $param);
         $this->model = $this->model->orderBy($column, $value);
         return $this;
     }
 
-    public function limit()
+    /**
+     * Limit the resource
+     * @return self
+     */
+    public function limit(): self
     {
         $limit = Arr::get($this->params, 'limit', 15);
         $this->model = $this->model->limit($limit);
@@ -112,7 +196,11 @@ class BaseRepository implements BaseInterface
     }
 
     //type=collection
-    public function get()
+    /**
+     * Get the resource
+     * @return Collection|LengthAwarePaginator
+     */
+    public function get(): Collection|LengthAwarePaginator
     {
         if (Arr::get($this->params, 'type', null) === 'collection') {
             return $this->model->get();
@@ -121,21 +209,29 @@ class BaseRepository implements BaseInterface
     }
 
     //&columns=id,name
-    public function columns()
+    /**
+     * Columns the resource
+     * @return self
+     */
+    public function columns(): self
     {
-        $this->model = $this->model->select($this->pregSplit('@,@',  Arr::get( $this->params, 'columns', []) ));
+        $this->model = $this->model->select($this->pregSplit('@,@',  Arr::get($this->params, 'columns', [])));
         return $this;
     }
 
     //&with=itemPrice.unit:id;<;20,images:id;1
-    public function with()
+    /**
+     * With the resource
+     * @return self
+     */
+    public function with(): self
     {
-        
-        $relationships = $this->pregSplit('@,@', Arr::get( $this->params, 'with') );
-        foreach($relationships as $relationship){
-            
+
+        $relationships = $this->pregSplit('@,@', Arr::get($this->params, 'with'));
+        foreach ($relationships as $relationship) {
+
             $pregSplit = $this->pregSplit('@:@', $relationship);
-            if(count($pregSplit) > 1){
+            if (count($pregSplit) > 1) {
                 [$relationTable, $fieldConditionValue] = $this->pregSplit('@:@', $relationship);
 
                 $fieldConditionValueArray = $this->pregSplit('@;@', $fieldConditionValue);
@@ -143,25 +239,21 @@ class BaseRepository implements BaseInterface
                     [$field, $comparison, $value] = $fieldConditionValueArray;
                     $this->model = $this->model->whereRelation($relationTable, $field, $comparison, $this->optimus()->decode($value));
                 } else {
-                    
+
                     [$field, $value] = $fieldConditionValueArray;
-                    
-                    $this->model = $this->model->with([$relationTable => function($q) use ($field, $value) {
-                        if(Arr::get( $this->params, 'isOptimus') === 'false' ){
+
+                    $this->model = $this->model->with([$relationTable => function ($q) use ($field, $value) {
+                        if (Arr::get($this->params, 'isOptimus') === 'false') {
                             return $q->where($field, $value);
                         }
                         return $q->where($field, $this->optimus()->decode($value));
-                       
                     }]);
                 }
-               
-            }else{
+            } else {
                 $this->model = $this->model->with($relationship);
             }
-            
-            
         }
-        
+
         return $this;
     }
 
@@ -174,11 +266,11 @@ class BaseRepository implements BaseInterface
             [$relationTable, $fieldConditionValue] = $this->pregSplit('@:@', $relationship);
             $fieldConditionValueArray = $this->pregSplit('@;@', $fieldConditionValue);
             if (count($fieldConditionValueArray) === 3) {
-                
+
                 [$field, $comparison, $value] = $fieldConditionValueArray;
                 $this->model = $this->model->whereRelation($relationTable, $field, $comparison, $this->optimus()->decode($value));
             } else {
-                
+
                 [$field, $value] = $fieldConditionValueArray;
                 $this->model = $this->model->whereRelation($relationTable, $field, $this->optimus()->decode($value));
             }
@@ -197,19 +289,16 @@ class BaseRepository implements BaseInterface
             $fieldConditionValueArray = $this->pregSplit('@;@', $fieldConditionValue);
             if (count($fieldConditionValueArray) === 3) {
                 [$field, $comparison, $value] = $fieldConditionValueArray;
-                if($comparison == 'in'){
+                if ($comparison == 'in') {
                     $explode = explode('*', $value);
                     $this->model = $this->model->whereRelation($relationTable, fn($q) => $q->whereIn($field, $explode));
-                }
-                else if( $comparison == 'like'){
-                    $this->model = $this->model->whereRelation($relationTable, fn($q) => $q->where($field, 'LIKE' , '%' . $value . '%'));
-                }
-                else{
+                } else if ($comparison == 'like') {
+                    $this->model = $this->model->whereRelation($relationTable, fn($q) => $q->where($field, 'LIKE', '%' . $value . '%'));
+                } else {
                     $this->model = $this->model->whereRelation($relationTable, $field, $comparison, $value);
-                } 
-               
+                }
             } else {
-                
+
                 [$field, $value] = $fieldConditionValueArray;
                 $this->model = $this->model->whereRelation($relationTable, $field, $value);
             }
@@ -227,7 +316,7 @@ class BaseRepository implements BaseInterface
     public function whereHas()
     {
         $relationships = $this->pregSplit('@,@', Arr::get($this->params, 'whereHas', []));
-        
+
         foreach ($relationships as $relationship) {
             [$relationTable, $fieldValue] = $this->pregSplit('@:@', $relationship);
             $fieldValueArray = $this->pregSplit('@;@', $fieldValue);
@@ -236,12 +325,11 @@ class BaseRepository implements BaseInterface
 
                 $this->model = $this->model->whereHas(
                     $relationTable,
-                    function(Builder $query) use ($field, $value) {
+                    function (Builder $query) use ($field, $value) {
                         $explode = explode('.', $value);
                         $query->whereIn($field, $explode);
                     }
                 );
-                
             }
         }
 
@@ -276,29 +364,9 @@ class BaseRepository implements BaseInterface
         return $this;
     }
 
+
+
     
-
-    public function like($column, $value):self
-    {
-        $this->model = $this->model->where($column, 'LIKE', '%' . $value . '%');
-        return $this;
-    }
-
-    public function first()
-    {
-        return $this->model->first();
-    }
-
-    public function findOrFail($id)
-    {
-        $this->model = $this->model->findOrFail($this->optimus()->decode($id));
-        return $this->model;
-    }
-
-    public function create()
-    {
-        return $this->model->create($this->params);
-    }
 
     public function update()
     {
@@ -320,7 +388,7 @@ class BaseRepository implements BaseInterface
     {
 
         if (isset($_FILES["images"])) {
-           
+
 
             foreach ($_FILES["images"]['name'] as $key => $value) {
 
@@ -330,45 +398,45 @@ class BaseRepository implements BaseInterface
                 $this->size = $_FILES["images"]['size'][$key];
                 $uploadfile = file_get_contents($fileTmp);
 
-                \File::put(public_path() . '/images/uploads/' . $this->fileName , $uploadfile);
+                \File::put(public_path() . '/images/uploads/' . $this->fileName, $uploadfile);
 
                 if ($this->request->isPrimary && $this->model->image) {
-                    foreach($this->model->images as $image){
+                    foreach ($this->model->images as $image) {
                         $image->update([
                             'is_primary' => 0
                         ]);
                     }
 
-                    if($this->name == $this->request->primaryName){
+                    if ($this->name == $this->request->primaryName) {
                         $this->imageUploadIsPrimary(true);
-                    }else{
+                    } else {
                         $this->imageUploadIsPrimary(false);
                     }
-                    
-
-                }else{
-                    if($key == 0){
+                } else {
+                    if ($key == 0) {
                         $this->imageUploadIsPrimary(true);
-                    }else{
+                    } else {
                         $this->imageUploadIsPrimary(false);
                     }
                 }
             }
         }
-        
     }
 
-   
 
-    public function all(){
+
+    public function all()
+    {
         return $this->model->all();
     }
 
-    public function noDecodeWhere($field, $condition, $value){
+    public function noDecodeWhere($field, $condition, $value)
+    {
         return $this->model->where($field, $condition, $value);
     }
 
-    public function decodeWhere($field, $value){
+    public function decodeWhere($field, $value)
+    {
         return $this->model->where($field, $this->optimus()->decode($value));
     }
 
@@ -388,7 +456,7 @@ class BaseRepository implements BaseInterface
                 $fileTmp = $_FILES["files"]['tmp_name'][$key];
                 $this->size = $_FILES["files"]['size'][$key];
                 $uploadfile = file_get_contents($fileTmp);
-                \File::put(public_path() . '/images/uploads/' . $this->fileName , $uploadfile);
+                \File::put(public_path() . '/images/uploads/' . $this->fileName, $uploadfile);
 
                 $image = new Image([
                     'thumbnail' => 'images/uploads/' . $this->fileName,
@@ -399,16 +467,13 @@ class BaseRepository implements BaseInterface
                 ]);
 
                 $this->model->first()->images()->save($image);
-
             }
-
-           
         }
         $this->deletedFiles();
-        
     }
 
-    protected function deletedFiles(){
+    protected function deletedFiles()
+    {
         $request = app()->make('request');
         if ($request->deletedFiles) {
             foreach ($request->deletedFiles as $id) {
@@ -423,5 +488,4 @@ class BaseRepository implements BaseInterface
             }
         }
     }
-
 }

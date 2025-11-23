@@ -17,8 +17,4 @@ class CategoryController extends ApiController
         $this->updateRequest = CategoryRequest::class;
     }
 
-    protected function getResource() : BaseResource {
-        return new BaseResource( $this->result );
-    }
-
 }

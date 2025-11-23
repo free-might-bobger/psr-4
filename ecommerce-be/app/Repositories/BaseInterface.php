@@ -11,7 +11,7 @@ interface BaseInterface {
 	public function columns();
 	public function with();
 	public function relation();
-	public function like($column, $value);
+	public function like(string $column, string $value): self;
 	public function first();
 
 	/**
