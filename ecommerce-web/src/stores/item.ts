@@ -16,7 +16,7 @@ interface ItemObjectState {
     items: Array<ItemState>,
     item: ItemState,
     searchString: string,
-    selectedCategory: string | null
+    selectedCategory: string
 }
 
 const itemFields = {
@@ -31,7 +31,7 @@ const itemFields = {
 }
 export const useItemStore = defineStore('items', {
     state: () : ItemObjectState => ({
-        selectedCategory: null,
+        selectedCategory: '',
         items: [],
         item: itemFields,
         searchString: ''

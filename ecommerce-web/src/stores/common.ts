@@ -31,16 +31,18 @@ export const useCommonStore = defineStore('common', {
   actions: {
     async setResultPagination(payload: any, loading = true) {
       const response = await get(payload, loading);
-      const meta = response.data.meta
-      const data = response.data.data
-      this.result = data
-      if (meta) {
-        this.pagination.page = meta.current_page;
-        this.pagination.rowsPerPage = meta.per_page;
-        this.pagination.rowsNumber = meta.total;
-        this.pagination.from = meta.from;
-        this.pagination.to = meta.to;
-        this.pagination.lastPage = meta.last_page;
+      if (response && typeof response === 'object' && 'data' in response) {
+        const meta = (response as any).data.meta
+        const data = (response as any).data.data
+        this.result = data
+        if (meta) {
+          this.pagination.page = meta.current_page;
+          this.pagination.rowsPerPage = meta.per_page;
+          this.pagination.rowsNumber = meta.total;
+          this.pagination.from = meta.from;
+          this.pagination.to = meta.to;
+          this.pagination.lastPage = meta.last_page;
+        }
       }
   
     }

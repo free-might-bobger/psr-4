@@ -123,9 +123,12 @@ interface PriceInterface {
 }
 
 export interface ItemInterface {
+  id: number;
+  optimus_id: number;
   name: string;
   description: string;
   images?: string[]; // Assuming it's an array of strings
+  primary_img?: { path_thumbnail?: string } | null;
   unit?: UnitInterface
   category?: CategoryInterface|null
   item_price?: PriceInterface[]

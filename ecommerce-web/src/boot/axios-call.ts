@@ -139,11 +139,11 @@ export async function get(
       return res;
     })
     .catch((err) => {
-      if(err.status === ERROR_CODE.UNAUTHORIZED){
-        logout()
-        window.location.href = '/'
-      }
-      return err;
+      // if(err.status === ERROR_CODE.UNAUTHORIZED){
+      //   logout()
+      //   window.location.href = '/'
+      // }
+      // return err;
     });
 }
 

@@ -31,7 +31,7 @@
     <div class="wrapper">
       <div class="flex-container">
         <router-link :to="`/public_stores/${route.params.id}/item/${val.optimus_id}`" class="generic-box"
-          v-for="val in result" :key="val.id">
+          :style="result.length <= 2 ? { maxWidth: '390px' } : {}" v-for="val in result" :key="val.id">
           <div class="row">
             <div class="col-4">
               <img :src="val.primary_img?.path_thumbnail" width="100" class="item-image" />
@@ -42,7 +42,7 @@
                   <br />
                   <div style="font-weight: bold">{{ val.name }}</div>
                   <div class="q-mt-sm">
-                    {{ getPriceRange(val.item_price) }}
+                    {{ getPriceRange(val.item_price || []) }}
                   </div>
                 </span>
               </div>
@@ -62,30 +62,33 @@
 import { useItemStore } from 'src/stores/item';
 import { storeToRefs } from 'pinia';
 import { useRoute } from 'vue-router';
-import { onMounted, ref, watch } from 'vue';
+import { onMounted, ref, watch, computed } from 'vue';
 import { get, show } from 'src/boot/axios-call';
 import { useCommonStore } from 'src/stores/common';
 import { getPriceRange } from 'src/boot/utilities';
 import BreadCrumbsWrapper from 'src/components/BreadCrumbsWrapper.vue'
-import { truncateString } from 'src/boot/common';
+import { ItemInterface } from 'src/boot/interfaces';
 
 const useItem = useItemStore();
 const { searchString, selectedCategory } = storeToRefs(useItem);
 const useCommon = useCommonStore();
-const { lat, lng, mobile } = storeToRefs(useCommon);
 
-const { pagination, result } = storeToRefs(useCommon);
-const store = ref({
+const { pagination, result: resultRef } = storeToRefs(useCommon);
+const result = computed(() => resultRef.value as ItemInterface[]);
+const store = ref<{
+  id?: number;
+  name: string;
+  logo: { path_url: string };
+  default_address: {
+    complete_address: string;
+  };
+}>({
   name: '',
   logo: { path_url: '' },
   default_address: {
     complete_address: '',
   },
 });
-const markerDrag = (e: { latLng: google.maps.LatLng }) => {
-  lat.value = e.latLng.lat();
-  lng.value = e.latLng.lng();
-};
 
 const storeId = ref();
 const route = useRoute();
@@ -106,6 +109,8 @@ const showStore = async () => {
 
 const categories = ref([]);
 const getCategories = async () => {
+  if (!store.value.id) return;
+
   let cat = await get(
     {
       message: 'Getting Categories',
@@ -119,7 +124,9 @@ const getCategories = async () => {
     false
   );
 
-  categories.value = cat.data.data;
+  if (cat && typeof cat === 'object' && 'data' in cat) {
+    categories.value = (cat as any).data.data;
+  }
 };
 
 const onRequest = async () => {
@@ -128,13 +135,13 @@ const onRequest = async () => {
     filters = `store_id:${storeId.value},` + 'name:' + searchString.value;
   }
 
-  if (selectedCategory.value) {
-    filters += ',category_id:' + selectedCategory.value?.id;
+  if (selectedCategory.value && typeof selectedCategory.value === 'object' && 'id' in selectedCategory.value) {
+    filters += ',category_id:' + (selectedCategory.value as any).id;
   }
 
   useCommon.setResultPagination(
     {
-      entity: 'items',
+      entity: 'public_items',
       query: {
         with: 'images:is_primary;1,itemPrice.unit,store',
         filters: filters,
@@ -150,6 +157,7 @@ const onRequest = async () => {
 onMounted(() => {
 
   showStore();
+  onRequest();
 });
 
 // useCommon.$subscribe(async (mutation, state) => {
@@ -177,5 +185,4 @@ watch(searchString, () => {
   border-radius: 5px;
   padding: 8px;
 }
-
 </style>
