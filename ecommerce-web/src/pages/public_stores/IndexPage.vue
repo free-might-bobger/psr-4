@@ -1,22 +1,25 @@
 <template>
-  <div style="margin: 5px">
-    <div class="row q-gutter-xs">
-      <div class="col-12">
-        <BreadCrumbsWrapper :bread-crumbs="[{
-          name: truncateString(store.name, 20),
-          path: ''
-        }]" />
+  <div class="q-ma-sm">
+    <div class="row q-col-gutter-xs">
+      <div class="col-md-6 col-xs-12">
+        <div class="flex items-center breadcrumbs-container">
+          <BreadCrumbsWrapper :bread-crumbs="[{
+            name: store.name,
+            path: ''
+          }]" />
+        </div>
+
       </div>
-      <div class="col">
+      <div class="col-md-3 col-xs-6">
         <q-select outlined v-model="selectedCategory" :options="categories" label="Select Category" hide-bottom-space
-          use-input dense>
+          use-input dense class="category-select">
           <template v-slot:append>
             <q-icon v-if="selectedCategory !== ''" name="close" @click.stop.prevent="selectedCategory = ''"
               class="cursor-pointer" />
           </template>
         </q-select>
       </div>
-      <div class="col">
+      <div class="col-md-3 col-xs-6">
         <q-input outlined dense v-model="searchString" placeholder="Search Item..." debounce="800">
           <template v-slot:prepend>
             <q-icon v-if="searchString === ''" name="search" />
@@ -145,7 +148,7 @@ const onRequest = async () => {
 };
 
 onMounted(() => {
-  
+
   showStore();
 });
 
@@ -165,3 +168,14 @@ watch(searchString, () => {
   onRequest();
 });
 </script>
+
+
+<style scoped>
+.breadcrumbs-container {
+  height: 40px;
+  border: 1px solid #c2c2c2;
+  border-radius: 5px;
+  padding: 8px;
+}
+
+</style>

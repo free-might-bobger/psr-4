@@ -174,6 +174,7 @@ export interface StoreInterface {
   latitude: number
   longitude: number
   distance: number
+  optimus_id: number
 }
 interface OrderInterface {
   id: string

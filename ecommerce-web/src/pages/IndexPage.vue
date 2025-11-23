@@ -19,7 +19,7 @@
       }" :pin-options="{ background: '#34A853' }" @click="handleClickStoreAdvanceMarker(store)">
         <InfoWindow :options="{ headerContent: store.name, disableAutoPan: false }">
           <div class="my-window">
-            <a :href="`/public_stores/${store.id}`">View to Store</a>
+            <a :href="`/public_stores/${store.optimus_id}`">View to Store</a>
           </div>
         </InfoWindow>
       </AdvancedMarker>
