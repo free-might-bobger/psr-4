@@ -34,7 +34,7 @@ abstract class ApiController extends Controller {
      * @return BaseResource
      */
     public function show( int $id ) : BaseResource {
-        $this->result = $this->repository->where( 'id', $id )->first();
+        $this->result = $this->repository->where( 'id', $id );
         return $this->getResource();
     }
 

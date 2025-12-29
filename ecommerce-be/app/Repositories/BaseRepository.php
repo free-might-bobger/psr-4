@@ -228,6 +228,7 @@ class BaseRepository implements BaseInterface
     {
 
         $relationships = $this->pregSplit('@,@', Arr::get($this->params, 'with'));
+
         foreach ($relationships as $relationship) {
 
             $pregSplit = $this->pregSplit('@:@', $relationship);

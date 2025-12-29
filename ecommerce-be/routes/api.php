@@ -25,7 +25,7 @@ use App\Http\Controllers\ {
     CustomerTransactionController,
     MyStoreController,
     ItemPriceController,
-    PublicItemController,
+    PublicStoreItemController,
     StoreMenuAccessController
 }
 ;
@@ -61,7 +61,7 @@ Route::group( [ 'middleware' => 'auth:api' ], function () {
 });
 
  Route::get('listing_api', [ListingApiController::class, 'index']);
- Route::resource('public_items', PublicItemController::class)->only(['index']);
+ Route::resource('public_store_items', PublicStoreItemController::class)->only(['index', 'show']);
 
  /**
   * UPDATED 08-20-2024

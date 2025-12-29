@@ -137,7 +137,7 @@ const onRequest = async () => {
 
   useCommon.setResultPagination(
     {
-      entity: 'public_items',
+      entity: 'public_store_items',
       query: {
         with: 'images:is_primary;1,itemPrice.unit,store',
         filters: filters,
@@ -173,13 +173,3 @@ watch(searchString, () => {
   onRequest();
 });
 </script>
-
-
-<style scoped>
-.breadcrumbs-container {
-  height: 40px;
-  border: 1px solid #c2c2c2;
-  border-radius: 5px;
-  padding: 8px;
-}
-</style>

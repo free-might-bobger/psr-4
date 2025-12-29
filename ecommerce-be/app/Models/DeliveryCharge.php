@@ -8,7 +8,7 @@ use App\Http\Requests\BaseIndexRequest;
 use App\Services\DeliveryChargeService;
 use Illuminate\Support\Arr;
 use App\Traits\Google\Maps;
-
+use Optimus\Obfuscate\Optimus;
 use Config;
 
 class DeliveryCharge extends Model
@@ -25,13 +25,10 @@ class DeliveryCharge extends Model
 
     public function getDeliveryAmountAttribute(): int {
         $request = app()->make( 'request' );
-
-        $stores = [];
-        foreach ( explode( ',', $request->storeIds ) as $storeId ) {
-            $store = Store::where( 'id', $storeId )->first();
-            $distance = Maps::calculateDistance( $store->latitude, $store->longitude, $request->latitude, $request->longitude );
-            $stores[] = [ $storeId => $store->distance ];
-        }
+        $storeId = $request->storeIds;
+        $store = Store::where( 'id', $storeId )->first();
+        $distance = Maps::calculateDistance( $store->latitude, $store->longitude, $request->latitude, $request->longitude );
+        $stores[] = [ $storeId => $store->distance ];
 
         $currentDistance = 0;
         $storeDistance = 0;

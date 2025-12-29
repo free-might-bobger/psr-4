@@ -7,9 +7,12 @@ interface CartItem {
   id: number;
   optimus_id: number;
   name: string;
-  item_price: Array<{ item_price: Array<{ unit_id: number; price: number; unit: object }> }>
+  count?: number;
+  store_id?: number;
+  item_price: Array<{ unit_id: number; online_price: number; price: number; unit: { id: number; name: string } }>
   variations: Array<{ unit: number; count: number }>
   primary_img: { path_url: string}
+  store: { optimus_id: number }
 }
 
 
@@ -24,23 +27,26 @@ export const useUserCartStore = defineStore('userCart', {
   getters: {
     countTotalItems: (state) =>
       state.cart.reduce(
-        (total, current) => parseInt(total) + parseInt(current.count),
+        (total, current) => total + (current.count || 0),
         0
       ),
     groupByStore: (state) => {
-      const key = 'store_id';
+      const key = 'store_id' as keyof CartItem;
       return state.cart.reduce(
-        (hash, obj) => ({
-          ...hash,
-          [obj[key]]: (hash[obj[key]] || []).concat(obj),
-        }),
-        {}
+        (hash: Record<number, CartItem[]>, obj) => {
+          const storeId = obj[key] as number | undefined;
+          if (storeId !== undefined) {
+            hash[storeId] = (hash[storeId] || []).concat(obj);
+          }
+          return hash;
+        },
+        {} as Record<number, CartItem[]>
       );
     },
     total: (state) => {
-      const purchasesTotal = state.cart.reduce((total, current: { variations: Array<{ count: number, unit: number}>}) => {
+      const purchasesTotal = state.cart.reduce((total, current) => {
         // Iterate over each variation to find the corresponding price
-        current.variations?.forEach((variation: { count: number, unit: number}) => {
+        current.variations?.forEach((variation) => {
           // Look through all itemPrice entries to find a matching unit_id
           for (const item of current.item_price) {
             if (item.unit_id === variation.unit) {
@@ -61,12 +67,12 @@ export const useUserCartStore = defineStore('userCart', {
     }
   },
   actions: {
-    addQty(payload: object) {
+    addQty(payload: CartItem) {
       const cartIndex = this.cart.findIndex(
         (v) => v.optimus_id === payload.optimus_id
       );
       if (cartIndex > -1) {
-       this.cart[cartIndex].count =  this.cart[cartIndex].count + payload.count
+       this.cart[cartIndex].count =  (this.cart[cartIndex].count || 0) + (payload.count || 0);
        this.cart[cartIndex].variations.push(payload.variations[0])
       } else {
         this.cart.push(payload);

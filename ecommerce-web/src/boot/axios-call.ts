@@ -267,7 +267,6 @@ export async function onRequest(
 }
 
 export const nextPage = (entityQuery: GetParams) => {
-  console.log('entityQuery');
   if(entityQuery.query.page){
     entityQuery.query.page++;
   }
