@@ -4,10 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Repositories\CustomerTransactionRepository;
 use App\Http\Requests\BaseIndexRequest;
+use App\Http\Requests\TransactionRequest;
 use App\Models\Transaction;
+use Illuminate\Support\Facades\Auth;
 
 class CustomerTransactionController extends ApiController
 {
+    protected $model;
     public function __construct( CustomerTransactionRepository $repository ) {
         $this->model            =  Transaction::class;
         $this->repository       = $repository;
@@ -24,6 +27,6 @@ class CustomerTransactionController extends ApiController
         /**
          * result is limited to this user_id only.
          */
-        $this->params['user_id'] = \Auth::User()->id; 
+        $this->params['user_id'] = Auth::user()->id; 
     }
 }

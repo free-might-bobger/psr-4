@@ -17,12 +17,21 @@ export const addComma = (val: object) => {
   }
 };
 
-export const getPriceRange = (priceArray: Array<object>) => {
-  if (!priceArray) {
+interface PriceItem {
+  online_price?: number;
+  price?: number;
+}
+
+export const getPriceRange = (priceArray: Array<PriceItem>) => {
+  if (!priceArray || priceArray.length === 0) {
     return '';
   }
-  // Extract online prices from the array
-  const prices = priceArray.map((item) => item.online_price);
+  // Extract online prices from the array (fallback to price if online_price doesn't exist)
+  const prices = priceArray.map((item) => item.online_price ?? item.price ?? 0).filter(price => price > 0);
+
+  if (prices.length === 0) {
+    return '';
+  }
 
   // Find the minimum and maximum prices
   const minPrice = Math.min(...prices);

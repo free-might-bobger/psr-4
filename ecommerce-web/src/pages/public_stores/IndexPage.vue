@@ -28,29 +28,25 @@
         </q-input>
       </div>
     </div>
-    <div class="wrapper">
-      <div class="flex-container">
-        <router-link :to="`/public_stores/${route.params.id}/item/${val.optimus_id}`" class="generic-box"
-          :style="result.length <= 2 ? { maxWidth: '390px' } : {}" v-for="val in result" :key="val.id">
-          <div class="row">
-            <div class="col-4">
-              <img :src="val.primary_img?.path_thumbnail" width="100" class="item-image" />
-            </div>
-            <div class="col">
-              <div class="item-wrapper">
-                <span class="item-desc">
-                  <br />
-                  <div style="font-weight: bold">{{ val.name }}</div>
-                  <div class="q-mt-sm">
-                    {{ getPriceRange(val.item_price || []) }}
-                  </div>
-                </span>
+    <div class="main-store-wrapper">
+      <router-link :to="`/public_stores/${route.params.id}/item/${val.optimus_id}`" class="main-store-generic-box"
+        :class="{ 'main-store-generic-box-large': result.length <= 2 }" v-for="val in result" :key="val.id">
+        <div class="row">
+          <div class="col-12">
+            <img :src="val.primary_img?.path_thumbnail" width="100" class="main-store-item-image" />
+          </div>
+          <div class="col-12">
+            <div class="main-store-item-wrapper">
+              <div class="main-store-item-desc">
+                <div class="main-store-item-name">{{ val.name }}</div>
+                <div class="main-store-item-price q-mt-sm">
+                  {{ getPriceRange(val.item_price || []) }}
+                </div>
               </div>
             </div>
-
           </div>
-        </router-link>
-      </div>
+        </div>
+      </router-link>
     </div>
     <br />
     <div class="q-pa-sm flex flex-center" v-if="result.length > 0" outline>
@@ -141,7 +137,7 @@ const onRequest = async () => {
 
   useCommon.setResultPagination(
     {
-      entity: 'public_items',
+      entity: 'public_store_items',
       query: {
         with: 'images:is_primary;1,itemPrice.unit,store',
         filters: filters,
@@ -160,13 +156,14 @@ onMounted(() => {
   onRequest();
 });
 
-// useCommon.$subscribe(async (mutation, state) => {
-//   if (mutation.events) {
-//     if (mutation.events?.key == 'page') {
-//       onRequest();
-//     }
-//   }
-// });
+useCommon.$subscribe(async (mutation, state) => {
+  if (mutation.events) {
+    const events = Array.isArray(mutation.events) ? mutation.events : [mutation.events];
+    if (events.some(event => event.key === 'page')) {
+      onRequest();
+    }
+  }
+});
 
 watch(selectedCategory, () => {
   onRequest();
@@ -176,13 +173,3 @@ watch(searchString, () => {
   onRequest();
 });
 </script>
-
-
-<style scoped>
-.breadcrumbs-container {
-  height: 40px;
-  border: 1px solid #c2c2c2;
-  border-radius: 5px;
-  padding: 8px;
-}
-</style>

@@ -249,6 +249,5 @@ const onSubmit = async () => {
 };
 
 const filterFn = () => {
-  console.log('asf');
 };
 </script>

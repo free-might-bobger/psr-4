@@ -5,7 +5,7 @@ namespace App\Repositories;
 use App\Models\Transaction;
 use App\Models\ItemPrice;
 use App\Enum\Status;
-use Auth;
+use Illuminate\Support\Facades\Auth;
 
 class TransactionRepository extends BaseRepository implements BaseInterface
  {
@@ -26,7 +26,7 @@ class TransactionRepository extends BaseRepository implements BaseInterface
         float $total,
     ): Transaction {
 
-        $user = Auth::User();
+        $user = Auth::user();
         return $this->model->create( [
             'user_id'               => $user->id,
             'payment_method_id'     => $selectedPaymenthMethod,

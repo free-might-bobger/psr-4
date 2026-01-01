@@ -2,7 +2,7 @@ import { isEmailUnique } from './axios-call';
 import { ErrorValidationInterface } from './interfaces';
 
 export const isValidMobileNumber = (mobile: string): boolean => {
-  const mobileNumberPattern = /^\d{11}$/;
+  const mobileNumberPattern = /^\d{10}$/;
   return mobileNumberPattern.test(mobile);
 }
 
@@ -13,21 +13,21 @@ export const validateRequired = (val: object) => {
   return false;
 };
 
-export const validateUniqueEmail = async (email: string): Promise<Result | null> => {
+export const validateUniqueEmail = async (email: string): Promise<ErrorValidationInterface> => {
   
   const isUnique = await isEmailUnique({
     email: email,
   });
   if (!isUnique) {
     return {
-      error: 'Email already exist.',
+      message: 'Email already exist.',
       status: false,
     };
   }
 
   return {
-    error: '',
-    status: false,
+    message: '',
+    status: true,
   };
 };
 
