@@ -15,11 +15,6 @@ class ReceiveMethodController extends ApiController
         $this->indexRequest = BaseIndexRequest::class;
     }
 
-    public function getResource()
-    {
-        return new BaseResource($this->result);
-    }
-
     public function isPublicRoute(string $routeName): Bool {
         return true;
     }

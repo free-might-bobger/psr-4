@@ -5,8 +5,12 @@ namespace App\Http\Controllers;
 use App\Repositories\TransactionRepository;
 use App\Http\Requests\TransactionRequest;
 use App\Models\Transaction;
+use App\Http\Requests\BaseIndexRequest;
+use App\Http\Resources\BaseResource;
 
 class TransactionController extends ApiController {
+
+    protected $model;
     public function __construct( TransactionRepository $repository ) {
         $this->model =  Transaction::class;
         $this->repository = $repository;
@@ -19,7 +23,7 @@ class TransactionController extends ApiController {
         return true;
     }
 
-    public function store() {
+    public function store(): BaseResource {
         
         $request = app($this->storeRequest);
         $this->result = $this->repository

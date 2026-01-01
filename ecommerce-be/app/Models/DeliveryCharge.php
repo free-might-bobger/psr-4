@@ -8,12 +8,12 @@ use App\Http\Requests\BaseIndexRequest;
 use App\Services\DeliveryChargeService;
 use Illuminate\Support\Arr;
 use App\Traits\Google\Maps;
-use Optimus\Obfuscate\Optimus;
+use App\Traits\Obfuscate\OptimusRequiredToModel;
 use Config;
 
 class DeliveryCharge extends Model
  {
-    use HasFactory;
+    use HasFactory, OptimusRequiredToModel;
 
     protected $table = 'delivery_charges';
     protected $fillable = [
@@ -26,7 +26,7 @@ class DeliveryCharge extends Model
     public function getDeliveryAmountAttribute(): int {
         $request = app()->make( 'request' );
         $storeId = $request->storeIds;
-        $store = Store::where( 'id', $storeId )->first();
+        $store = Store::where( 'id', $this->optimus()->decode( $storeId ) )->first();
         $distance = Maps::calculateDistance( $store->latitude, $store->longitude, $request->latitude, $request->longitude );
         $stores[] = [ $storeId => $store->distance ];
 

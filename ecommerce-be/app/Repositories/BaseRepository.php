@@ -97,6 +97,7 @@ class BaseRepository implements BaseInterface
             }
         }
         $this->with();
+        $this->orderBy(Arr::get($parameters, 'orderBy', 'created_at:desc'));
         return $this;
     }
 
@@ -109,6 +110,7 @@ class BaseRepository implements BaseInterface
     {
         $limit = Arr::get($this->params, 'limit', 12);
         $type  = Arr::get($this->params, 'type', false);
+        
         if ($type) {
             return $this->model->take($limit)->get();
         }
