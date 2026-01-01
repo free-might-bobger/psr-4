@@ -1,117 +1,112 @@
 <template>
-  <div class="q-ma-sm">
-    <div class="row q-gutter-md">
+  <div class="checkout-container">
+    <div class="row q-gutter-md q-mb-md">
       <div class="col-12">
-        <BreadCrumbsWrapper
-          :bread-crumbs="[
-            {
-              name: 'Cart',
-              path: '/cart',
-            },
-            {
-              name: 'Checkout',
-              path: '',
-            },
-          ]"
-        />
+        <BreadCrumbsWrapper :bread-crumbs="[
+          {
+            name: 'Cart',
+            path: '/cart',
+          },
+          {
+            name: 'Checkout',
+            path: '',
+          },
+        ]" />
       </div>
     </div>
 
-    <div class="row">
-      <div class="col-12">
-        <GoogleMap
-          class="q-mt-sm"
-          :api-key="GOOGLE_MAP_API_KEY"
-          :map-id="GOOGLE_MAP_ID"
-          style="height: 350px"
-          :center="{ lat: lat, lng: lng }"
-          :zoom="15"
-          :draggable="true"
-          :clickable-icons="false"
-        >
-          <AdvancedMarker
-            :options="{
+    <div class="text-h5 text-weight-bold q-mb-md">
+      <q-icon name="location_on" class="q-mr-sm" />
+      Delivery Location
+    </div>
+
+    <!-- Map Section -->
+    <q-card flat bordered class="map-card q-mb-lg">
+      <q-card-section class="q-pa-none">
+        <GoogleMap :api-key="GOOGLE_MAP_API_KEY" :map-id="GOOGLE_MAP_ID" class="checkout-map"
+          :center="{ lat: lat, lng: lng }" :zoom="15" :draggable="true" :clickable-icons="false">
+          <AdvancedMarker :options="{
+            position: { lat: lat, lng: lng },
+            gmpDraggable: false,
+            title: 'Delivery Location',
+          }" @drag="markerDrag" :pin-options="{ background: '#FBBC04' }">
+            <InfoWindow v-model="showInfoWindow" :options="{
               position: { lat: lat, lng: lng },
-              gmpDraggable: false,
-              title: 'MARKER',
-            }"
-            @drag="markerDrag"
-            :pin-options="{ background: '#FBBC04' }"
-          >
-            <InfoWindow
-              v-model="showInfoWindow"
-              :options="{
-                position: { lat: lat, lng: lng },
-                headerContent: 'My Location',
-              }"
-            >
+              headerContent: 'Delivery Location',
+            }">
             </InfoWindow>
           </AdvancedMarker>
         </GoogleMap>
-      </div>
-    </div>
-    <br />
-    <div class="row" v-if="hasVerificationCode === false && !profile.token">
-      <div class="col-12">
-        <q-form @submit="getVerificationCode" ref="myForm">
-          <q-input
-            v-model="mobile"
-            class="full-width"
-            outlined
-            dense
-            label="Enter mobile number"
-            :rules="[
-              async (val) =>
-                isValidMobileNumber(val) ||
-                'Please enter a valid mobile number.',
-            ]"
-            hide-bottom-space
-          />
-          <div class="flex justify-between">
-            <q-btn
-              class="q-mt-sm full-width"
-              color="primary"
-              @click="getVerificationCode"
-              unelevated
-              >Get Passcode</q-btn
-            >
-          </div>
-        </q-form>
-      </div>
-    </div>
-    <div class="row" v-if="profile.token && countTotalItems > 0">
-      <div class="col-12">
-        <q-btn
-          class="full-width"
-          label="Complete My Order"
-          color="primary"
-          @click="processCustomerOrder"
-          unelevated
-        />
-      </div>
-    </div>
-    <q-dialog v-model="showPassCodeModal" persistent>
-      <q-form @submit="verifyPassCode" ref="verifyForm"></q-form>
-      <q-card>
+      </q-card-section>
+      <q-card-section class="q-pt-sm">
+        <div class="text-caption text-grey-7">
+          <q-icon name="info" size="xs" class="q-mr-xs" />
+          Drag the marker to set your delivery location
+        </div>
+      </q-card-section>
+    </q-card>
+
+    <!-- Authentication Section -->
+    <div v-if="hasVerificationCode === false && !profile.token" class="auth-section q-mb-lg">
+      <q-card flat bordered class="auth-card">
         <q-card-section>
-          <q-input
-            v-model="passCode"
-            label="Enter Passcode"
-            outlined
-            class="full-width"
-            :rules="[
-              (val) => (val && val.length > 0) || 'Passcode is required.',
-            ]"
-          />
-          <div>
-            <q-btn flat label="Cancel" color="primary" v-close-popup />
-            <q-btn
-              flat
-              label="Complete My Order"
-              color="primary"
-              @click="verifyPassCode"
-            />
+          <div class="text-h6 text-weight-bold q-mb-md">
+            <q-icon name="phone_android" class="q-mr-sm" />
+            Verify Your Mobile Number
           </div>
+          <q-form @submit="getVerificationCode" ref="myForm">
+            <q-input v-model="mobile" class="full-width q-mb-md" outlined label="Enter mobile number"
+              placeholder="9XX XXX XXXX" :rules="[
+                async (val) =>
+                  isValidMobileNumber(val) ||
+                  'Please enter a valid mobile number.',
+              ]" hide-bottom-space prefix="+63">
+              <template v-slot:prepend>
+                <q-icon name="phone" />
+              </template>
+            </q-input>
+            <q-btn class="full-width" color="primary" unelevated size="lg"
+              icon="verified_user" label="Get Verification Code" type="submit" />
+          </q-form>
+        </q-card-section>
+      </q-card>
+    </div>
+
+    <!-- Complete Order Button -->
+    <div v-if="profile.token && countTotalItems > 0" class="complete-order-section">
+      <q-btn class="complete-order-btn full-width" label="Complete My Order" color="primary"
+        @click="processCustomerOrder" unelevated size="lg" icon="check_circle" />
+    </div>
+    <!-- Passcode Verification Modal -->
+    <q-dialog v-model="showPassCodeModal" persistent>
+      <q-card class="passcode-modal">
+        <q-card-section class="row items-center q-pb-none">
+          <div class="text-h6 text-weight-bold">
+            <q-icon name="lock" class="q-mr-sm" />
+            Enter Verification Code
+          </div>
+          <q-space />
+          <q-btn icon="close" flat round dense v-close-popup />
+        </q-card-section>
+
+        <q-card-section>
+          <q-form @submit="verifyPassCode" ref="verifyForm">
+            <div class="text-body2 text-grey-7 q-mb-md">
+              We've sent a verification code to your mobile number. Please enter it below.
+            </div>
+            <q-input v-model="passCode" label="Enter Verification Code" outlined class="full-width q-mb-md" :rules="[
+              (val) => (val && val.length > 0) || 'Verification code is required.',
+            ]" mask="######" placeholder="000000">
+              <template v-slot:prepend>
+                <q-icon name="vpn_key" />
+              </template>
+            </q-input>
+            <div class="row q-gutter-sm">
+              <q-btn flat label="Cancel" color="grey-7" v-close-popup class="col" />
+              <q-btn label="Verify & Complete Order" color="primary" unelevated class="col"
+                icon="check_circle" type="submit" />
+            </div>
+          </q-form>
         </q-card-section>
       </q-card>
     </q-dialog>
@@ -134,7 +129,6 @@ import { useUserStore } from 'src/stores/user';
 import {
   ItemOrder,
   CustomerOrder,
-  GroupStoreItemsInterface,
   GroupStoreItemInterface,
 } from 'src/boot/interfaces';
 import type { QForm } from 'quasar';
@@ -169,7 +163,7 @@ const getVerificationCode = async () => {
         {
           entity: 'create-new-activation-code',
           data: {
-            mobile: mobile.value,
+            mobile: 0 + mobile.value,
           },
         },
         true,
@@ -201,7 +195,7 @@ const verifyPassCode = async () => {
           entity: 'verify-passcode',
           data: {
             passCode: passCode.value,
-            mobile: mobile.value,
+            mobile: 0 + mobile.value,
           },
         },
         true,
@@ -222,7 +216,7 @@ const verifyPassCode = async () => {
       showPassCodeModal.value = false;
 
       const loginResult = await login({
-        mobile: mobile.value,
+        mobile: 0 + mobile.value,
         password: passCode.value,
       });
 
@@ -240,25 +234,25 @@ const passCode = ref('');
 
 const processCustomerOrder = async () => {
   let customerOrders: CustomerOrder[] = [];
-  Object.entries(groupByStore.value as Record<string, GroupStoreItemInterface[]>).forEach(
-  ([key, items]) => {
-    const itemOrders: ItemOrder[] = items.map(
-      (item: GroupStoreItemInterface) => {
-        return {
-          item_id: item.id,
-          variations: item.variations,
-          qty: item.count,
-          unit_id: item.unit_id
-        };
-      }
-    );
+  Object.entries(groupByStore.value as unknown as Record<string, GroupStoreItemInterface[]>).forEach(
+    ([key, items]) => {
+      const itemOrders: ItemOrder[] = items.map(
+        (item: GroupStoreItemInterface) => {
+          return {
+            item_id: item.id,
+            variations: item.variations,
+            qty: item.count,
+            unit_id: item.unit_id
+          };
+        }
+      );
 
-    customerOrders.push({
-      store_id: key,
-      items: itemOrders,
-    });
-  }
-);
+      customerOrders.push({
+        store_id: key,
+        items: itemOrders,
+      });
+    }
+  );
 
   const result = await create(
     {
@@ -284,8 +278,86 @@ const processCustomerOrder = async () => {
 };
 </script>
 
+<style scoped lang="scss">
+.checkout-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+.map-card {
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+}
+
+.checkout-map {
+  height: 400px;
+  width: 100%;
+  border-radius: 12px 12px 0 0;
+}
+
+.auth-section {
+  margin-top: 32px;
+}
+
+.auth-card {
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.complete-order-section {
+  margin-top: 32px;
+}
+
+.complete-order-btn {
+  height: 56px;
+  font-size: 18px;
+  font-weight: 600;
+  border-radius: 8px;
+  letter-spacing: 0.5px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+  }
+}
+
+.passcode-modal {
+  min-width: 400px;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+
+  .q-card__section {
+    padding: 24px;
+  }
+}
+
+@media (max-width: 600px) {
+  .checkout-container {
+    padding: 8px;
+  }
+
+  .checkout-map {
+    height: 300px;
+  }
+
+  .passcode-modal {
+    min-width: 90%;
+    margin: 16px;
+  }
+
+  .complete-order-btn {
+    height: 48px;
+    font-size: 16px;
+  }
+}
+</style>
+
 <style>
-/* Scoped CSS for Vue component */
+/* Global styles for Google Maps */
 .gm-style-iw button.gm-ui-hover-effect {
   display: none !important;
 }

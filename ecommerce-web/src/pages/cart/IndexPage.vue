@@ -84,7 +84,7 @@
             <q-card-section>
               <div class="text-subtitle1 text-weight-bold q-mb-md">
                 <q-icon name="local_shipping" class="q-mr-sm" />
-                Delivery Method
+                Order Fulfillment
               </div>
               <div class="row q-col-gutter-sm">
                 <div class="col-12" v-for="receiveMethod in receiveMethods" :key="receiveMethod.id">
