@@ -3,14 +3,14 @@
     <!-- Header -->
     <q-header class="dashboard-header bg-white">
       <q-toolbar class="dashboard-toolbar">
-        <q-btn flat dense round @click="toggleLeftDrawer" aria-label="Menu" icon="menu" class="menu-toggle-btn" />
-
+        <q-btn flat dense round @click="toggleLeftDrawer" aria-label="Menu" icon="menu" class="menu-toggle-btn"
+          color="grey-8" />
         <router-link to="/" class="logo-section">
-          <q-avatar size="40px" class="q-mr-sm">
-            <img src="/logo.png" alt="Logo" />
-          </q-avatar>
+          <div class="logo-container">
+            <ZentenpoLogo :size="48" />
+          </div>
           <q-toolbar-title class="dashboard-title">
-            Dashboard
+            Zentenpo
           </q-toolbar-title>
         </router-link>
 
@@ -22,7 +22,7 @@
             <q-icon name="account_circle" size="36px" color="primary" />
           </q-avatar>
           <div class="user-details q-ml-sm">
-            <div class="text-body2 text-weight-medium">{{ profile.name || 'User' }}</div>
+            <div class="text-body2 text-grey-8 text-weight-medium">{{ profile.name || 'User' }}</div>
             <div class="text-caption text-grey-6">{{ profile.mobile || '' }}</div>
           </div>
         </div>
@@ -79,6 +79,7 @@
     <q-page-container class="dashboard-content">
       <router-view />
     </q-page-container>
+
   </q-layout>
 </template>
 
@@ -89,6 +90,8 @@ import { storeToRefs } from 'pinia';
 import { logout } from 'src/boot/axios-call';
 import { useRouter } from 'vue-router';
 import { useQuasar } from 'quasar';
+import ZentenpoLogo from 'src/components/ZentenpoLogo.vue';
+import AppFooter from 'src/components/AppFooter.vue';
 
 const $q = useQuasar();
 const router = useRouter();
@@ -145,10 +148,29 @@ const handleLogout = async () => {
   text-decoration: none;
   color: inherit;
   transition: transform 0.2s ease;
+  gap: 12px;
 
   &:hover {
     transform: scale(1.02);
   }
+}
+
+.logo-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #f5f7fa 0%, #ffffff 100%);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  padding: 4px;
+}
+
+.logo-section:hover .logo-container {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transform: scale(1.05);
 }
 
 .dashboard-title {

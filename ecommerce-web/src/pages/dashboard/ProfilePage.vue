@@ -47,8 +47,8 @@
           <div class="form-actions">
             <q-btn label="Cancel" type="reset" color="grey-7" outline class="action-btn" @click="onReset" />
             <q-btn label="Update Profile" type="submit" color="primary" unelevated class="action-btn" icon="save" />
-          </div>
-        </q-form>
+      </div>
+    </q-form>
       </q-card-section>
     </q-card>
   </div>
@@ -74,7 +74,7 @@ const onSubmit = async () => {
   myForm.value?.validate().then(async (success: any) => {
     if (success) {
       try {
-        await update({
+      await update({
           entity: 'profile',
           optimus_id: profile.value.optimus_id,
           data: {
