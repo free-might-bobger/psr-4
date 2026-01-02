@@ -5,6 +5,7 @@ namespace App\Service;
 use App\Repositories\Menu\MenuRepository;
 use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\Auth;
 
 class UserMenuService {
 
@@ -18,7 +19,7 @@ class UserMenuService {
 
     public function getUserMenus(): Collection  {
 
-        $user = \Auth::User();
+        $user = Auth::user();
         $menuIds = [];
 
         foreach ( $user->roles as $role ) {

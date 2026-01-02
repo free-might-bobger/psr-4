@@ -3,7 +3,8 @@
 namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Http\Requests\UserRequest;
-use Auth;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 use Laravel\Passport\RefreshToken;
 use Laravel\Passport\Token;
 use App\Models\User;
@@ -19,7 +20,7 @@ class RegisterController extends BaseController
      */
     public function register(Request $request)
     {
-        $validator = \Validator::make($request->all(), [
+        $validator = Validator::make($request->all(), [
             'firstname'     => 'required',
             'lastname'      => 'required',
             'email'         => 'required|email',
@@ -32,6 +33,7 @@ class RegisterController extends BaseController
    
         $input = $request->all();
         $input['password'] = bcrypt($input['password']);
+        /** @var User $user */
         $user = User::create($input);
         $success['token'] =  $user->createToken('MyApp')->accessToken;
         $success['name'] =  $user->name;
@@ -55,6 +57,7 @@ class RegisterController extends BaseController
         if(Auth::attempt(['mobile' => $request->mobile, 'password' => $request->password, 'status' => 1]))
         {
             $userMenuService = app(UserMenuService::class);
+            /** @var User $user */
             $user = Auth::user(); 
             $success['token'] =  $user->createToken('MyApp')->accessToken;
             $success['optimus_id'] =  $user->optimus_id;
@@ -74,7 +77,7 @@ class RegisterController extends BaseController
      * Logout All Device
      */
     public function logout(){
-        
+        /** @var User $user */
         $user = Auth::user();
         $tokens =  $user->tokens->pluck('id');
         Token::whereIn('id', $tokens)
@@ -86,6 +89,7 @@ class RegisterController extends BaseController
     }
 
     public function profile(){
+        /** @var User $user */
         $user = Auth::user();
         return $this->sendResponse($user, null);
     }

@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Resources\BaseResource;
 abstract class ApiController extends Controller {
 
-    protected $repository, $indexRequest, $storeRequest, $updateRequest, $result, $params;
+    protected $model, $repository, $indexRequest, $storeRequest, $updateRequest, $result, $params;
     /**
      * Index the resource
      * @return BaseResource
