@@ -1,8 +1,8 @@
 {
-  "name": "roceeshop",
+  "name": "zetenpo",
   "version": "0.0.1",
-  "description": "Rocee shop",
-  "productName": "Rocee shop",
+  "description": "Zetenpo",
+  "productName": "Zetenpo",
   "author": "Bobby Gerez <ugerez@yahoo.com>",
   "private": true,
   "scripts": {

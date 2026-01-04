@@ -5,6 +5,7 @@ namespace App\Service;
 use App\Repositories\Menu\MenuRepository;
 use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\Auth;
 
 class UserMenuService {
 
@@ -16,9 +17,9 @@ class UserMenuService {
         $this->params = $request->all();
     }
 
-    public function getUserMenus(): Collection  {
+    public function getUserMenus(): array  {
 
-        $user = \Auth::User();
+        $user = Auth::user();
         $menuIds = [];
 
         foreach ( $user->roles as $role ) {
@@ -42,7 +43,7 @@ class UserMenuService {
         unset($this->params['mobile']);
         unset($this->params['password']);
         $this->params['type'] = 'collection';
-        return $this->repository->filterQuery($this->params)->getResults();
+        return array_values($this->repository->filterQuery($this->params)->getResults()->sortBy('id')->toArray());
     }
 
 }

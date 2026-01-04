@@ -12,7 +12,7 @@ use App\Traits\UtilsTrait;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
-
+use App\Http\Requests\BaseIndexRequest;
 class BaseRepository implements BaseInterface
 {
     use UtilsTrait, SearchFieldSupport, OptimusRequiredToModel, BaseSupportRepository;
@@ -136,7 +136,10 @@ class BaseRepository implements BaseInterface
      */
     public function where(string $field, int $optimusId): Model
     {
-        return $this->model->where($field, $this->optimus()->decode($optimusId))->first();
+        $this->model = $this->model->where($field, $this->optimus()->decode($optimusId));
+        $this->params = app(BaseIndexRequest::class)->all();
+        $this->with();
+        return $this->model->first();
     }
 
 
@@ -230,7 +233,6 @@ class BaseRepository implements BaseInterface
     {
 
         $relationships = $this->pregSplit('@,@', Arr::get($this->params, 'with'));
-
         foreach ($relationships as $relationship) {
 
             $pregSplit = $this->pregSplit('@:@', $relationship);

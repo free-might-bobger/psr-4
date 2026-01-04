@@ -1,330 +1,475 @@
 <template>
-  <div style="margin: 5px">
-    <GoogleMap ref="mapRef" class="q-mt-sm" :api-key="GOOGLE_MAP_API_KEY" :map-id="GOOGLE_MAP_ID" style="height: 450px"
-      :center="{ lat: lat, lng: lng }" :zoom="15" :draggable="true" :clickable-icons="false">
-      <AdvancedMarker :options="{
-        position: { lat: lat, lng: lng },
-        gmpDraggable: false,
-        title: 'My location',
-      }" @drag="markerDrag" :pin-options="{ background: '#FBBC04' }">
-        <InfoWindow :options="{ headerContent: 'My Location', disableAutoPan: false }">
-          <div>
+  <div class="home-page">
+    <!-- Hero Section -->
+    <section class="hero-section">
+      <div class="hero-content">
+        <div class="hero-text">
+          <h1 class="hero-title">
+            Welcome to <span class="brand-name">Zetenpo</span>
+          </h1>
+          <p class="hero-subtitle">
+            Your trusted marketplace for daily essentials. Discover multiple stores, compare prices, and shop with
+            confidence.
+          </p>
+          <div class="hero-actions">
+            <q-btn to="/find-store" color="primary" size="lg" unelevated class="hero-btn" icon="explore"
+              label="Find Stores Near Me" />
+            <q-btn to="/cart" color="secondary" size="lg" outline class="hero-btn" icon="shopping_cart"
+              label="View Cart" />
           </div>
-        </InfoWindow>
-      </AdvancedMarker>
-      <AdvancedMarker v-for="store in nearestStores" :key="store.id" :options="{
-        position: { lat: store.latitude, lng: store.longitude },
-        gmpDraggable: false,
-        title: store.name,
-      }" :pin-options="{ background: '#34A853' }" @click="handleClickStoreAdvanceMarker(store)">
-        <InfoWindow :options="{ headerContent: store.name, disableAutoPan: false }">
-          <div class="my-window">
-            <a :href="`/public_stores/${store.optimus_id}`">View to Store</a>
+        </div>
+        <div class="hero-image">
+          <ZetenpoLogo :size="200" />
+        </div>
+      </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features-section">
+      <div class="features-container">
+        <h2 class="section-title">Why Choose Zetenpo?</h2>
+        <div class="features-grid">
+          <q-card flat bordered class="feature-card">
+            <q-card-section>
+              <div class="feature-icon">
+                <q-icon name="store" size="48px" color="primary" />
+              </div>
+              <h3 class="feature-title">Multiple Stores</h3>
+              <p class="feature-description">
+                Browse products from various stores all in one place. Compare prices and find the best deals.
+              </p>
+            </q-card-section>
+          </q-card>
+
+          <q-card flat bordered class="feature-card">
+            <q-card-section>
+              <div class="feature-icon">
+                <q-icon name="local_shipping" size="48px" color="primary" />
+              </div>
+              <h3 class="feature-title">Fast Delivery</h3>
+              <p class="feature-description">
+                Get your orders delivered quickly and safely to your doorstep. Track your delivery in real-time.
+              </p>
+            </q-card-section>
+          </q-card>
+
+          <q-card flat bordered class="feature-card">
+            <q-card-section>
+              <div class="feature-icon">
+                <q-icon name="security" size="48px" color="primary" />
+              </div>
+              <h3 class="feature-title">Secure Shopping</h3>
+              <p class="feature-description">
+                Shop with confidence. Your payment information is protected with industry-standard security.
+              </p>
+            </q-card-section>
+          </q-card>
+
+          <q-card flat bordered class="feature-card">
+            <q-card-section>
+              <div class="feature-icon">
+                <q-icon name="support_agent" size="48px" color="primary" />
+              </div>
+              <h3 class="feature-title">24/7 Support</h3>
+              <p class="feature-description">
+                Our customer support team is always ready to help you with any questions or concerns.
+              </p>
+            </q-card-section>
+          </q-card>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section">
+      <q-card flat bordered class="cta-card">
+        <q-card-section class="cta-content">
+          <div class="cta-text">
+            <h2 class="cta-title">Ready to Start Shopping?</h2>
+            <p class="cta-description">
+              Find stores near you and discover amazing products at great prices.
+            </p>
           </div>
-        </InfoWindow>
-      </AdvancedMarker>
-    </GoogleMap>
+          <q-btn to="/find-store" color="primary" size="lg" unelevated class="cta-button" icon="explore"
+            label="Find Stores Now" />
+        </q-card-section>
+      </q-card>
+    </section>
   </div>
 </template>
 
 <script setup lang="ts">
-import { GOOGLE_MAP_API_KEY, GOOGLE_MAP_ID } from 'src/boot/constant';
-import { GoogleMap, AdvancedMarker, InfoWindow } from 'vue3-google-map';
-import { onMounted, ref, nextTick, watch } from 'vue';
-import { useCommonStore } from 'src/stores/common';
-import { storeToRefs } from 'pinia';
-import { getLocation } from 'src/boot/utilities';
-import { get } from 'src/boot/axios-call';
-import { StoreInterface } from 'src/boot/interfaces';
-
-
-const useCommon = useCommonStore();
-const { lat, lng } = storeToRefs(useCommon);
-
-
-const mapRef = ref<any>(null)
-const directions = ref<google.maps.DirectionsResult | null>(null)
-const directionsRenderer = ref<google.maps.DirectionsRenderer | null>(null)
-const storeListControl = ref<HTMLElement | null>(null)
-
-const origin = ref({ lat: lat.value, lng: lng.value })
-const destination = ref({ lat: 14.609, lng: 120.994 })
-
-
-
-onMounted(async () => {
-  localGetLocation();
-  // Wait for the next tick to ensure the GoogleMap component is mounted
-  await nextTick()
-
-  // Wait for Google Maps API to be fully loaded
-  await waitForGoogleMaps()
-
-  // Wait for the map to be fully initialized
-  await waitForMapReady()
-
-});
-
-const localGetLocation = () => {
-  getLocation().then((position) => {
-    lat.value = position.coords.latitude;
-    lng.value = position.coords.longitude;
-    origin.value = { lat: lat.value, lng: lng.value }
-  });
-}
-const markerDrag = (e: { latLng: google.maps.LatLng }) => {
-  lat.value = e.latLng.lat();
-  lng.value = e.latLng.lng();
-};
-
-const kmRadius = ref(1);
-const nearestStores = ref<Array<StoreInterface>>([]);
-
-const getNearestStore = async () => {
-
-  localGetLocation();
-  const result = await get(
-    {
-      message: 'Searching nearest store',
-      entity: 'public_stores',
-      query: {
-        orderBy: 'name:asc',
-        columns: 'id,name',
-        latitude: lat.value,
-        longitude: lng.value,
-        radius: kmRadius.value,
-      },
-    },
-    true
-  );
-
-  if (result && typeof result === 'object' && 'data' in result) {
-    nearestStores.value = (result as any).data.data;
-    updateStoreList();
-  }
-};
-
-const updateStoreList = () => {
-  if (!storeListControl.value) return;
-
-  if (nearestStores.value.length === 0) {
-    storeListControl.value.innerHTML = '<div style="color: #666; font-style: italic;">No stores found in the area</div>';
-    return;
-  }
-
-  let storeListHTML = '';
-  nearestStores.value.forEach((store, __index) => {
-    storeListHTML += `
-      <div style="
-        padding: 6px 8px; 
-        margin: 4px 0; 
-        background-color: #f5f5f5; 
-        border-radius: 4px; 
-        cursor: pointer;
-        border-left: 3px solid #34a853;
-        transition: background-color 0.2s;
-      " 
-      onmouseover="this.style.backgroundColor='#e8f5e8'" 
-      onmouseout="this.style.backgroundColor='#f5f5f5'"
-      onclick="handleStoreClick(${store.id})">
-        <div style="font-weight: 500; color: #333;">${store.name} (${store.distance} )</div>
-        <div style="color: #666; font-size: 11px;">Click the marker to view the store</div>
-      </div>
-    `;
-  });
-
-  storeListControl.value.innerHTML = storeListHTML;
-};
-
-// Make handleStoreClick available globally for onclick events
-const handleStoreClick = (storeId: number) => {
-  const store = nearestStores.value.find(s => s.id === storeId);
-  if (store) {
-    handleClickStoreAdvanceMarker(store);
-  }
-};
-
-// Add to window for onclick access
-if (typeof window !== 'undefined') {
-  (window as any).handleStoreClick = handleStoreClick;
-}
-
-const handleClickStoreAdvanceMarker = (store: StoreInterface) => {
-  destination.value = { lat: store.latitude, lng: store.longitude }
-  requestDirections()
-}
-
-// Watch for when directions become available
-watch(() => directions.value, (newDirections) => {
-  if (newDirections) {
-    const map = mapRef.value?.$mapObject || mapRef.value?.map || mapRef.value?.$map
-    if (map) {
-      setupDirectionsRenderer(map)
-    }
-  }
-})
-
-const waitForGoogleMaps = () => {
-  return new Promise((resolve) => {
-    const checkGoogleMaps = () => {
-      if (window.google &&
-        window.google.maps &&
-        window.google.maps.DirectionsService &&
-        window.google.maps.TravelMode) {
-        resolve(void 0)
-      } else {
-        setTimeout(checkGoogleMaps, 100)
-      }
-    }
-    checkGoogleMaps()
-  })
-}
-
-const waitForMapReady = () => {
-  return new Promise((resolve) => {
-    const checkMapReady = () => {
-      // Try different ways to access the map
-      const map = mapRef.value?.$mapObject || mapRef.value?.map || mapRef.value?.$map
-      if (map) {
-        addLocationControl(map)
-        resolve(void 0)
-      } else {
-        setTimeout(checkMapReady, 200)
-      }
-    }
-    checkMapReady()
-  })
-}
-
-const addLocationControl = (map: google.maps.Map) => {
-  // Create a custom control element
-  const controlDiv = document.createElement('div')
-  controlDiv.style.cssText = `
-    background-color: white;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    padding: 8px 12px;
-    margin: 0;
-    font-family: Arial, sans-serif;
-    font-size: 14px;
-    max-width: 300px;
-    max-height: 400px;
-    overflow-y: auto;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-  `
-
-  // Add header with click functionality
-  const headerDiv = document.createElement('div')
-  headerDiv.style.cssText = `
-    display: flex; 
-    align-items: center; 
-    gap: 4px; 
-    margin-bottom: 8px; 
-    font-weight: bold; 
-    cursor: pointer; 
-    padding: 4px 8px; 
-    border-radius: 4px; 
-    transition: background-color 0.2s;
-  `
-  headerDiv.innerHTML = `
-    <span style="color: #1976d2;">🏪</span>
-    <span style="color: #1976d2;">Nearby Stores</span>
-    <span style="color: #666; font-size: 11px; margin-left: 8px;">(Click to search)</span>
-  `
-
-  // Add click functionality to header
-  headerDiv.addEventListener('click', () => {
-    getNearestStore()
-  })
-
-  // Add hover effects
-  headerDiv.addEventListener('mouseenter', () => {
-    headerDiv.style.backgroundColor = '#f0f8ff'
-  })
-
-  headerDiv.addEventListener('mouseleave', () => {
-    headerDiv.style.backgroundColor = 'transparent'
-  })
-
-  // Add store list container
-  const storeListDiv = document.createElement('div')
-  storeListDiv.id = 'store-list-container'
-  storeListDiv.style.cssText = 'font-size: 12px;'
-  storeListDiv.innerHTML = '<div style="color: #666; font-style: italic;">Click "Nearby Stores" above to find stores</div>'
-
-  controlDiv.appendChild(headerDiv)
-  controlDiv.appendChild(storeListDiv)
-
-  // Store reference for updates
-  storeListControl.value = storeListDiv
-
-  // Position the control below the map type controls (satellite/map toggle)
-  // Remove from default controls and position manually
-  setTimeout(() => {
-    const mapContainer = map.getDiv()
-    if (mapContainer) {
-      // Position absolutely within the map container
-      controlDiv.style.position = 'absolute'
-      controlDiv.style.top = '60px' // Position below the map/satellite controls
-      controlDiv.style.left = '10px' // Align with left edge
-      controlDiv.style.zIndex = '1000'
-      controlDiv.style.pointerEvents = 'auto'
-
-      // Append directly to map container
-      mapContainer.appendChild(controlDiv)
-    }
-  }, 200)
-}
-
-const setupDirectionsRenderer = (map: google.maps.Map) => {
-  // Clean up existing renderer
-  if (directionsRenderer.value) {
-    directionsRenderer.value.setMap(null)
-  }
-
-  // Create new directions renderer
-  directionsRenderer.value = new google.maps.DirectionsRenderer({
-    suppressMarkers: true,
-    polylineOptions: {
-      strokeColor: '#4285F4',
-      strokeWeight: 5
-    }
-  })
-
-  directionsRenderer.value.setMap(map)
-
-  if (directions.value) {
-    directionsRenderer.value.setDirections(directions.value)
-  }
-}
-
-const requestDirections = () => {
-  try {
-    const directionsService = new google.maps.DirectionsService()
-
-    directionsService.route(
-      {
-        origin: origin.value,
-        destination: destination.value,
-        travelMode: google.maps.TravelMode.DRIVING
-      },
-      (result, status) => {
-        if (status === google.maps.DirectionsStatus.OK && result) {
-          directions.value = result
-
-          // Try to set up renderer immediately if map is available
-          const map = mapRef.value?.$mapObject || mapRef.value?.map || mapRef.value?.$map
-          if (map) {
-            setupDirectionsRenderer(map)
-          }
-        } else {
-          console.error('Error fetching directions:', status)
-        }
-      }
-    )
-  } catch (error) {
-    console.error('Error creating DirectionsService:', error)
-  }
-}
-
+import ZetenpoLogo from 'src/components/ZetenpoLogo.vue';
 </script>
+
+<style scoped lang="scss">
+.home-page {
+  min-height: calc(100vh - 64px);
+}
+
+.hero-section {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 80px 24px;
+  color: white;
+}
+
+.hero-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 60px;
+  flex-wrap: wrap;
+}
+
+.hero-text {
+  flex: 1;
+  min-width: 300px;
+}
+
+.hero-title {
+  font-size: 48px;
+  font-weight: 700;
+  margin: 0 0 24px 0;
+  line-height: 1.2;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+  .brand-name {
+    color: #fee140;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  }
+}
+
+.hero-subtitle {
+  font-size: 20px;
+  line-height: 1.6;
+  margin: 0 0 32px 0;
+  opacity: 0.95;
+  max-width: 600px;
+}
+
+.hero-actions {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.hero-btn {
+  min-width: 200px;
+  height: 52px;
+  font-weight: 600;
+  font-size: 16px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s ease;
+  white-space: nowrap;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+  }
+}
+
+.hero-image {
+  flex: 0 0 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  padding: 40px;
+  backdrop-filter: blur(10px);
+}
+
+.features-section {
+  padding: 80px 24px;
+  background: #f8f9fa;
+}
+
+.features-container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.section-title {
+  font-size: 36px;
+  font-weight: 700;
+  text-align: center;
+  margin: 0 0 48px 0;
+  color: #1a1a1a;
+}
+
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 24px;
+}
+
+.feature-card {
+  border-radius: 16px;
+  transition: all 0.3s ease;
+  height: 100%;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  }
+}
+
+.feature-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 80px;
+  height: 80px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #f5f7fa 0%, #ffffff 100%);
+  margin: 0 auto 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.feature-title {
+  font-size: 22px;
+  font-weight: 600;
+  text-align: center;
+  margin: 0 0 12px 0;
+  color: #1a1a1a;
+}
+
+.feature-description {
+  font-size: 15px;
+  line-height: 1.6;
+  text-align: center;
+  color: #666;
+  margin: 0;
+}
+
+.cta-section {
+  padding: 80px 24px;
+  background: white;
+}
+
+.cta-card {
+  max-width: 1000px;
+  margin: 0 auto;
+  border-radius: 20px;
+  background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+}
+
+.cta-content {
+  padding: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 32px;
+  flex-wrap: wrap;
+}
+
+.cta-text {
+  flex: 1;
+  min-width: 300px;
+  text-align: left;
+}
+
+.cta-title {
+  font-size: 32px;
+  font-weight: 700;
+  margin: 0 0 12px 0;
+  color: #1a1a1a;
+}
+
+.cta-description {
+  font-size: 18px;
+  color: #666;
+  margin: 0;
+  line-height: 1.6;
+}
+
+.cta-button {
+  min-width: 200px;
+  height: 52px;
+  font-weight: 600;
+  font-size: 16px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+  }
+}
+
+@media (max-width: 768px) {
+  .hero-section {
+    padding: 60px 20px;
+  }
+
+  .hero-content {
+    flex-direction: column;
+    gap: 40px;
+    text-align: center;
+  }
+
+  .hero-title {
+    font-size: 36px;
+  }
+
+  .hero-subtitle {
+    font-size: 18px;
+  }
+
+  .hero-image {
+    flex: 0 0 auto;
+    width: 100%;
+    max-width: 300px;
+  }
+
+  .hero-actions {
+    width: 100%;
+    justify-content: center;
+    flex-direction: column;
+  }
+
+  .hero-btn {
+    width: 100%;
+    min-width: 0;
+    font-size: 15px;
+  }
+
+  .features-section {
+    padding: 60px 20px;
+  }
+
+  .section-title {
+    font-size: 28px;
+    margin-bottom: 32px;
+  }
+
+  .features-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .cta-section {
+    padding: 60px 20px;
+  }
+
+  .cta-content {
+    flex-direction: column;
+    text-align: center;
+    padding: 32px;
+    align-items: center;
+  }
+
+  .cta-text {
+    min-width: 0;
+    width: 100%;
+    text-align: center;
+  }
+
+  .cta-title {
+    font-size: 24px;
+    text-align: center;
+  }
+
+  .cta-description {
+    font-size: 16px;
+    text-align: center;
+  }
+
+  .cta-button {
+    width: 100%;
+    text-align: center;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 600px) {
+  .hero-title {
+    font-size: 28px;
+  }
+
+  .hero-subtitle {
+    font-size: 16px;
+  }
+
+  .hero-actions {
+    flex-direction: column;
+  }
+
+  .hero-btn {
+    width: 100%;
+    min-width: 0;
+    font-size: 14px;
+    padding: 0 16px;
+    white-space: normal;
+    height: auto;
+    min-height: 48px;
+    line-height: 1.4;
+  }
+}
+
+@media (max-width: 400px) {
+  .hero-btn {
+    font-size: 13px;
+    padding: 0 12px;
+  }
+
+  .cta-section {
+    padding: 40px 16px;
+  }
+
+  .cta-content {
+    padding: 24px 16px;
+  }
+
+  .cta-title {
+    font-size: 20px;
+  }
+
+  .cta-description {
+    font-size: 14px;
+  }
+
+  .cta-button {
+    font-size: 14px;
+    padding: 0 16px;
+    white-space: normal;
+    height: auto;
+    min-height: 48px;
+    line-height: 1.4;
+  }
+}
+
+@media (max-width: 370px) {
+  .cta-section {
+    padding: 32px 12px;
+  }
+
+  .cta-content {
+    padding: 20px 12px;
+  }
+
+  .cta-title {
+    font-size: 18px;
+    margin-bottom: 8px;
+  }
+
+  .cta-description {
+    font-size: 13px;
+    line-height: 1.5;
+  }
+
+  .cta-button {
+    font-size: 13px;
+    padding: 0 12px;
+    min-height: 44px;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+</style>

@@ -17,7 +17,7 @@
 
     <!-- Transactions Grid -->
     <q-table grid :rows="result" :columns="customerTransactionsColumns as any" row-key="optimus_id" hide-header
-      :visible-columns="[]" class="transactions-table" hide-bottom :loading="false">
+      :visible-columns="[]" class="transactions-table" hide-bottom :loading="false" :rows-per-page-options="[0]">
       <template v-slot:item="props">
         <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 q-pa-sm">
           <q-card flat bordered class="transaction-card" :class="{ 'transaction-card-selected': props.selected }">
@@ -106,7 +106,7 @@ entityQuery.value = {
     with: 'status,paymentMethod,receiveMethod',
     orderBy: 'created_at:desc',
     page: pagination.value.page,
-    limit: 10,
+    limit: 12,
   },
 };
 
