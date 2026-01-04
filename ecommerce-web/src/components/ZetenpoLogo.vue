@@ -1,6 +1,6 @@
 <template>
     <svg :width="size" :height="size" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"
-        class="zentenpo-logo">
+        class="Zetenpo-logo">
         <!-- Multiple storefronts representing marketplace -->
         <rect x="4" y="20" width="8" height="16" rx="1" fill="url(#gradient1)" />
         <rect x="6" y="24" width="4" height="4" rx="0.5" fill="white" opacity="0.8" />
@@ -60,7 +60,7 @@ defineProps({
 </script>
 
 <style scoped lang="scss">
-.zentenpo-logo {
+.Zetenpo-logo {
     width: 100%;
     height: 100%;
     filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));

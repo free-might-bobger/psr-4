@@ -1,5 +1,5 @@
 <template>
-  <div class="cart-container" v-if="countTotalItems > 0">
+  <div class="cart-container">
     <!-- Header -->
     <div class="cart-header q-mb-lg">
       <BreadCrumbsWrapper :bread-crumbs="[
@@ -13,191 +13,213 @@
           <q-icon name="shopping_cart" class="q-mr-sm" />
           Shopping Cart
         </div>
-        <div class="text-body2 text-grey-7 q-mt-xs">
+        <div class="text-body2 text-grey-7 q-mt-xs" v-if="countTotalItems > 0">
           {{ countTotalItems }} {{ countTotalItems === 1 ? 'item' : 'items' }} in your cart
         </div>
       </div>
     </div>
 
-    <div class="cart-layout">
-      <!-- Left Column: Cart Items -->
-      <div class="cart-items-column">
-        <!-- Cart Items -->
-        <div class="cart-items-section">
-          <div v-for="(item, i) in cart" :key="i" class="cart-item-card q-mb-md">
-            <q-card flat bordered class="cart-item">
-              <q-card-section>
-                <div class="row q-col-gutter-md">
-                  <!-- Product Image -->
-                  <div class="col-12 col-sm-4 col-md-3">
-                    <router-link :to="`/public_stores/${item.store.optimus_id}/item/${item.optimus_id}`"
-                      class="cart-item-image-link">
-                      <q-img :src="item.primary_img.path_url" class="cart-item-image" :ratio="1" fit="cover">
-                        <template v-slot:error>
-                          <div class="absolute-full flex flex-center bg-grey-3">
-                            <q-icon name="image_not_supported" size="32px" color="grey-6" />
-                          </div>
-                        </template>
-                      </q-img>
-                    </router-link>
-                  </div>
+    <!-- Empty Cart State -->
+    <div v-if="countTotalItems === 0" class="empty-cart-container">
+      <div class="empty-cart-content">
+        <div class="empty-cart-icon">
+          <q-icon name="shopping_cart" size="120px" color="grey-4" />
+        </div>
+        <div class="text-h5 text-weight-bold text-grey-8 q-mt-lg">
+          Your cart is empty
+        </div>
+        <div class="text-body1 text-grey-6 q-mt-sm q-mb-lg">
+          Looks like you haven't added any items to your cart yet.
+        </div>
+        <q-btn color="primary" label="Start Shopping" icon="storefront" size="lg" unelevated to="/"
+          class="start-shopping-btn" />
+      </div>
+    </div>
 
-                  <!-- Product Details -->
-                  <div class="col-12 col-sm-8 col-md-9">
-                    <div class="cart-item-content">
-                      <!-- Product Name and Remove -->
-                      <div class="flex justify-between items-start q-mb-sm">
-                        <router-link :to="`/public_stores/${item.store.optimus_id}/item/${item.optimus_id}`"
-                          class="cart-item-name-link">
-                          <div class="text-h6 text-weight-medium cart-item-name">
-                            {{ item.name }}
-                          </div>
-                        </router-link>
-                        <q-btn flat round dense icon="close" color="grey-7" size="sm"
-                          @click="userCart.removeItem(item.optimus_id)" class="remove-btn">
-                          <q-tooltip>Remove item</q-tooltip>
-                        </q-btn>
-                      </div>
+    <!-- Cart Content -->
+    <div v-else>
 
-                      <!-- Order Details -->
-                      <div class="cart-item-details">
-                        <div v-for="(orderDetail, index) in getOrderDetail(
-                          item.item_price as any,
-                          item.variations
-                        )" :key="index" class="cart-item-variation">
-                          <div class="variation-info">
-                            <q-icon name="check_circle" size="xs" color="positive" class="q-mr-xs" />
-                            <span class="text-body2">
-                              <strong>{{ orderDetail.count }}</strong> {{ orderDetail.unit_name }} ×
-                              <span class="text-primary">{{ formatMoney(orderDetail.price) }}</span>
-                            </span>
-                          </div>
-                          <div class="variation-total text-body1 text-weight-bold text-primary">
-                            {{ formatMoney(computePrice(orderDetail.count, orderDetail.price)) }}
+      <div class="cart-layout">
+        <!-- Left Column: Cart Items -->
+        <div class="cart-items-column">
+          <!-- Cart Items -->
+          <div class="cart-items-section">
+            <div v-for="(item, i) in cart" :key="i" class="cart-item-card q-mb-md">
+              <q-card flat bordered class="cart-item">
+                <q-card-section>
+                  <div class="row q-col-gutter-md">
+                    <!-- Product Image -->
+                    <div class="col-12 col-sm-4 col-md-3">
+                      <router-link :to="`/public_stores/${item.store.optimus_id}/item/${item.optimus_id}`"
+                        class="cart-item-image-link">
+                        <q-img :src="item.primary_img.path_url" class="cart-item-image" :ratio="1" fit="cover">
+                          <template v-slot:error>
+                            <div class="absolute-full flex flex-center bg-grey-3">
+                              <q-icon name="image_not_supported" size="32px" color="grey-6" />
+                            </div>
+                          </template>
+                        </q-img>
+                      </router-link>
+                    </div>
+
+                    <!-- Product Details -->
+                    <div class="col-12 col-sm-8 col-md-9">
+                      <div class="cart-item-content">
+                        <!-- Product Name and Remove -->
+                        <div class="flex justify-between items-start q-mb-sm">
+                          <router-link :to="`/public_stores/${item.store.optimus_id}/item/${item.optimus_id}`"
+                            class="cart-item-name-link">
+                            <div class="text-h6 text-weight-medium cart-item-name">
+                              {{ item.name }}
+                            </div>
+                          </router-link>
+                          <q-btn flat round dense icon="close" color="grey-7" size="sm"
+                            @click="userCart.removeItem(item.optimus_id)" class="remove-btn">
+                            <q-tooltip>Remove item</q-tooltip>
+                          </q-btn>
+                        </div>
+
+                        <!-- Order Details -->
+                        <div class="cart-item-details">
+                          <div v-for="(orderDetail, index) in getOrderDetail(
+                            item.item_price as any,
+                            item.variations
+                          )" :key="index" class="cart-item-variation">
+                            <div class="variation-info">
+                              <q-icon name="check_circle" size="xs" color="positive" class="q-mr-xs" />
+                              <span class="text-body2">
+                                <strong>{{ orderDetail.count }}</strong> {{ orderDetail.unit_name }} ×
+                                <span class="text-primary">{{ formatMoney(orderDetail.price) }}</span>
+                              </span>
+                            </div>
+                            <div class="variation-total text-body1 text-weight-bold text-primary">
+                              {{ formatMoney(computePrice(orderDetail.count, orderDetail.price)) }}
+                            </div>
                           </div>
                         </div>
-                      </div>
 
-                      <!-- Item Subtotal -->
-                      <div class="cart-item-subtotal q-mt-sm">
-                        <q-separator class="q-mb-sm" />
-                        <div class="flex justify-between items-center">
-                          <span class="text-body2 text-grey-7">Item Subtotal:</span>
-                          <span class="text-h6 text-weight-bold text-primary">
-                            {{ formatMoney(getItemTotal(item)) }}
-                          </span>
+                        <!-- Item Subtotal -->
+                        <div class="cart-item-subtotal q-mt-sm">
+                          <q-separator class="q-mb-sm" />
+                          <div class="flex justify-between items-center">
+                            <span class="text-body2 text-grey-7">Item Subtotal:</span>
+                            <span class="text-h6 text-weight-bold text-primary">
+                              {{ formatMoney(getItemTotal(item)) }}
+                            </span>
+                          </div>
                         </div>
                       </div>
                     </div>
                   </div>
+                </q-card-section>
+              </q-card>
+            </div>
+          </div>
+
+          <!-- Options Section -->
+          <div class="cart-options-section q-mt-lg">
+            <div class="row q-col-gutter-md">
+              <!-- Delivery Method -->
+              <div class="col-12 col-md-6">
+                <q-card flat bordered class="options-card">
+                  <q-card-section>
+                    <div class="text-subtitle1 text-weight-bold q-mb-md">
+                      <q-icon name="local_shipping" class="q-mr-sm" />
+                      Delivery Method
+                    </div>
+                    <div class="row q-col-gutter-sm">
+                      <div class="col-12" v-for="receiveMethod in receiveMethods" :key="receiveMethod.id">
+                        <q-radio v-model="selectedReceiveMethod" :val="receiveMethod.value" :label="receiveMethod.name"
+                          color="primary" class="delivery-option" />
+                      </div>
+                    </div>
+                  </q-card-section>
+                </q-card>
+              </div>
+
+              <!-- Payment Method -->
+              <div class="col-12 col-md-6">
+                <q-card flat bordered class="options-card">
+                  <q-card-section>
+                    <div class="text-subtitle1 text-weight-bold q-mb-md">
+                      <q-icon name="payment" class="q-mr-sm" />
+                      Payment Method
+                    </div>
+                    <div class="row q-col-gutter-sm">
+                      <div class="col-12" v-for="peymentMethod in paymentMethods" :key="peymentMethod.id">
+                        <q-radio v-model="selectedPaymenthMethod" :val="peymentMethod.value" :label="peymentMethod.name"
+                          color="primary" class="payment-option" />
+                      </div>
+                    </div>
+                  </q-card-section>
+                </q-card>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Column: Order Summary (Sticky) -->
+        <div class="cart-summary-column">
+          <div class="summary-sticky">
+            <q-card flat bordered class="summary-card">
+              <q-card-section>
+                <div class="text-h6 text-weight-bold q-mb-md">
+                  <q-icon name="receipt_long" class="q-mr-sm" />
+                  Order Summary
                 </div>
+
+                <q-separator class="q-mb-md" />
+
+                <div class="summary-row q-mb-sm">
+                  <span class="summary-label">Subtotal ({{ countTotalItems }} {{ countTotalItems === 1 ? 'item' :
+                    'items'
+                  }}):</span>
+                  <span class="summary-value">{{ formatMoney(total) }}</span>
+                </div>
+
+                <div v-if="selectedReceiveMethod === DELIVERY_TYPE.DELIVER" class="summary-row q-mb-sm">
+                  <span class="summary-label">
+                    <q-icon name="local_shipping" size="xs" class="q-mr-xs" />
+                    Delivery Charge:
+                  </span>
+                  <span class="summary-value">{{ formatMoney(deliveryCharge) }}</span>
+                </div>
+
+                <div v-else class="summary-row q-mb-sm">
+                  <span class="summary-label text-positive">
+                    <q-icon name="check_circle" size="xs" class="q-mr-xs" />
+                    Pickup (Free):
+                  </span>
+                  <span class="summary-value text-positive">₱0.00</span>
+                </div>
+
+                <q-separator class="q-my-md" />
+
+                <div class="summary-row-total">
+                  <span class="summary-label-total">Total Amount:</span>
+                  <span class="summary-value-total">{{
+                    decimalThousandSeparator(total + deliveryCharge)
+                  }}</span>
+                </div>
+
+                <!-- Trust Indicators -->
+                <div class="trust-indicators q-mt-md">
+                  <div class="trust-item">
+                    <q-icon name="lock" size="sm" color="positive" class="q-mr-xs" />
+                    <span class="text-caption">Secure Checkout</span>
+                  </div>
+                  <div class="trust-item">
+                    <q-icon name="verified" size="sm" color="positive" class="q-mr-xs" />
+                    <span class="text-caption">Protected Payment</span>
+                  </div>
+                </div>
+
+                <!-- Checkout Button -->
+                <q-btn color="primary" class="checkout-btn q-mt-lg" to="/cart/checkout" label="Proceed to Checkout"
+                  icon="arrow_forward" size="lg" unelevated :disable="disabledCheckout" :loading="disabledCheckout" />
               </q-card-section>
             </q-card>
           </div>
-        </div>
-
-        <!-- Options Section -->
-        <div class="cart-options-section q-mt-lg">
-          <div class="row q-col-gutter-md">
-            <!-- Delivery Method -->
-            <div class="col-12 col-md-6">
-              <q-card flat bordered class="options-card">
-                <q-card-section>
-                  <div class="text-subtitle1 text-weight-bold q-mb-md">
-                    <q-icon name="local_shipping" class="q-mr-sm" />
-                    Delivery Method
-                  </div>
-                  <div class="row q-col-gutter-sm">
-                    <div class="col-12" v-for="receiveMethod in receiveMethods" :key="receiveMethod.id">
-                      <q-radio v-model="selectedReceiveMethod" :val="receiveMethod.value" :label="receiveMethod.name"
-                        color="primary" class="delivery-option" />
-                    </div>
-                  </div>
-                </q-card-section>
-              </q-card>
-            </div>
-
-            <!-- Payment Method -->
-            <div class="col-12 col-md-6">
-              <q-card flat bordered class="options-card">
-                <q-card-section>
-                  <div class="text-subtitle1 text-weight-bold q-mb-md">
-                    <q-icon name="payment" class="q-mr-sm" />
-                    Payment Method
-                  </div>
-                  <div class="row q-col-gutter-sm">
-                    <div class="col-12" v-for="peymentMethod in paymentMethods" :key="peymentMethod.id">
-                      <q-radio v-model="selectedPaymenthMethod" :val="peymentMethod.value" :label="peymentMethod.name"
-                        color="primary" class="payment-option" />
-                    </div>
-                  </div>
-                </q-card-section>
-              </q-card>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Right Column: Order Summary (Sticky) -->
-      <div class="cart-summary-column">
-        <div class="summary-sticky">
-          <q-card flat bordered class="summary-card">
-            <q-card-section>
-              <div class="text-h6 text-weight-bold q-mb-md">
-                <q-icon name="receipt_long" class="q-mr-sm" />
-                Order Summary
-              </div>
-
-              <q-separator class="q-mb-md" />
-
-              <div class="summary-row q-mb-sm">
-                <span class="summary-label">Subtotal ({{ countTotalItems }} {{ countTotalItems === 1 ? 'item' : 'items'
-                }}):</span>
-                <span class="summary-value">{{ formatMoney(total) }}</span>
-              </div>
-
-              <div v-if="selectedReceiveMethod === DELIVERY_TYPE.DELIVER" class="summary-row q-mb-sm">
-                <span class="summary-label">
-                  <q-icon name="local_shipping" size="xs" class="q-mr-xs" />
-                  Delivery Charge:
-                </span>
-                <span class="summary-value">{{ formatMoney(deliveryCharge) }}</span>
-              </div>
-
-              <div v-else class="summary-row q-mb-sm">
-                <span class="summary-label text-positive">
-                  <q-icon name="check_circle" size="xs" class="q-mr-xs" />
-                  Pickup (Free):
-                </span>
-                <span class="summary-value text-positive">₱0.00</span>
-              </div>
-
-              <q-separator class="q-my-md" />
-
-              <div class="summary-row-total">
-                <span class="summary-label-total">Total Amount:</span>
-                <span class="summary-value-total">{{
-                  decimalThousandSeparator(total + deliveryCharge)
-                }}</span>
-              </div>
-
-              <!-- Trust Indicators -->
-              <div class="trust-indicators q-mt-md">
-                <div class="trust-item">
-                  <q-icon name="lock" size="sm" color="positive" class="q-mr-xs" />
-                  <span class="text-caption">Secure Checkout</span>
-                </div>
-                <div class="trust-item">
-                  <q-icon name="verified" size="sm" color="positive" class="q-mr-xs" />
-                  <span class="text-caption">Protected Payment</span>
-                </div>
-              </div>
-
-              <!-- Checkout Button -->
-              <q-btn color="primary" class="checkout-btn q-mt-lg" to="/cart/checkout" label="Proceed to Checkout"
-                icon="arrow_forward" size="lg" unelevated :disable="disabledCheckout" :loading="disabledCheckout" />
-            </q-card-section>
-          </q-card>
         </div>
       </div>
     </div>
@@ -326,6 +348,56 @@ const getItemTotal = (item: any): number => {
   max-width: 1400px;
   margin: 0 auto;
   padding: 16px;
+}
+
+.empty-cart-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 500px;
+  padding: 60px 20px;
+}
+
+.empty-cart-content {
+  text-align: center;
+  max-width: 500px;
+  width: 100%;
+}
+
+.empty-cart-icon {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 24px;
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+.start-shopping-btn {
+  height: 56px;
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 8px;
+  letter-spacing: 0.5px;
+  padding: 0 32px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+  }
 }
 
 .cart-header {

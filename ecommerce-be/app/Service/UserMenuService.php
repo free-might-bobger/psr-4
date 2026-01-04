@@ -17,7 +17,7 @@ class UserMenuService {
         $this->params = $request->all();
     }
 
-    public function getUserMenus(): Collection  {
+    public function getUserMenus(): array  {
 
         $user = Auth::user();
         $menuIds = [];
@@ -43,7 +43,7 @@ class UserMenuService {
         unset($this->params['mobile']);
         unset($this->params['password']);
         $this->params['type'] = 'collection';
-        return $this->repository->filterQuery($this->params)->getResults();
+        return array_values($this->repository->filterQuery($this->params)->getResults()->sortBy('id')->toArray());
     }
 
 }

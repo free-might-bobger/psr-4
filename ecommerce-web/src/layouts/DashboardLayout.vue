@@ -7,10 +7,10 @@
           color="grey-8" />
         <router-link to="/" class="logo-section">
           <div class="logo-container">
-            <ZentenpoLogo :size="48" />
+            <ZetenpoLogo :size="48" />
           </div>
           <q-toolbar-title class="dashboard-title">
-            Zentenpo
+            Zetenpo
           </q-toolbar-title>
         </router-link>
 
@@ -80,6 +80,31 @@
       <router-view />
     </q-page-container>
 
+    <!-- Logout Confirmation Dialog -->
+    <q-dialog v-model="showLogoutDialog" persistent>
+      <q-card class="logout-dialog-card">
+        <q-card-section class="row items-center q-pb-none">
+          <div class="text-h6 text-weight-bold">Confirm Logout</div>
+          <q-space />
+          <q-btn icon="close" flat round dense v-close-popup />
+        </q-card-section>
+
+        <q-card-section class="q-pt-md">
+          <div class="logout-dialog-content">
+            <q-icon name="logout" size="48px" color="negative" class="q-mb-md" />
+            <div class="text-body1 text-grey-8">
+              Are you sure you want to logout?
+            </div>
+          </div>
+        </q-card-section>
+
+        <q-card-actions align="right" class="q-pa-md">
+          <q-btn flat label="Cancel" color="grey-7" v-close-popup />
+          <q-btn flat label="Logout" color="negative" @click="confirmLogout" />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
+
   </q-layout>
 </template>
 
@@ -90,28 +115,39 @@ import { storeToRefs } from 'pinia';
 import { logout } from 'src/boot/axios-call';
 import { useRouter } from 'vue-router';
 import { useQuasar } from 'quasar';
-import ZentenpoLogo from 'src/components/ZentenpoLogo.vue';
-import AppFooter from 'src/components/AppFooter.vue';
+import ZetenpoLogo from 'src/components/ZetenpoLogo.vue';
 
-const $q = useQuasar();
 const router = useRouter();
+const $q = useQuasar();
 const { profile } = storeToRefs(useUserStore());
 const leftDrawerOpen = ref(false);
+const showLogoutDialog = ref(false);
 
 const toggleLeftDrawer = () => {
   leftDrawerOpen.value = !leftDrawerOpen.value;
 };
 
-const handleLogout = async () => {
-  $q.dialog({
-    title: 'Confirm Logout',
-    message: 'Are you sure you want to logout?',
-    cancel: true,
-    persistent: true
-  }).onOk(async () => {
+const handleLogout = () => {
+  showLogoutDialog.value = true;
+};
+
+const confirmLogout = async () => {
+  try {
+    showLogoutDialog.value = false;
     await logout();
+    $q.notify({
+      message: 'You have been logged out successfully.',
+      type: 'positive',
+      position: 'top',
+    });
     router.push('/');
-  });
+  } catch (error) {
+    $q.notify({
+      message: 'An error occurred during logout.',
+      type: 'negative',
+      position: 'top',
+    });
+  }
 };
 
 </script>
@@ -284,6 +320,25 @@ const handleLogout = async () => {
 
 .drawer-footer-content {
   padding: 16px;
+}
+
+.logout-dialog-card {
+  min-width: 400px;
+  border-radius: 12px;
+}
+
+.logout-dialog-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 16px 0;
+}
+
+@media (max-width: 600px) {
+  .logout-dialog-card {
+    min-width: 300px;
+  }
 }
 
 .logout-btn {

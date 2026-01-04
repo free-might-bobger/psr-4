@@ -5,7 +5,7 @@
       <div class="hero-content">
         <div class="hero-text">
           <h1 class="hero-title">
-            Welcome to <span class="brand-name">Zentenpo</span>
+            Welcome to <span class="brand-name">Zetenpo</span>
           </h1>
           <p class="hero-subtitle">
             Your trusted marketplace for daily essentials. Discover multiple stores, compare prices, and shop with
@@ -19,7 +19,7 @@
           </div>
         </div>
         <div class="hero-image">
-          <ZentenpoLogo :size="200" />
+          <ZetenpoLogo :size="200" />
         </div>
       </div>
     </section>
@@ -27,7 +27,7 @@
     <!-- Features Section -->
     <section class="features-section">
       <div class="features-container">
-        <h2 class="section-title">Why Choose Zentenpo?</h2>
+        <h2 class="section-title">Why Choose Zetenpo?</h2>
         <div class="features-grid">
           <q-card flat bordered class="feature-card">
             <q-card-section>
@@ -99,7 +99,7 @@
 </template>
 
 <script setup lang="ts">
-import ZentenpoLogo from 'src/components/ZentenpoLogo.vue';
+import ZetenpoLogo from 'src/components/ZetenpoLogo.vue';
 </script>
 
 <style scoped lang="scss">
@@ -162,6 +162,7 @@ import ZentenpoLogo from 'src/components/ZentenpoLogo.vue';
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   transition: all 0.3s ease;
+  white-space: nowrap;
 
   &:hover {
     transform: translateY(-2px);
@@ -269,6 +270,7 @@ import ZentenpoLogo from 'src/components/ZentenpoLogo.vue';
 .cta-text {
   flex: 1;
   min-width: 300px;
+  text-align: left;
 }
 
 .cta-title {
@@ -328,11 +330,13 @@ import ZentenpoLogo from 'src/components/ZentenpoLogo.vue';
   .hero-actions {
     width: 100%;
     justify-content: center;
+    flex-direction: column;
   }
 
   .hero-btn {
-    flex: 1;
+    width: 100%;
     min-width: 0;
+    font-size: 15px;
   }
 
   .features-section {
@@ -356,18 +360,29 @@ import ZentenpoLogo from 'src/components/ZentenpoLogo.vue';
     flex-direction: column;
     text-align: center;
     padding: 32px;
+    align-items: center;
+  }
+
+  .cta-text {
+    min-width: 0;
+    width: 100%;
+    text-align: center;
   }
 
   .cta-title {
     font-size: 24px;
+    text-align: center;
   }
 
   .cta-description {
     font-size: 16px;
+    text-align: center;
   }
 
   .cta-button {
     width: 100%;
+    text-align: center;
+    justify-content: center;
   }
 }
 
@@ -380,8 +395,81 @@ import ZentenpoLogo from 'src/components/ZentenpoLogo.vue';
     font-size: 16px;
   }
 
+  .hero-actions {
+    flex-direction: column;
+  }
+
   .hero-btn {
     width: 100%;
+    min-width: 0;
+    font-size: 14px;
+    padding: 0 16px;
+    white-space: normal;
+    height: auto;
+    min-height: 48px;
+    line-height: 1.4;
+  }
+}
+
+@media (max-width: 400px) {
+  .hero-btn {
+    font-size: 13px;
+    padding: 0 12px;
+  }
+
+  .cta-section {
+    padding: 40px 16px;
+  }
+
+  .cta-content {
+    padding: 24px 16px;
+  }
+
+  .cta-title {
+    font-size: 20px;
+  }
+
+  .cta-description {
+    font-size: 14px;
+  }
+
+  .cta-button {
+    font-size: 14px;
+    padding: 0 16px;
+    white-space: normal;
+    height: auto;
+    min-height: 48px;
+    line-height: 1.4;
+  }
+}
+
+@media (max-width: 370px) {
+  .cta-section {
+    padding: 32px 12px;
+  }
+
+  .cta-content {
+    padding: 20px 12px;
+  }
+
+  .cta-title {
+    font-size: 18px;
+    margin-bottom: 8px;
+  }
+
+  .cta-description {
+    font-size: 13px;
+    line-height: 1.5;
+  }
+
+  .cta-button {
+    font-size: 13px;
+    padding: 0 12px;
+    min-height: 44px;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 }
 </style>

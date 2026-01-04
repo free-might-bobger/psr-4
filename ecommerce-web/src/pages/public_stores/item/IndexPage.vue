@@ -1,8 +1,7 @@
 <template>
-  <div class="q-ma-sm">
-    <div class="row q-col-gutter-xs">
-      <div class="col-xs-12">
-        <div class="flex items-center breadcrumbs-container">
+  <div class="store-page-container">
+    <!-- Store Header -->
+    <div class="store-header q-mb-lg">
           <BreadCrumbsWrapper :bread-crumbs="[
             {
               name: store.name,
@@ -15,22 +14,19 @@
           ]" />
         </div>
 
-      </div>
-    </div>
-
     <div class="row q-col-gutter-md" v-if="item">
       <div class="col-lg-5 col-md-5 col-xs-12">
         <q-card class="product-image-card q-mt-sm" flat bordered>
           <q-carousel v-model="slide" vertical transition-prev="slide-down" transition-next="slide-up" swipeable
             animated control-color="primary" navigation-icon="radio_button_unchecked" navigation padding height="400px"
             class="rounded-borders">
-            <q-carousel-slide :name="index" class="column no-wrap flex-center" v-for="(image, index) in item.images"
-              :key="image.id">
+          <q-carousel-slide :name="index" class="column no-wrap flex-center" v-for="(image, index) in item.images"
+            :key="image.id">
               <div class="q-pa-md text-center full-width full-height flex flex-center">
                 <img :src="image.path_url" class="product-image" :alt="item.name" />
-              </div>
-            </q-carousel-slide>
-          </q-carousel>
+            </div>
+          </q-carousel-slide>
+        </q-carousel>
         </q-card>
       </div>
 
@@ -38,8 +34,8 @@
         <q-card class="product-info-card q-mt-sm" flat bordered>
           <q-card-section>
             <div class="product-title text-h4 text-weight-bold q-mb-md">
-              {{ item.name }}
-            </div>
+            {{ item.name }}
+          </div>
 
             <div class="product-description text-body1 text-grey-8 q-mb-lg">
               {{ item.description }}
@@ -55,14 +51,14 @@
                     class="unit-radio" />
                 </div>
               </div>
-            </div>
+          </div>
 
             <div class="price-section q-mb-lg">
               <div class="text-subtitle2 text-weight-medium q-mb-sm">Price:</div>
               <div class="price-display text-h5 text-weight-bold text-primary">
                 {{ getPriceRange(filteredItemPrice) }}
-              </div>
-            </div>
+        </div>
+      </div>
 
             <q-separator class="q-mb-lg" />
 
@@ -226,15 +222,15 @@ const userAddCart = () => {
     id: item.value.id || 0,
     optimus_id: item.value.optimus_id,
     name: item.value.name,
-    count: qty.value,
+      count: qty.value,
     store_id: item.value.store?.optimus_id || Number(route.params.id),
     item_price: transformedItemPrice,
-    variations: [
-      {
-        count: qty.value,
-        unit: selectedUnit.value,
-      },
-    ],
+      variations: [
+        {
+          count: qty.value,
+          unit: selectedUnit.value,
+        },
+      ],
     primary_img: {
       path_url: item.value.images && item.value.images.length > 0
         ? item.value.images[0].path_url
@@ -244,7 +240,7 @@ const userAddCart = () => {
       optimus_id: item.value.store?.optimus_id || Number(route.params.id),
     },
   };
-   useUserCart.addQty(cartItem);
+  useUserCart.addQty(cartItem);
 
   $q.notify({
     message: 'You have successfully added the item to the cart.',
@@ -255,6 +251,16 @@ const userAddCart = () => {
 </script>
 
 <style scoped lang="scss">
+.store-page-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+.store-header {
+  padding: 16px 0;
+}
+
 .product-image-card {
   border-radius: 12px;
   overflow: hidden;

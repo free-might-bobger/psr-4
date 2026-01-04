@@ -6,10 +6,10 @@
                 <div class="footer-brand">
                     <div class="footer-logo-section">
                         <div class="footer-logo">
-                            <ZentenpoLogo :size="40" />
+                            <ZetenpoLogo :size="40" />
                         </div>
                         <div class="footer-brand-text">
-                            <div class="footer-brand-name">Zentenpo</div>
+                            <div class="footer-brand-name">Zetenpo</div>
                             <div class="footer-brand-tagline">Your Trusted Online Shop</div>
                         </div>
                     </div>
@@ -38,7 +38,7 @@
                     </div>
                     <div class="footer-contact-item">
                         <q-icon name="email" size="sm" class="q-mr-sm" />
-                        <span>support@zentenpo.com</span>
+                        <span>support@zetenpo.com</span>
                     </div>
                     <div class="footer-contact-item">
                         <q-icon name="location_on" size="sm" class="q-mr-sm" />
@@ -52,7 +52,7 @@
             <div class="footer-bottom">
                 <div class="footer-copyright">
                     <q-icon name="copyright" size="sm" class="q-mr-xs" />
-                    <span>2024 Zentenpo. All rights reserved.</span>
+                    <span>2024 Zetenpo. All rights reserved.</span>
                 </div>
                 <div class="footer-social">
                     <q-btn flat round icon="facebook" size="sm" class="social-btn" />
@@ -67,7 +67,7 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia';
 import { useUserStore } from 'src/stores/user';
-import ZentenpoLogo from 'src/components/ZentenpoLogo.vue';
+import ZetenpoLogo from 'src/components/ZetenpoLogo.vue';
 
 const { profile } = storeToRefs(useUserStore());
 </script>

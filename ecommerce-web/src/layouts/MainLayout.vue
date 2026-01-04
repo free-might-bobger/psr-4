@@ -5,14 +5,14 @@
         <!-- Logo Section -->
         <router-link to="/" class="logo-link">
           <div class="logo-container">
-            <ZentenpoLogo :size="48" />
+            <ZetenpoLogo :size="48" />
           </div>
           <div class="logo-text">
-            <span class="logo-brand-name">Zentenpo</span>
+            <span class="logo-brand-name">Zetenpo</span>
             <span class="logo-tagline">Your Trusted Shop</span>
           </div>
         </router-link>
-       
+
         <q-space />
 
         <!-- Action Buttons -->
@@ -82,7 +82,7 @@ import { storeToRefs } from 'pinia';
 import { useUserCartStore } from 'src/stores/userCart';
 import { logout } from 'src/boot/axios-call';
 import AppFooter from 'src/components/AppFooter.vue';
-import ZentenpoLogo from 'src/components/ZentenpoLogo.vue';
+import ZetenpoLogo from 'src/components/ZetenpoLogo.vue';
 
 const { profile } = storeToRefs(useUserStore());
 const { countTotalItems } = storeToRefs(useUserCartStore());
@@ -194,8 +194,6 @@ const { countTotalItems } = storeToRefs(useUserCartStore());
   min-width: 20px;
   height: 20px;
   padding: 0 6px;
-  top: 4px;
-  right: 4px;
   animation: pulse 2s infinite;
 }
 
@@ -268,10 +266,6 @@ const { countTotalItems } = storeToRefs(useUserCartStore());
 
   .user-menu-list {
     min-width: 200px;
-  }
-
-  .logo-text {
-    display: none;
   }
 }
 </style>
