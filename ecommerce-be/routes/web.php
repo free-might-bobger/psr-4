@@ -88,7 +88,7 @@ Route::post('register/ {
 Route::post('register', [RegisterController::class, 'register']);
 Route::post('send-email-invitation', [UserController::class, 'inviteByEmail']);
 Route::post('create-new-activation-code', [MobileActivationCodeController::class, 'createNewActivationcode']);
-Route::post('verify-passcode', [MobileActivationCodeController::class, 'verifyPasscode']);
+Route::get('verify/activation_code/{activation_code}', [RegisterController::class, 'verifyActivationCode']);
 Route::get('login', [RegisterController::class, 'loginPageRedirect']);
 Route::post('login', [RegisterController::class, 'login']);
 Route::post( 'login', [ RegisterController::class, 'login' ] );

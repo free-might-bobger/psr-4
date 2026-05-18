@@ -1,14 +1,14 @@
 @component('mail::message')
-# Hi, Welcome {{ $array['name'] }}!
+# Hi, Welcome {{ $user['name'] }}!
 
-To verify your email address ({{ $array['email'] }}), please click the following link.
+To verify your email address ({{ $user['email'] }}), please click the following link.
 
 <br />
-<a href="{{ $array['activation_code']}}">Verify Email</a>
+<a href="{{ $user['activation_code']}}">Verify Email</a>
 <br />
 <br />
-{{ $array['activation_code']}}
+{{ $user['activation_code']}}
 
 Thanks,<br>
-Saint Homobonus Academy, Inc.
+MyNearShops
 @endcomponent

@@ -26,12 +26,13 @@ class User extends Authenticatable
         'lastname',
         'email',
         'mobile',
-        'passcode',
+        'activation_code',
         'status',
         'mobile_attempt_count',
         'mobile_verified_at',
         'email_verified_at',
-        'password'
+        'password',
+        'is_active'
     ];
 
     /**

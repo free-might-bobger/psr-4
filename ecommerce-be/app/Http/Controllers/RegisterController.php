@@ -14,6 +14,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Log;
 use Laravel\Socialite\Facades\Socialite;
 use App\Models\RoleUser;
+use App\Services\RegisterService;
 use Throwable;
 class RegisterController extends BaseController
 {
@@ -40,6 +41,7 @@ class RegisterController extends BaseController
         $input['email'] = $request->email;
         $input['password'] = bcrypt($request->password);
         $input['status'] = 0;
+        $input['activation_code'] = Str::random(64);
 
         if ($request->filled('name')) {
             $trimmed = trim((string) $request->name);
@@ -228,6 +230,15 @@ class RegisterController extends BaseController
         }
 
         return $frontendUrl . '/login?' . http_build_query($query);
+    }
+
+     public function verifyActivationCode(string $activationCode, RegisterService $service){
+
+        $verified = $service->verifyActivationCode($activationCode);
+        if($verified){
+            return redirect(config('app.frontend_url') . '?success=1');
+        }
+        return redirect(config('app.frontend_url') . '?success=0');
     }
 
 }
