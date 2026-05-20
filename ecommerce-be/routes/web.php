@@ -72,6 +72,8 @@ Route::group( [ 'middleware' => 'auth:api' ], function () {
 /* Route get */
 Route::get('/auth/facebook', [RegisterController::class, 'facebook']);
 Route::get('/auth/facebook/callback', [RegisterController::class, 'facebookCallback']);
+Route::get('/auth/google', [RegisterController::class, 'google']);
+Route::get('/auth/google/callback', [RegisterController::class, 'googleCallback']);
 Route::get( 'user/validator/mobile', [ UserValidationController::class, 'mobile' ] );
 Route::get( 'user/validator/is-mobile-a-user', [ UserValidationController::class, 'isMobileAUser' ] );
 Route::get('listing_api', [ListingApiController::class, 'index']);

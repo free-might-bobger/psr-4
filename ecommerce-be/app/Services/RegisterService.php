@@ -11,7 +11,7 @@ public function verifyActivationCode(String $activationCode): Bool {
         if($user){
             $user->update([
                 'activation_code' => null,
-                'is_active' => 1
+                'status' => 1
             ]);
             return true;
         }

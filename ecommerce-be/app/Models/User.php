@@ -32,7 +32,6 @@ class User extends Authenticatable
         'mobile_verified_at',
         'email_verified_at',
         'password',
-        'is_active'
     ];
 
     /**

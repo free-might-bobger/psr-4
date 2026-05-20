@@ -106,12 +106,23 @@
 
               <div class="social-login-copy q-mb-md">
                 <div class="text-subtitle1 text-weight-medium q-mb-sm">
-                  Continue with Facebook
+                  Continue with Google Account
                 </div>
                 <div class="form-helper-text">
-                  Use your Facebook account to sign in quickly and continue shopping.
+                  Use your google account to sign in quickly and continue shopping.
                 </div>
               </div>
+
+              <q-btn
+                label="Continue with Google"
+                color="primary"
+                class="login-submit-btn google-login-btn full-width q-mt-sm"
+                unelevated
+                size="lg"
+                :loading="isGoogleRedirecting"
+                :disable="isEmailSubmitting"
+                @click="loginWithGoogle"
+              />
 
               <q-btn
                 label="Continue with Facebook"
@@ -122,7 +133,10 @@
                 :loading="isFacebookRedirecting"
                 :disable="isEmailSubmitting"
                 @click="loginWithFacebook"
+                :disabled=true
               />
+
+              
 
               <div class="trust-section q-mt-lg">
                 <div class="trust-item">
@@ -171,10 +185,15 @@ const password = ref('');
 const showPassword = ref(false);
 const isEmailSubmitting = ref(false);
 const isFacebookRedirecting = ref(false);
+const isGoogleRedirecting = ref(false);
 
 const redirectTo = route.redirectedFrom?.fullPath;
 const getFacebookLoginUrl = () => {
   return new URL('auth/facebook', axios.defaults.baseURL).toString();
+};
+
+const getGoogleLoginUrl = () => {
+  return new URL('auth/google', axios.defaults.baseURL).toString();
 };
 
 const getQueryValue = (value: unknown): string => {
@@ -223,6 +242,19 @@ const finishFacebookLoginFromQuery = async (token: string) => {
   await router.replace(redirectTo || '/');
 };
 
+const finishGoogleLoginFromQuery = async (token: string) => {
+  const socialProfile: ProfileState = {
+    token,
+    name: getQueryValue(route.query.name) || null,
+    mobile: getQueryValue(route.query.mobile),
+    optimus_id: Number(getQueryValue(route.query.optimus_id) || 0),
+    userMenu: getUserMenuFromQuery(),
+  };
+
+  applyAuthPayload(socialProfile, 'Google login successful! Welcome back.');
+  await router.replace(redirectTo || '/');
+};
+
 const loginWithEmail = async () => {
   isEmailSubmitting.value = true;
   try {
@@ -237,7 +269,7 @@ const loginWithEmail = async () => {
         name: data.name ?? null,
         mobile: data.mobile ?? '',
         optimus_id: Number(data.optimus_id ?? 0),
-        userMenu: Array.isArray(data.userMenu) ? data.userMenu : [],
+        userMenu: Array.isArray(data.userMenu) ? data.userMenu : (typeof data.userMenu === 'string' ? JSON.parse(data.userMenu) : []),
       };
       applyAuthPayload(profile, 'Signed in successfully. Welcome back.');
       await router.replace(redirectTo || '/');
@@ -260,15 +292,23 @@ const loginWithFacebook = () => {
   window.location.href = getFacebookLoginUrl();
 };
 
+const loginWithGoogle = () => {
+  isGoogleRedirecting.value = true;
+  window.location.href = getGoogleLoginUrl();
+};
+
 onMounted(async () => {
   const token = getQueryValue(route.query.token);
   const error = getQueryValue(route.query.error);
+  const provider = getQueryValue(route.query.provider);
 
   if (error) {
     $q.notify({
       message: error === 'facebook_email_required'
         ? 'Facebook did not return an email address for this account.'
-        : 'Facebook login failed. Please try again.',
+        : error === 'google_email_required'
+        ? 'Google did not return an email address for this account.'
+        : 'Social login failed. Please try again.',
       type: 'negative',
       position: 'top',
       icon: 'error'
@@ -277,13 +317,19 @@ onMounted(async () => {
 
   if (!token) {
     isFacebookRedirecting.value = false;
+    isGoogleRedirecting.value = false;
     return;
   }
 
   try {
-    await finishFacebookLoginFromQuery(token);
+    if (provider === 'google') {
+      await finishGoogleLoginFromQuery(token);
+    } else {
+      await finishFacebookLoginFromQuery(token);
+    }
   } finally {
     isFacebookRedirecting.value = false;
+    isGoogleRedirecting.value = false;
   }
 });
 </script>
@@ -422,6 +468,10 @@ onMounted(async () => {
 
 .facebook-login-btn {
   background: #1877f2 !important;
+}
+
+.google-login-btn {
+  background: #4285f4 !important;
 }
 
 .or-separator {

@@ -195,6 +195,7 @@ class RegisterController extends BaseController
                 'name' => $user->name,
                 'mobile' => $user->mobile,
                 'userMenu' => json_encode($userMenuService->getUserMenus()),
+                'provider' => 'facebook',
             ]));
 
         } catch (Throwable $e) {
@@ -206,6 +207,88 @@ class RegisterController extends BaseController
 
             return redirect($this->getFrontendLoginRedirect([
                 'error' => 'facebook_failed',
+            ]));
+        }
+    }
+
+    public function google()
+    {
+        $callbackUrl = url('/auth/google/callback');
+
+        return Socialite::driver('google')
+            ->redirectUrl($callbackUrl)
+            ->scopes(['email'])
+            ->stateless()
+            ->redirect();
+    }
+
+    public function googleCallback()
+    {
+        try {
+            $callbackUrl = url('/auth/google/callback');
+            $googleUser = Socialite::driver('google')
+                ->redirectUrl($callbackUrl)
+                ->stateless()
+                ->user();
+            $email = $googleUser->getEmail();
+
+            if (!$email) {
+                return redirect($this->getFrontendLoginRedirect([
+                    'error' => 'google_email_required',
+                ]));
+            }
+
+            /** @var User $user */
+            $user = User::firstOrNew(['email' => $email]);
+            $user->name = $googleUser->getName() ?: $googleUser->getNickname() ?: 'Google User';
+            $user->email = $email;
+            $user->status = 1;
+
+            if (!$user->exists) {
+                $user->password = bcrypt(Str::random(40));
+            }
+
+            if (isset($user->email_verified_at) && !$user->email_verified_at) {
+                $user->email_verified_at = now();
+            }
+
+            $user->save();
+
+            RoleUser::create([
+                'user_id' => $user->id,
+                'role_id' => Role::CUSTOMER
+            ]);
+            Auth::login($user);
+
+            $userMenuService = app(UserMenuService::class);
+            $token = $user->createToken('google-login')->accessToken;
+
+            Log::info('Google login successful', [
+                'user' => $user,
+                'token' => $token,
+                'optimus_id' => $user->optimus_id,
+                'name' => $user->name,
+                'mobile' => $user->mobile,
+                'userMenu' => json_encode($userMenuService->getUserMenus()),
+            ]);
+            return redirect($this->getFrontendLoginRedirect([
+                'token' => $token,
+                'optimus_id' => $user->optimus_id,
+                'name' => $user->name,
+                'mobile' => $user->mobile,
+                'userMenu' => json_encode($userMenuService->getUserMenus()),
+                'provider' => 'google',
+            ]));
+
+        } catch (Throwable $e) {
+            Log::error('Google login failed', [
+                'message' => $e->getMessage(),
+                'callback_url' => url('/auth/google/callback'),
+                'request_url' => request()->fullUrl(),
+            ]);
+
+            return redirect($this->getFrontendLoginRedirect([
+                'error' => 'google_failed',
             ]));
         }
     }

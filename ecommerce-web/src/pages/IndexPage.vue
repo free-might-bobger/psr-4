@@ -101,6 +101,22 @@
 
 <script setup lang="ts">
 import BiliscartLogo from 'src/components/BiliscartLogo.vue';
+import { useQuasar } from 'quasar';
+
+const $q = useQuasar();
+const urlParams = new URLSearchParams(window.location.search);
+const success = urlParams.get('success')?.trim();
+
+if (success === 'true') {
+  $q.notify({
+    type: 'positive',
+    message: 'Account activated successfully',
+    position: 'top',
+    timeout: 0,
+    closeBtn: 'OK'
+  });
+}
+
 </script>
 
 <style scoped lang="scss">
