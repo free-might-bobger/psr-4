@@ -93,10 +93,10 @@ export function truncateString(str: string, num = 30): string {
   if (str.length <= num) {
     return str;
   }
-  return str.slice(0, num) + "...";
+  return str.slice(0, num) + '...';
 }
 
-export function formatMoney(actualNumber: any) {
+export function formatMoney(actualNumber: number) {
   return '₱ ' + actualNumber.toLocaleString('en-US', { maximumFractionDigits: 2, minimumFractionDigits: 2 })
 }
 

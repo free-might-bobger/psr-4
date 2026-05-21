@@ -25,174 +25,160 @@
       </div>
     </div>
 
-    <!-- Desktop Grid View -->
+    <!-- Desktop Table View -->
     <div class="desktop-only">
       <div v-if="typedResult.length === 0" class="empty-state-desktop">
         <q-icon name="receipt_long" size="80px" color="grey-4" />
         <div class="text-h5 q-mt-md text-grey-6">No transactions found</div>
         <div class="text-body2 text-grey-5 q-mt-sm">Your transaction history will appear here</div>
       </div>
-      <div v-else>
-        <!-- Grid Header -->
-        <div class="grid-header transactions-grid-header">
-          <div class="grid-header-cell header-name">
-            <q-icon name="tag" size="20px" color="primary" class="q-mr-xs" />
-            <span class="header-label">Reference</span>
-          </div>
-          <div class="grid-header-cell header-name">
-            <q-icon name="tag" size="20px" color="primary" class="q-mr-xs" />
-            <span class="header-label">Order Status</span>
-          </div>
-          <div class="grid-header-cell header-mobile">
-            <q-icon name="payments" size="20px" color="primary" class="q-mr-xs" />
-            <span class="header-label">Summary</span>
-          </div>
-          <div class="grid-header-cell header-actions">
-            <q-icon name="settings" size="20px" color="primary" class="q-mr-xs" />
-            <span class="header-label">Actions</span>
-          </div>
-        </div>
-
-        <!-- Grid Rows -->
-        <div class="stores-grid">
-          <q-card
-            v-for="transaction in typedResult"
-            :key="transaction.optimus_id"
-            flat
-            bordered
-            class="store-grid-item"
-          >
-            <div class="grid-row transaction-grid-row">
-              <div class="grid-cell cell-name">
-                <router-link
-                  :to="`${$route.path}/${transaction.optimus_id}`"
-                  class="transaction-reference"
-                >
-                  <div class="transaction-reference-text">
-                    <div class="transaction-reference-id"> {{ transaction.reference_id }}</div>
-                    <div class="transaction-date">
-                      <q-icon name="calendar_today" size="xs" class="q-mr-xs" />
-                      {{ formatDate(transaction.created_at) }}
-                    </div>
-                  </div>
-                </router-link>
+      <q-table
+        v-else
+        flat
+        bordered
+        :rows="typedResult"
+        :columns="columns"
+        row-key="optimus_id"
+        class="transactions-table"
+      >
+        <template v-slot:body-cell-reference="props">
+          <q-td :props="props">
+            <router-link
+              :to="`${$route.path}/${props.row.optimus_id}`"
+              class="transaction-reference-link"
+            >
+              <div class="transaction-reference-id">{{ props.row.reference_id }}</div>
+              <div class="transaction-date">
+                <q-icon name="calendar_today" size="xs" class="q-mr-xs" />
+                {{ formatDate(props.row.created_at) }}
               </div>
-            <div class="grid-cell cell-status">
-              <q-badge
-                :color="getStatusColor(transaction.status?.label)"
-                :label="transaction.status?.label || 'Pending'"
-                class="status-badge"
+            </router-link>
+          </q-td>
+        </template>
+
+        <template v-slot:body-cell-status="props">
+          <q-td :props="props">
+            <q-badge
+              :color="getStatusColor(props.row.status?.label)"
+              :label="props.row.status?.label || 'Pending'"
+              class="status-badge"
+            />
+          </q-td>
+        </template>
+
+        <template v-slot:body-cell-summary="props">
+          <q-td :props="props">
+            <div class="transaction-summary">
+              <div class="transaction-total">
+                Grand Total: <span>{{ props.row.grand_total }}</span>
+              </div>
+              <div class="transaction-meta">
+                <div class="transaction-meta-item">
+                  <q-icon name="payment" size="xs" class="q-mr-xs" />
+                  {{ props.row.payment_method?.name || 'N/A' }}
+                </div>
+                <div class="transaction-meta-item">
+                  <q-icon name="local_shipping" size="xs" class="q-mr-xs" />
+                  {{ props.row.receive_method?.name || 'N/A' }}
+                </div>
+              </div>
+            </div>
+          </q-td>
+        </template>
+
+        <template v-slot:body-cell-actions="props">
+          <q-td :props="props">
+            <div class="action-buttons">
+              <q-btn
+                v-if="props.row.status"
+                unelevated
+                dense
+                round
+                color="secondary"
+                icon="check_circle"
+                @click="markedAsReceived(props.row.optimus_id)"
+                size="sm"
+                class="q-mr-xs"
+              >
+                <q-tooltip>Mark as received</q-tooltip>
+              </q-btn>
+              <q-btn
+                round
+                unelevated
+                dense
+                color="primary"
+                icon="visibility"
+                :to="`${$route.path}/${props.row.optimus_id}`"
+                size="sm"
+                class="q-mr-xs"
+              >
+                <q-tooltip>View details</q-tooltip>
+              </q-btn>
+              <q-btn
+                v-if="props.row.status"
+                unelevated
+                dense
+                round
+                color="negative"
+                icon="undo"
+                :to="`${$route.path}/${props.row.optimus_id}`"
+                size="sm"
+              >
+                <q-tooltip>Request refund</q-tooltip>
+              </q-btn>
+            </div>
+          </q-td>
+        </template>
+
+        <template v-slot:bottom>
+          <div class="table-pagination">
+            <div class="pagination-info">
+              Showing {{ pagination.from }} - {{ pagination.to }} of {{ pagination.rowsNumber }} transactions
+            </div>
+            <div class="pagination-controls">
+              <q-btn
+                v-if="pagination.lastPage > 2"
+                flat
+                round
+                dense
+                icon="first_page"
+                color="grey-8"
+                :disable="pagination.page === 1"
+                @click="goToFirstPage"
+              />
+              <q-btn
+                flat
+                round
+                dense
+                icon="chevron_left"
+                color="grey-8"
+                :disable="pagination.page === 1"
+                @click="goToPreviousPage"
+              />
+              <span class="page-number">{{ pagination.page }} / {{ pagination.lastPage }}</span>
+              <q-btn
+                flat
+                round
+                dense
+                icon="chevron_right"
+                color="grey-8"
+                :disable="pagination.page === pagination.lastPage"
+                @click="goToNextPage"
+              />
+              <q-btn
+                v-if="pagination.lastPage > 2"
+                flat
+                round
+                dense
+                icon="last_page"
+                color="grey-8"
+                :disable="pagination.page === pagination.lastPage"
+                @click="goToLastPage"
               />
             </div>
-              <div class="grid-cell cell-mobile">
-                <div class="transaction-summary">
-                  <div class="transaction-total">
-                    Grand Total:
-                    <span>{{ transaction.grand_total }}</span>
-                  </div>
-                  <div class="transaction-meta">
-                    <div class="transaction-meta-item">
-                      <q-icon name="payment" size="xs" class="q-mr-xs" />
-                      {{ transaction.payment_method?.name || 'N/A' }}
-                    </div>
-                    <div class="transaction-meta-item">
-                      <q-icon name="local_shipping" size="xs" class="q-mr-xs" />
-                      {{ transaction.receive_method?.name || 'N/A' }}
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="grid-cell cell-actions">
-                <div class="action-buttons">
-                  <q-btn
-                    v-if="transaction.status"
-                    unelevated
-                    dense
-                    round
-                    color="secondary"
-                    icon="check_circle"
-                    @click="markedAsReceived(transaction.optimus_id)"
-                     class="action-btn-grid action-btn-delete"
-                  >
-                    <q-tooltip>Mark as received</q-tooltip>
-                  </q-btn>
-                  <q-btn
-                    round
-                    unelevated
-                    dense
-                    color="primary"
-                    icon="visibility"
-                    :to="`${$route.path}/${transaction.optimus_id}`"
-                      class="action-btn-grid action-btn-edit"
-                  >
-                    <q-tooltip>View details</q-tooltip>
-                  </q-btn>
-                  <q-btn
-                    v-if="transaction.status"
-                    unelevated
-                    dense
-                    round
-                    color="negative"
-                    icon="undo"
-                    :to="`${$route.path}/${transaction.optimus_id}`"
-                     class="action-btn-grid action-btn-delete"
-                  >
-                    <q-tooltip>Request refund</q-tooltip>
-                  </q-btn>
-                </div>
-              </div>
-            </div>
-          </q-card>
-        </div>
-
-        <!-- Pagination -->
-        <div class="grid-pagination">
-          <div class="pagination-info">
-            Showing {{ pagination.from }} - {{ pagination.to }} of {{ pagination.rowsNumber }} transactions
           </div>
-          <div class="pagination-controls">
-            <q-btn
-              v-if="pagination.lastPage > 2"
-              flat
-              round
-              dense
-              icon="first_page"
-              color="grey-8"
-              :disable="pagination.page === 1"
-              @click="goToFirstPage"
-            />
-            <q-btn
-              flat
-              round
-              dense
-              icon="chevron_left"
-              color="grey-8"
-              :disable="pagination.page === 1"
-              @click="goToPreviousPage"
-            />
-            <span class="page-number">{{ pagination.page }} / {{ pagination.lastPage }}</span>
-            <q-btn
-              flat
-              round
-              dense
-              icon="chevron_right"
-              color="grey-8"
-              :disable="pagination.page === pagination.lastPage"
-              @click="goToNextPage"
-            />
-            <q-btn
-              v-if="pagination.lastPage > 2"
-              flat
-              round
-              dense
-              icon="last_page"
-              color="grey-8"
-              :disable="pagination.page === pagination.lastPage"
-              @click="goToLastPage"
-            />
-          </div>
-        </div>
-      </div>
+        </template>
+      </q-table>
     </div>
 
     <!-- Mobile Card View -->
@@ -301,6 +287,39 @@ entityQuery.value = {
 
 const typedResult = result as unknown as CustomerTransactionRow[];
 
+const columns = [
+  {
+    name: 'reference',
+    required: true,
+    label: 'Reference',
+    align: 'left',
+    field: 'reference_id',
+    sortable: true
+  },
+  {
+    name: 'status',
+    required: true,
+    label: 'Order Status',
+    align: 'left',
+    field: row => row.status?.label || 'Pending',
+    sortable: true
+  },
+  {
+    name: 'summary',
+    required: true,
+    label: 'Summary',
+    align: 'left',
+    field: 'grand_total'
+  },
+  {
+    name: 'actions',
+    required: true,
+    label: 'Actions',
+    align: 'center',
+    field: ''
+  }
+];
+
 const handlePageChange = (page: number) => {
   entityQuery.value.query.page = page;
   onRequest(entityQuery.value);
@@ -363,7 +382,7 @@ const formatDate = (dateString: string | undefined): string => {
 };
 
 const markedAsReceived = async (transactionId: string) => {
-   const updated = await update(
+   await update(
       {
         entity: 'my-transactions-marked-as-received',
         data: {},
@@ -378,27 +397,102 @@ const markedAsReceived = async (transactionId: string) => {
 <style scoped lang="scss">
 @import 'src/css/dashboard/all-stores/index.scss';
 
-.transactions-grid-header {
-  grid-template-columns: 2fr 1.5fr 2fr 1fr;
+.transactions-table {
+  width: 100%;
 }
 
-.transaction-grid-row {
-  grid-template-columns: 2fr 1.5fr 2fr 1fr;
+.transaction-reference-link {
+  text-decoration: none;
+  color: inherit;
+
+  &:hover {
+    color: #1976d2;
+  }
 }
 
-.cell-status {
+.transaction-reference-id {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1a1a1a;
+}
+
+.transaction-date {
+  font-size: 12px;
+  color: #666;
   display: flex;
   align-items: center;
+  margin-top: 2px;
 }
 
 .status-badge {
   font-size: 12px;
   font-weight: 600;
-  padding: 6px 12px;
-  border-radius: 16px;
+  padding: 4px 10px;
+  border-radius: 12px;
 }
 
-/* Mobile card: wrap status badge to next line when header row is too tight */
+.transaction-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.transaction-total {
+  font-size: 13px;
+  color: #1a1a1a;
+  font-weight: 600;
+
+  span {
+    font-weight: 700;
+  }
+}
+
+.transaction-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  color: #666;
+  font-size: 12px;
+}
+
+.transaction-meta-item {
+  display: flex;
+  align-items: center;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 4px;
+  justify-content: center;
+}
+
+.table-pagination {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+}
+
+.pagination-info {
+  font-size: 13px;
+  color: #666;
+}
+
+.pagination-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.page-number {
+  font-size: 13px;
+  color: #1a1a1a;
+  font-weight: 600;
+  min-width: 50px;
+  text-align: center;
+}
+
+/* Mobile card styles */
 .store-card-header.transaction-store-card-header {
   flex-wrap: wrap;
   align-items: flex-start;
@@ -430,61 +524,6 @@ const markedAsReceived = async (transactionId: string) => {
   max-width: 100%;
 }
 
-.transaction-reference {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  color: #1a1a1a;
-}
-
-.transaction-reference-text {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.transaction-reference-id {
-  font-size: 16px;
-  font-weight: 700;
-  color: #1a1a1a;
-}
-
-.transaction-date {
-  font-size: 12px;
-  color: #666;
-  display: flex;
-  align-items: center;
-}
-
-.transaction-summary {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.transaction-total {
-  font-size: 14px;
-  color: #1a1a1a;
-  font-weight: 600;
-
-  span {
-    font-weight: 700;
-  }
-}
-
-.transaction-meta {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  color: #666;
-  font-size: 13px;
-}
-
-.transaction-meta-item {
-  display: flex;
-  align-items: center;
-}
-
 .transaction-mobile-details {
   margin-top: 12px;
   display: flex;
@@ -506,23 +545,5 @@ const markedAsReceived = async (transactionId: string) => {
 
 .transaction-detail-value {
   font-weight: 600;
-}
-
-@media (max-width: 768px) {
-  .transactions-grid-header {
-    display: none;
-  }
-
-  .transaction-grid-row {
-    grid-template-columns: 1fr;
-  }
-
-  .transaction-reference {
-    gap: 10px;
-  }
-
-  .transaction-reference-id {
-    font-size: 18px;
-  }
 }
 </style>

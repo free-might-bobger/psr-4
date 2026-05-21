@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { UserState, Menu, ProfileState } from 'src/boot/interfaces';
+import { UserState, ProfileState } from 'src/boot/interfaces';
 
 
 const user = () => ({
@@ -20,6 +20,9 @@ export const useUserStore = defineStore('user', {
         return true;
       }
       return false;
+    },
+    menuIds: (state) => {
+      return state.profile.userMenu.map((menu) => menu.id);
     },
   },
   actions: {
