@@ -25,133 +25,122 @@
       </div>
     </div>
 
-    <!-- Desktop Grid View -->
+    <!-- Desktop Table View -->
     <div class="desktop-only">
       <div v-if="typedResult.length === 0" class="empty-state-desktop">
         <q-icon name="person_off" size="80px" color="grey-4" />
         <div class="text-h5 q-mt-md text-grey-6">No users found</div>
         <div class="text-body2 text-grey-5 q-mt-sm">Try adjusting your search criteria</div>
       </div>
-      <div v-else>
-        <!-- Grid Header -->
-        <div class="grid-header">
-          <div class="grid-header-cell header-name">
-            <q-icon name="person" size="20px" color="primary" class="q-mr-xs" />
-            <span class="header-label">User Name</span>
-          </div>
-          <div class="grid-header-cell header-mobile">
-            <q-icon name="phone" size="20px" color="primary" class="q-mr-xs" />
-            <span class="header-label">Mobile</span>
-          </div>
-          <div class="grid-header-cell header-actions">
-            <q-icon name="settings" size="20px" color="primary" class="q-mr-xs" />
-            <span class="header-label">Actions</span>
-          </div>
-        </div>
+      <q-table
+        v-else
+        flat
+        bordered
+        :rows="typedResult"
+        :columns="columns"
+        row-key="optimus_id"
+        class="users-table"
+      >
+        <template v-slot:body-cell-name="props">
+          <q-td :props="props">
+            <router-link
+              :to="`${$route.path}/${props.row.optimus_id}`"
+              class="user-name-link"
+            >
+              <q-icon name="person" color="primary" class="q-mr-xs" />
+              <span>{{ props.row.name || props.row.label || 'N/A' }}</span>
+            </router-link>
+          </q-td>
+        </template>
 
-        <!-- Grid Rows -->
-        <div class="stores-grid">
-          <q-card
-            v-for="user in typedResult"
-            :key="user.id"
-            flat
-            bordered
-            class="store-grid-item"
-          >
-            <div class="grid-row">
-              <div class="grid-cell cell-name">
-                <router-link
-                  :to="`${$route.path}/${user.optimus_id}`"
-                  class="store-name-grid"
-                >
-                  <q-icon name="person" color="primary" />
-                  <span class="store-name-text">{{ user.name || user.label || 'N/A' }}</span>
-                </router-link>
-              </div>
-              <div class="grid-cell cell-mobile">
-                <div class="mobile-info">
-                  <q-icon name="phone" color="primary" />
-                  <span>{{ user.mobile || 'N/A' }}</span>
-                </div>
-              </div>
-              <div class="grid-cell cell-actions">
-                <div class="action-buttons">
-                  <q-btn
-                    unelevated
-                    round
-                    dense
-                    color="primary"
-                    icon="edit_note"
-                    :to="`${$route.path}/${user.optimus_id}`"
-                    class="action-btn-grid action-btn-edit"
-                  >
-                    <q-tooltip>Edit User</q-tooltip>
-                  </q-btn>
-                  <q-btn
-                    unelevated
-                    round
-                    dense
-                    color="negative"
-                    icon="delete_forever"
-                    @click="handleDeleteUser(user)"
-                    class="action-btn-grid action-btn-delete"
-                  >
-                    <q-tooltip>Delete User</q-tooltip>
-                  </q-btn>
-                </div>
-              </div>
+        <template v-slot:body-cell-mobile="props">
+          <q-td :props="props">
+            <div class="mobile-cell">
+              <q-icon name="phone" color="primary" class="q-mr-xs" />
+              <span>{{ props.row.mobile || 'N/A' }}</span>
             </div>
-          </q-card>
-        </div>
+          </q-td>
+        </template>
 
-        <!-- Pagination -->
-        <div class="grid-pagination">
-          <div class="pagination-info">
-            Showing {{ pagination.from }} - {{ pagination.to }} of {{ pagination.rowsNumber }} users
+        <template v-slot:body-cell-actions="props">
+          <q-td :props="props">
+            <div class="action-buttons">
+              <q-btn
+                unelevated
+                dense
+                round
+                color="primary"
+                icon="edit_note"
+                :to="`${$route.path}/${props.row.optimus_id}`"
+                size="sm"
+                class="q-mr-xs"
+              >
+                <q-tooltip>Edit User</q-tooltip>
+              </q-btn>
+              <q-btn
+                unelevated
+                dense
+                round
+                color="negative"
+                icon="delete_forever"
+                @click="handleDeleteUser(props.row)"
+                size="sm"
+              >
+                <q-tooltip>Delete User</q-tooltip>
+              </q-btn>
+            </div>
+          </q-td>
+        </template>
+
+        <template v-slot:bottom>
+          <div class="table-pagination">
+            <div class="pagination-info">
+              Showing {{ pagination.from }} - {{ pagination.to }} of {{ pagination.rowsNumber }} users
+            </div>
+            <div class="pagination-controls">
+              <q-btn
+                v-if="pagination.lastPage > 2"
+                flat
+                round
+                dense
+                icon="first_page"
+                color="grey-8"
+                :disable="pagination.page === 1"
+                @click="goToFirstPage"
+              />
+              <q-btn
+                flat
+                round
+                dense
+                icon="chevron_left"
+                color="grey-8"
+                :disable="pagination.page === 1"
+                @click="goToPreviousPage"
+              />
+              <span class="page-number">{{ pagination.page }} / {{ pagination.lastPage }}</span>
+              <q-btn
+                flat
+                round
+                dense
+                icon="chevron_right"
+                color="grey-8"
+                :disable="pagination.page === pagination.lastPage"
+                @click="goToNextPage"
+              />
+              <q-btn
+                v-if="pagination.lastPage > 2"
+                flat
+                round
+                dense
+                icon="last_page"
+                color="grey-8"
+                :disable="pagination.page === pagination.lastPage"
+                @click="goToLastPage"
+              />
+            </div>
           </div>
-          <div class="pagination-controls">
-            <q-btn
-              v-if="pagination.lastPage > 2"
-              flat
-              round
-              dense
-              icon="first_page"
-              color="grey-8"
-              :disable="pagination.page === 1"
-              @click="goToFirstPage"
-            />
-            <q-btn
-              flat
-              round
-              dense
-              icon="chevron_left"
-              color="grey-8"
-              :disable="pagination.page === 1"
-              @click="goToPreviousPage"
-            />
-            <span class="page-number">{{ pagination.page }} / {{ pagination.lastPage }}</span>
-            <q-btn
-              flat
-              round
-              dense
-              icon="chevron_right"
-              color="grey-8"
-              :disable="pagination.page === pagination.lastPage"
-              @click="goToNextPage"
-            />
-            <q-btn
-              v-if="pagination.lastPage > 2"
-              flat
-              round
-              dense
-              icon="last_page"
-              color="grey-8"
-              :disable="pagination.page === pagination.lastPage"
-              @click="goToLastPage"
-            />
-          </div>
-        </div>
-      </div>
+        </template>
+      </q-table>
     </div>
 
     <!-- Mobile Card View -->
@@ -255,6 +244,32 @@ entityQuery.value = {
 
 const typedResult = result as unknown as UserRow[];
 
+const columns = [
+  {
+    name: 'name',
+    required: true,
+    label: 'User Name',
+    align: 'left' as const,
+    field: (row: any) => row.name || row.label || 'N/A',
+    sortable: true
+  },
+  {
+    name: 'mobile',
+    required: true,
+    label: 'Mobile',
+    align: 'left' as const,
+    field: 'mobile',
+    sortable: true
+  },
+  {
+    name: 'actions',
+    required: true,
+    label: 'Actions',
+    align: 'center' as const,
+    field: ''
+  }
+];
+
 const handleDeleteUser = (user: UserRow) => {
   onDeleteEntity('users', user.optimus_id, user.name || user.label || 'User');
 };
@@ -299,4 +314,56 @@ watch(search, (newValue) => {
 
 <style scoped lang="scss">
 @import 'src/css/dashboard/all-stores/index.scss';
+
+.users-table {
+  width: 100%;
+}
+
+.user-name-link {
+  text-decoration: none;
+  color: inherit;
+  display: flex;
+  align-items: center;
+
+  &:hover {
+    color: #1976d2;
+  }
+}
+
+.mobile-cell {
+  display: flex;
+  align-items: center;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 4px;
+  justify-content: center;
+}
+
+.table-pagination {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+}
+
+.pagination-info {
+  font-size: 13px;
+  color: #666;
+}
+
+.pagination-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.page-number {
+  font-size: 13px;
+  color: #1a1a1a;
+  font-weight: 600;
+  min-width: 50px;
+  text-align: center;
+}
 </style>
