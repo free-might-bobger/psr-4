@@ -41,7 +41,7 @@ Route::resource('public_store_items', PublicStoreItemController::class)->only(['
 
 /* Route group */
 Route::group(['middleware' => 'auth:api', 'myTransactionMiddleware'], function () {
-  Route::get('my-transactions-marked-as-received/{transactionId}', [MyStoreTransactionController::class, 'markedAsReceived']);
+  Route::patch('my-transactions-marked-as-received/{transactionId}', [MyStoreTransactionController::class, 'markedAsReceived']);
 });
 
 Route::group( [ 'middleware' => 'auth:api' ], function () {

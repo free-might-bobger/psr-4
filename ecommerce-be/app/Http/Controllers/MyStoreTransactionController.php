@@ -9,7 +9,7 @@ use App\Repositories\MyStoreTransactionRepository;
 
 class MyStoreTransactionController extends ApiController {
 
-    protected $model;
+    protected string $model;
     public function __construct( MyStoreTransactionRepository $repository ) {
         $this->model =  Transaction::class;
         $this->repository = $repository;
@@ -18,9 +18,9 @@ class MyStoreTransactionController extends ApiController {
 
     }
 
-    public function markedAsReceived($transactionId) {
+    public function markedAsReceived(int $transactionId) {
         $updatedTransaction = $this->repository->markedAsReceived($transactionId);
-        return $this->successResponse($updatedTransaction, 'Transaction marked as received successfully');
+        return response()->json($updatedTransaction);
     }
 
 }

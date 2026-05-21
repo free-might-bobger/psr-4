@@ -12,7 +12,7 @@ use App\Http\Resources\BaseResource;
 
 class CustomerTransactionController extends ApiController
 {
-    protected $model;
+    protected string $model;
     public function __construct( CustomerTransactionRepository $repository ) {
         $this->model            =  Transaction::class;
         $this->repository       = $repository;

@@ -25,5 +25,7 @@ export enum ERROR_CODE{
 
 
 export enum TRANSACTION_STATUS {
-  CUSTOMER_RECEIVED_THE_ITEM = 4
+  COMPLETED = 'Completed'
 }
+
+

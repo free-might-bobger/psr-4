@@ -13,11 +13,20 @@ use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use App\Http\Requests\BaseIndexRequest;
+use Illuminate\Support\Facades\File;
 class BaseRepository implements BaseInterface
 {
     use UtilsTrait, SearchFieldSupport, OptimusRequiredToModel, BaseSupportRepository;
 
-    protected $model, $params, $cacheKey, $fillable;
+    protected Model|Builder|null $model;
+    protected array $params;
+    protected ?string $cacheKey;
+    protected array $fillable;
+    protected object $request;
+    protected array $associatedClass;
+    protected string $name;
+    protected string $fileName;
+    protected int $size;
 
     /**
      * Set the model
@@ -63,12 +72,16 @@ class BaseRepository implements BaseInterface
     /**
      * Find the resource or fail
      * @param int $id
+     * @param array $relations
      * @return Model
      */
-    public function findOrFail(int $id): Model
+    public function findOrFail(int $id, array $relations = []): Model
     {
-        $this->model = $this->model->findOrFail($this->optimus()->decode($id));
-        return $this->model;
+        $query = $this->model;
+        if (!empty($relations)) {
+            $query = $query->with($relations);
+        }
+        return $query->findOrFail($this->optimus()->decode($id));
     }
 
     /**
@@ -415,7 +428,7 @@ class BaseRepository implements BaseInterface
                 $this->size = $_FILES["images"]['size'][$key];
                 $uploadfile = file_get_contents($fileTmp);
 
-                \File::put(public_path() . '/images/uploads/' . $this->fileName, $uploadfile);
+                File::put(public_path() . '/images/uploads/' . $this->fileName, $uploadfile);
 
                 if ($this->request->isPrimary && $this->model->image) {
                     foreach ($this->model->images as $image) {
@@ -473,7 +486,7 @@ class BaseRepository implements BaseInterface
                 $fileTmp = $_FILES["files"]['tmp_name'][$key];
                 $this->size = $_FILES["files"]['size'][$key];
                 $uploadfile = file_get_contents($fileTmp);
-                \File::put(public_path() . '/images/uploads/' . $this->fileName, $uploadfile);
+                File::put(public_path() . '/images/uploads/' . $this->fileName, $uploadfile);
 
                 $image = new Image([
                     'thumbnail' => 'images/uploads/' . $this->fileName,

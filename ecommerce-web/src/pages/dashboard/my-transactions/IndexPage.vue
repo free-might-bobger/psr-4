@@ -90,7 +90,7 @@
           <q-td :props="props">
             <div class="action-buttons">
               <q-btn
-                v-if="props.row.status"
+                v-if="props.row.status.name !== TRANSACTION_STATUS.COMPLETED"
                 unelevated
                 dense
                 round
@@ -269,6 +269,7 @@ import { useCommonStore } from 'src/stores/common';
 import { onMounted, ref, watch } from 'vue';
 import { storeToRefs } from 'pinia';
 import { CustomerTransactionRow } from 'src/boot/interfaces';
+import { TRANSACTION_STATUS } from 'src/boot/constant'
 
 const search = ref('');
 const useCommon = useCommonStore();

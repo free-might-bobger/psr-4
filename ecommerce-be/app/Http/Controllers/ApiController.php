@@ -5,7 +5,13 @@ namespace App\Http\Controllers;
 use App\Http\Resources\BaseResource;
 abstract class ApiController extends Controller {
 
-    protected $model, $repository, $indexRequest, $storeRequest, $updateRequest, $result, $params;
+    protected string $model;
+    protected object $repository;
+    protected string $indexRequest;
+    protected string $storeRequest;
+    protected string $updateRequest;
+    protected mixed $result;
+    protected array $params;
     /**
      * Index the resource
      * @return BaseResource
@@ -34,7 +40,8 @@ abstract class ApiController extends Controller {
      * @return BaseResource
      */
     public function show( int $id ) : BaseResource {
-        $this->result = $this->repository->where( 'id', $id );
+        $this->params = app( $this->indexRequest )->all();
+        $this->result = $this->repository->filterQuery($this->params)->findOrFail( $id );
         return $this->getResource();
     }
 

@@ -273,12 +273,16 @@ const logoutNow = async () => {
 
 .dashboard-drawer {
   box-shadow: 2px 0 8px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
 }
 
 .drawer-header {
   padding: 24px 16px;
   background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
   border-bottom: 1px solid #e0e0e0;
+  flex-shrink: 0;
 }
 
 .drawer-user-profile {
@@ -299,6 +303,8 @@ const logoutNow = async () => {
 
 .dashboard-menu {
   padding: 8px 0;
+  flex: 1;
+  overflow-y: auto;
 }
 
 .menu-section-header {
@@ -345,10 +351,7 @@ const logoutNow = async () => {
 }
 
 .drawer-footer {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
+  flex-shrink: 0;
   background: white;
 }
 
