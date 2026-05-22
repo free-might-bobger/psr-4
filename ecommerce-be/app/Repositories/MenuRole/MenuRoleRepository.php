@@ -14,7 +14,7 @@ class MenuRoleRepository extends BaseRepository implements MenuRoleInterface
         $this->cacheKey = 'MenuRoles-get';
     }
 
-    public function role_id($param){
+    public function role_id(string $param){
         $explode = explode(',', $param);
         $this->model = $this->model->whereIn('role_id', $explode );
     }

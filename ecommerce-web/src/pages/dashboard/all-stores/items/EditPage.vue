@@ -163,7 +163,7 @@
               icon="save"
               :loading="isSubmitting"
             />
-            <q-btn label="Cancel" outline color="grey-8" icon="cancel" @click="router.back()" />
+            <q-btn label="Cancel" outline color="grey-8" icon="cancel" @click="router.back()" class="q-ml-sm"/>
           </div>
         </q-form>
       </q-card-section>
@@ -263,7 +263,7 @@ const listingApi = async () => {
     if (result && typeof result === 'object' && 'data' in result) {
         const apiResponse = result as ApiResponse<{ categories: Category[] }>;
         if (apiResponse.data) {
-            categories.value = apiResponse.data.data.categories;
+            categories.value = apiResponse.data.categories;
         }
     }
 };
@@ -275,8 +275,8 @@ const removeNewImage = (index: number) => {
 const setPrimaryImage = async (image: ItemImage) => {
     try {
         Loading.show({ message: 'Setting primary image...' });
-        await axios.post('images', {
-            entity: 'items',
+        await axios.post('update-primary-image', {
+            entity: 'Item',
             id: item.value.id,
             primaryName: image.name,
         });
@@ -456,6 +456,11 @@ const onSubmit = async () => {
 .preview-image {
   width: 100%;
   height: 100px;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
 }
 
 .absolute-top-right {

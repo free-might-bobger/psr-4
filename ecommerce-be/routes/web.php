@@ -57,7 +57,7 @@ Route::group( [ 'middleware' => 'auth:api' ], function () {
   Route::resource('item-prices', ItemPriceController::class);
   Route::resource('store-menu-access', StoreMenuAccessController::class);
   Route::resource('statuses', StatusController::class);
-  Route::resource('images', ImageController::class);
+  Route::post('update-primary-image', [ImageController::class, 'updatePrimaryImage']);
   
   /* Route get */
   Route::get('profile', [ProfileController::class, 'show']);

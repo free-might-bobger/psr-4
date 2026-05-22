@@ -3,15 +3,15 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Repositories\Image\ImageRepository;
+use App\Repositories\ImageRepository;
 use App\Models\Image;
 use Illuminate\Support\Facades\File;
 
 class ImageController extends Controller
 {
-    protected $repository;
-    protected $indexRequest;
-    protected $storeRequest;
+    protected ImageRepository $repository;
+    protected Request $indexRequest;
+    protected Request $storeRequest;
 
     public function __construct(ImageRepository $repository, Request $request){
         $this->repository = $repository;
@@ -19,33 +19,15 @@ class ImageController extends Controller
         $this->storeRequest = $request;
     }
 
-    public function store(){
+    public function updatePrimaryImage(){
 
-        $request = app()->make('request');
-        $query = $request->query->all();
-        $model = '\App\Models\\' . $query['entity'];
-        $model = $model::where('id',  $query['id'])->first();
-     
-        if($request->deletedFiles){
-            $deletedFiles = explode(',', $request->deletedFiles);
-            $deletedFiles = collect($deletedFiles)->filter(function($value){
-                return $value!= '';
-            })->all();
-
-
-            foreach($deletedFiles as $file){
-                $image = Image::where('id', $file)->first();
-                $path = public_path() . '/' . $image->path;
-                if(File::exists($path)){
-                    File::delete($path);
-                }
-                $image->delete();
-            }
-           
-        }
+        $model = '\App\Models\\' . $this->indexRequest->entity;
+        $model = $model::where('id', $this->indexRequest->id)->first();
+        $model->images()->where('name', $this->indexRequest->primaryName)->update(['is_primary' => true]);
+        $model->images()->where('name', '!=', $this->indexRequest->primaryName)->update(['is_primary' => false]);
 
         return response()->json([
-            'success' =>  $this->repository->setModel($model)->setRequest($request)->upload()
+            'success' => true
         ]);
 
     }
