@@ -29,31 +29,13 @@ class Image extends Model
 
     public function getPathUrlAttribute()
     {
-
-        $whitelist = array(
-            '127.0.0.1',
-            '::1',
-        );
-        if (!in_array($_SERVER['REMOTE_ADDR'], $whitelist)) {
-            return url('public/'.$this->path);
-        } else {
-            return url($this->path);
-        }
-
+        return url($this->path);
     }
 
     public function getPathThumbnailAttribute()
     {
 
-        $whitelist = array(
-            '127.0.0.1',
-            '::1',
-        );
-        if (!in_array($_SERVER['REMOTE_ADDR'], $whitelist)) {
-            return url('public/'.$this->path);
-        } else {
-            return url($this->path);
-        }
+         return url($this->path);
 
     }
 }

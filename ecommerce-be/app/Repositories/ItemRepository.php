@@ -11,6 +11,9 @@ use App\Repositories\Support\SearchFieldSupport;
 class ItemRepository extends BaseRepository
 {
     use UtilsTrait, SearchFieldSupport;
+
+    protected Collection $collection;
+
     public function __construct()
     {
         $this->setModel(new Item);
@@ -18,24 +21,24 @@ class ItemRepository extends BaseRepository
         $this->collection = new Collection();
     }
 
-    public function category_id($value) : void
+    public function category_id(int $value) : void
     {   
         $this->model = $this->model->where('category_id', $value);
     }
 
-    public function itemUpdateWithImage(int $id, array $params): bool
+    public function itemUpdateWithImage(int $id, array $params): Item
     {
         /**get fillable should be before accessing the model */
         $this->setFillable();
-        $this->where('id', $id);
-        
+        $this->model = $this->findOrFail($id);
         $data = array_intersect_key(
             $params,
             array_flip($this->fillable)
         );
         unset($data['store_id']);
         $this->filesUpload();
-        return tap( $this->model->first() )->update( $data );
+        $this->model->update($data);
+        return $this->model->fresh();
 
     }
 

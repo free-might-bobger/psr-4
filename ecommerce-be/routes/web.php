@@ -26,7 +26,8 @@ use App\Http\Controllers\ {
     PublicStoreItemController,
     StoreMenuAccessController,
     StatusController,
-    PublicItemController
+    PublicItemController,
+    ImageController
 };
 
 /* Route resouce */
@@ -56,6 +57,7 @@ Route::group( [ 'middleware' => 'auth:api' ], function () {
   Route::resource('item-prices', ItemPriceController::class);
   Route::resource('store-menu-access', StoreMenuAccessController::class);
   Route::resource('statuses', StatusController::class);
+  Route::resource('images', ImageController::class);
   
   /* Route get */
   Route::get('profile', [ProfileController::class, 'show']);

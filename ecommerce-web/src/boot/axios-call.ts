@@ -7,7 +7,6 @@ import { queryString, removeEmptyValue } from './common';
 import { useCommonStore } from 'src/stores/common';
 import { AxiosResponse } from 'axios';
 import { GetParams, CreateData, LoginInterface, ShowInterface, DeleteInterface, UpdateInterface} from 'boot/interfaces';
-import { ERROR_CODE } from './constant';
 
 function userRefs() {
   const useUser = useUserStore();
@@ -91,7 +90,7 @@ export const getUserMenus = async (): Promise<void> => {
   return await axios
     .get('menus?type=collection')
     .then((res) => {
-      const data = res.data.data;
+      res.data.data;
     })
     .catch((err) => err);
 };
@@ -151,7 +150,7 @@ export async function get(
       Loading.hide();
       return res;
     })
-    .catch((err) => {
+    .catch(() => {
       // if(err.status === ERROR_CODE.UNAUTHORIZED){
       //   logout()
       //   window.location.href = '/'
@@ -312,7 +311,7 @@ export const lastPage = (entityQuery: GetParams, pagination: { lastPage: number}
 export async function show<T>(params: ShowInterface, hasLoader = false): Promise<T> {
   if(hasLoader){
     Loading.show({
-      message: `Getting information...`,
+      message: 'Getting information...',
     });
   }
   return axios

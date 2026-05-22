@@ -320,6 +320,8 @@ watch(search, (newValue) => {
   color: inherit;
   display: flex;
   align-items: center;
+  font-weight: normal;
+  font-size: 16px;
 
   &:hover {
     color: #1976d2;

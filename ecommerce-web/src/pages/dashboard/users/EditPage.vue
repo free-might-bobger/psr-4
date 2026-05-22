@@ -70,22 +70,42 @@
           <q-table
             flat
             bordered
-            class="store-grid-item q-mb-lg roles-table"
+            class="roles-table"
             :rows="userRoles"
             :columns="roleColumns"
             row-key="id"
             hide-pagination
           >
+            <template v-slot:body-cell-label="props">
+              <q-td :props="props">
+                <q-icon name="badge" color="primary" class="q-mr-xs" />
+                <span>{{ props.row.label || props.row.name }}</span>
+              </q-td>
+            </template>
+
+            <template v-slot:body-cell-description="props">
+              <q-td :props="props">
+                <span class="text-grey-7">{{ props.row.description || '-' }}</span>
+              </q-td>
+            </template>
+
+            <template v-slot:body-cell-slug_name="props">
+              <q-td :props="props">
+                <span class="text-caption text-grey-6">{{ props.row.slug_name || '-' }}</span>
+              </q-td>
+            </template>
+
             <template v-slot:body-cell-actions="props">
               <q-td :props="props">
                 <q-btn
-                  flat
-                  round
+                  unelevated
                   dense
+                  round
                   color="negative"
                   icon="delete"
                   :loading="removingRoleId === props.row.id"
                   @click="confirmRemoveRole(props.row)"
+                  size="sm"
                 >
                   <q-tooltip>Remove role</q-tooltip>
                 </q-btn>
@@ -203,27 +223,34 @@
   const roleColumns = [
     {
       name: 'label',
+      required: true,
       label: 'Role',
       field: (row: UserRoleRow) => row.label || row.name,
       align: 'left' as const,
+      sortable: true,
     },
     {
       name: 'description',
+      required: true,
       label: 'Description',
       field: 'description',
       align: 'left' as const,
+      sortable: true,
     },
     {
       name: 'slug_name',
+      required: true,
       label: 'Slug',
       field: 'slug_name',
       align: 'left' as const,
+      sortable: true,
     },
     {
       name: 'actions',
+      required: true,
       label: 'Actions',
-      field: 'id',
-      align: 'right' as const,
+      field: '',
+      align: 'center' as const,
     },
   ];
   
@@ -371,6 +398,10 @@
     max-width: 100%;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
+  }
+
+  .roles-table {
+    width: 100%;
   }
 
   :deep(.roles-table) {

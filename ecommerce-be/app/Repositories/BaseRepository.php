@@ -14,6 +14,8 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use App\Http\Requests\BaseIndexRequest;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Http\Request;
 class BaseRepository implements BaseInterface
 {
     use UtilsTrait, SearchFieldSupport, OptimusRequiredToModel, BaseSupportRepository;
@@ -414,44 +416,44 @@ class BaseRepository implements BaseInterface
         return $this->model->delete();
     }
 
-    public function upload()
-    {
+    // public function upload()
+    // {
 
-        if (isset($_FILES["images"])) {
+    //     if (isset($_FILES["images"])) {
 
 
-            foreach ($_FILES["images"]['name'] as $key => $value) {
+    //         foreach ($_FILES["images"]['name'] as $key => $value) {
 
-                $this->name = $_FILES["images"]['name'][$key];
-                $this->fileName = time() . '-' . $this->name;
-                $fileTmp = $_FILES["images"]['tmp_name'][$key];
-                $this->size = $_FILES["images"]['size'][$key];
-                $uploadfile = file_get_contents($fileTmp);
+    //             $this->name = $_FILES["images"]['name'][$key];
+    //             $this->fileName = time() . '-' . $this->name;
+    //             $fileTmp = $_FILES["images"]['tmp_name'][$key];
+    //             $this->size = $_FILES["images"]['size'][$key];
+    //             $uploadfile = file_get_contents($fileTmp);
 
-                File::put(public_path() . '/images/uploads/' . $this->fileName, $uploadfile);
+    //             File::put(public_path() . '/images/uploads/' . $this->fileName, $uploadfile);
 
-                if ($this->request->isPrimary && $this->model->image) {
-                    foreach ($this->model->images as $image) {
-                        $image->update([
-                            'is_primary' => 0
-                        ]);
-                    }
+    //             if ($this->request->isPrimary && $this->model->image) {
+    //                 foreach ($this->model->images as $image) {
+    //                     $image->update([
+    //                         'is_primary' => 0
+    //                     ]);
+    //                 }
 
-                    if ($this->name == $this->request->primaryName) {
-                        $this->imageUploadIsPrimary(true);
-                    } else {
-                        $this->imageUploadIsPrimary(false);
-                    }
-                } else {
-                    if ($key == 0) {
-                        $this->imageUploadIsPrimary(true);
-                    } else {
-                        $this->imageUploadIsPrimary(false);
-                    }
-                }
-            }
-        }
-    }
+    //                 if ($this->name == $this->request->primaryName) {
+    //                     $this->imageUploadIsPrimary(true);
+    //                 } else {
+    //                     $this->imageUploadIsPrimary(false);
+    //                 }
+    //             } else {
+    //                 if ($key == 0) {
+    //                     $this->imageUploadIsPrimary(true);
+    //                 } else {
+    //                     $this->imageUploadIsPrimary(false);
+    //                 }
+    //             }
+    //         }
+    //     }
+    // }
 
 
 
@@ -470,42 +472,54 @@ class BaseRepository implements BaseInterface
         return $this->model->where($field, $this->optimus()->decode($value));
     }
 
-    public function filesUpload()
+    public function filesUpload(): void
     {
         $request = app()->make('request');
-        if (isset($_FILES["files"])) {
 
-            foreach ($this->model->first()->images as $image) {
-                $image->update(['is_primary' => 0]);
-            }
-
-            foreach ($_FILES["files"]['name'] as $key => $value) {
-
-                $this->name = $_FILES["files"]['name'][$key];
-                $this->fileName = time() . '-' . $this->name;
-                $fileTmp = $_FILES["files"]['tmp_name'][$key];
-                $this->size = $_FILES["files"]['size'][$key];
-                $uploadfile = file_get_contents($fileTmp);
-                File::put(public_path() . '/images/uploads/' . $this->fileName, $uploadfile);
-
-                $image = new Image([
-                    'thumbnail' => 'images/uploads/' . $this->fileName,
-                    'path' => 'images/uploads/' . $this->fileName,
-                    'name'  => $this->name,
-                    'is_primary' => $request->primaryImageName == $this->name,
-                    'size'  => $this->size
-                ]);
-
-                $this->model->first()->images()->save($image);
-            }
+        if (!$request->hasFile('images')) {
+            return;
         }
+
+        $files = $request->file('images');
+        if (!is_array($files)) {
+            $files = [$files];
+        }
+
+        // Reset all images to non-primary
+        $this->model->images()->update(['is_primary' => 0]);
+
+        foreach ($files as $file) {
+            if (!$file->isValid()) {
+                continue;
+            }
+
+            $originalName = $file->getClientOriginalName();
+            $fileName = uniqid() . '-' . $originalName;
+            $fileContent = file_get_contents($file->getPathname());
+            $filePath = 'images/uploads/' . $fileName;
+
+            File::put(public_path($filePath), $fileContent);
+
+            $image = new Image([
+                'thumbnail' => $filePath,
+                'path' => $filePath,
+                'name' => $originalName,
+                'is_primary' => $request->input('primaryImageName') === $originalName,
+                'size' => $file->getSize()
+            ]);
+
+            $this->model->images()->save($image);
+        }
+
         $this->deletedFiles();
         $this->updatePrimaryImageFromRequest($request);
     }
 
-    protected function updatePrimaryImageFromRequest($request)
+    protected function updatePrimaryImageFromRequest(Request $request): void
     {
-        if (!$request->primaryImageName) {
+        $primaryImageName = $request->input('primaryImageName');
+        
+        if (!$primaryImageName) {
             return;
         }
 
@@ -516,24 +530,34 @@ class BaseRepository implements BaseInterface
 
         $model->images()->update(['is_primary' => 0]);
         $model->images()
-            ->where('name', $request->primaryImageName)
+            ->where('name', $primaryImageName)
             ->update(['is_primary' => 1]);
     }
 
-    protected function deletedFiles()
+    protected function deletedFiles(): void
     {
         $request = app()->make('request');
-        if ($request->deletedFiles) {
-            foreach ($request->deletedFiles as $id) {
-                $image = Image::find($id);
-                if ($image) {
-                    $path = public_path($image->path);
-                    if (file_exists($path)) {
-                        unlink($path);
-                    }
-                    $image->delete();
-                }
+        $deletedFileIds = $request->input('deletedFiles');
+        
+        if (!$deletedFileIds) {
+            return;
+        }
+
+        if (!is_array($deletedFileIds)) {
+            $deletedFileIds = [$deletedFileIds];
+        }
+
+        foreach ($deletedFileIds as $id) {
+            $image = Image::find($id);
+            if (!$image) {
+                continue;
             }
+
+            if (Storage::disk('public')->exists($image->path)) {
+                Storage::disk('public')->delete($image->path);
+            }
+
+            $image->delete();
         }
     }
 }
