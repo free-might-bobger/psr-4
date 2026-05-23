@@ -57,8 +57,9 @@ Route::group( [ 'middleware' => 'auth:api' ], function () {
   Route::resource('item-prices', ItemPriceController::class);
   Route::resource('store-menu-access', StoreMenuAccessController::class);
   Route::resource('statuses', StatusController::class);
+  Route::post('item-update', [ItemController::class, 'itemUpdate']);
   Route::post('update-primary-image', [ImageController::class, 'updatePrimaryImage']);
-  
+  Route::delete('images/{id}', [ImageController::class, 'destroy']);
   /* Route get */
   Route::get('profile', [ProfileController::class, 'show']);
   Route::delete('role-user', [RoleUserController::class, 'destroyByPair'])->middleware('superAdminMiddleware');

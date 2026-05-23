@@ -8,6 +8,9 @@ use App\Traits\UtilsTrait;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Arr;
 use App\Repositories\Support\SearchFieldSupport;
+use Illuminate\Support\Facades\File;
+use App\Models\Image;
+
 class ItemRepository extends BaseRepository
 {
     use UtilsTrait, SearchFieldSupport;
@@ -77,6 +80,48 @@ class ItemRepository extends BaseRepository
     public function getCollection(): Collection
     {        
         return $this->collection;
+    }
+
+    public function filesUpload(): void
+    {
+        $request = app()->make('request');
+
+        if (!$request->hasFile('images')) {
+            return;
+        }
+
+        $files = $request->file('images');
+        if (!is_array($files)) {
+            $files = [$files];
+        }
+
+        // Reset all images to non-primary
+        $this->model->images()->update(['is_primary' => 0]);
+
+        foreach ($files as $file) {
+            if (!$file->isValid()) {
+                continue;
+            }
+
+            $originalName = $file->getClientOriginalName();
+            $fileName = uniqid() . '-' . $originalName;
+            $fileContent = file_get_contents($file->getPathname());
+            $filePath = 'images/uploads/' . $fileName;
+
+            File::put(public_path($filePath), $fileContent);
+
+            $image = new Image([
+                'thumbnail' => $filePath,
+                'path' => $filePath,
+                'name' => $originalName,
+                'is_primary' => $request->input('primaryImageName') === $originalName,
+                'size' => $file->getSize()
+            ]);
+
+            $this->model->images()->save($image);
+        }
+
+        $this->updatePrimaryImageFromRequest($request);
     }
 
 

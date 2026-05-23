@@ -13,7 +13,6 @@ use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use App\Http\Requests\BaseIndexRequest;
-use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
 class BaseRepository implements BaseInterface
@@ -472,48 +471,7 @@ class BaseRepository implements BaseInterface
         return $this->model->where($field, $this->optimus()->decode($value));
     }
 
-    public function filesUpload(): void
-    {
-        $request = app()->make('request');
-
-        if (!$request->hasFile('images')) {
-            return;
-        }
-
-        $files = $request->file('images');
-        if (!is_array($files)) {
-            $files = [$files];
-        }
-
-        // Reset all images to non-primary
-        $this->model->images()->update(['is_primary' => 0]);
-
-        foreach ($files as $file) {
-            if (!$file->isValid()) {
-                continue;
-            }
-
-            $originalName = $file->getClientOriginalName();
-            $fileName = uniqid() . '-' . $originalName;
-            $fileContent = file_get_contents($file->getPathname());
-            $filePath = 'images/uploads/' . $fileName;
-
-            File::put(public_path($filePath), $fileContent);
-
-            $image = new Image([
-                'thumbnail' => $filePath,
-                'path' => $filePath,
-                'name' => $originalName,
-                'is_primary' => $request->input('primaryImageName') === $originalName,
-                'size' => $file->getSize()
-            ]);
-
-            $this->model->images()->save($image);
-        }
-
-        $this->deletedFiles();
-        $this->updatePrimaryImageFromRequest($request);
-    }
+    
 
     protected function updatePrimaryImageFromRequest(Request $request): void
     {

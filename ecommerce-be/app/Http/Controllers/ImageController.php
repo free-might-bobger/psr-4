@@ -5,30 +5,23 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Repositories\ImageRepository;
 use App\Models\Image;
-use Illuminate\Support\Facades\File;
-
-class ImageController extends Controller
+class ImageController extends ApiController
 {
-    protected ImageRepository $repository;
-    protected Request $indexRequest;
-    protected Request $storeRequest;
+    public function __construct(ImageRepository $repository)
+    {
 
-    public function __construct(ImageRepository $repository, Request $request){
         $this->repository = $repository;
-        $this->indexRequest = $request;
-        $this->storeRequest = $request;
+        $this->model = Image::class;
     }
 
-    public function updatePrimaryImage(){
+    public function updatePrimaryImage(Request $request){
 
-        $model = '\App\Models\\' . $this->indexRequest->entity;
-        $model = $model::where('id', $this->indexRequest->id)->first();
-        $model->images()->where('name', $this->indexRequest->primaryName)->update(['is_primary' => true]);
-        $model->images()->where('name', '!=', $this->indexRequest->primaryName)->update(['is_primary' => false]);
+       $this->repository->updatePrimaryImage($request);
 
         return response()->json([
             'success' => true
         ]);
 
     }
+
 }

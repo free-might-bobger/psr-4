@@ -4,17 +4,18 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\Obfuscate\OptimusId;
 
 class Image extends Model
 {
-    use HasFactory;
+    use HasFactory, OptimusId;
     protected $table = 'images';
     protected $fillable = [
         'thumbnail', 'path', 'imageable_id', 'imageable_type',
         'is_primary', 'name', 'size'
     ];
 
-    protected $appends = ['path_url', 'path_thumbnail'];
+    protected $appends = ['path_url', 'path_thumbnail', 'optimus_id'];
     
     public function imageable()
     {

@@ -172,7 +172,7 @@
 </template>
 <script setup lang="ts">
 import { ref, onBeforeMount, computed } from 'vue';
-import { show, get } from 'src/boot/axios-call';
+import { show, get, deleteEntity } from 'src/boot/axios-call';
 import { axios } from 'src/boot/axios';
 import { useRoute, useRouter } from 'vue-router';
 import type { QForm } from 'quasar';
@@ -299,10 +299,10 @@ const setPrimaryImage = async (image: ItemImage) => {
 const deleteImage = async (image: ItemImage) => {
     try {
         Loading.show({ message: 'Deleting image...' });
-        await axios.post('images', {
-            entity: 'items',
-            id: item.value.id,
-            deletedFiles: image.id,
+        await deleteEntity({
+            entity: 'images',
+            optimus_id: image.optimus_id,
+            label: 'Image',
         });
         await getItem();
         Loading.hide();
