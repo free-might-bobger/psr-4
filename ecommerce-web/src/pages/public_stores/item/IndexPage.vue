@@ -1,262 +1,200 @@
 <template>
-  <div class="store-page-container">
-    <!-- Store Header -->
-    <div class="store-header q-mb-lg">
-          <BreadCrumbsWrapper :bread-crumbs="[
-            {
-              name: store.name,
-              path: `/public_stores/${route.params.id}`,
-            },
-            {
-              name: item.name || '',
-              path: '',
-            },
-          ]" />
+  <div class="product-page">
+    <div class="product-container">
+      <!-- Header -->
+      <div class="product-header">
+        <BreadCrumbsWrapper :bread-crumbs="[
+          {
+            name: store.name,
+            path: `/public_stores/${route.params.id}`,
+          },
+          {
+            name: item.name || '',
+            path: '',
+          },
+        ]" />
+      </div>
+
+      <!-- Main Content -->
+      <div class="product-content" v-if="item">
+        <!-- Left: Image Gallery -->
+        <div class="product-gallery">
+          <div class="main-image-wrapper">
+            <img
+              :src="item.images?.[slide]?.path_url || ''"
+              class="main-image"
+              :alt="item.name"
+              @click="openZoomModal(item.images?.[slide]?.path_url || '')"
+            />
+            <q-btn
+              icon="zoom_in"
+              class="zoom-btn"
+              round
+              flat
+              @click="openZoomModal(item.images?.[slide]?.path_url || '')"
+            />
+          </div>
+          <div class="thumbnail-list" v-if="item.images && item.images.length > 1">
+            <div
+              v-for="(image, index) in item.images"
+              :key="image.id"
+              class="thumbnail-item"
+              :class="{ active: slide === index }"
+              @click="slide = index"
+            >
+              <img :src="image.path_url" :alt="item.name" />
+            </div>
+          </div>
         </div>
 
-    <div class="row q-col-gutter-md" v-if="item">
-      <div class="col-lg-5 col-md-5 col-xs-12">
-        <q-card class="product-image-card q-mt-sm" flat bordered>
-          <q-carousel v-model="slide" vertical transition-prev="slide-down" transition-next="slide-up" swipeable
-            animated control-color="primary" navigation-icon="radio_button_unchecked" navigation padding height="400px"
-            class="rounded-borders">
-          <q-carousel-slide :name="index" class="column no-wrap flex-center" v-for="(image, index) in item.images"
-            :key="image.id">
-              <div class="q-pa-md text-center full-width full-height flex flex-center">
-                <img
-                  :src="image.path_url"
-                  class="product-image"
-                  :alt="item.name"
-                  @click="openZoomModal(image.path_url)"
-                />
+        <!-- Right: Product Info -->
+        <div class="product-info">
+          <h1 class="product-name">{{ item.name }}</h1>
+          <p class="product-description">{{ item.description }}</p>
+
+          <div class="info-section">
+            <div class="section-label">Select Unit</div>
+            <div class="unit-selector" v-if="units.length > 0">
+              <button
+                v-for="unit in units"
+                :key="unit.id"
+                class="unit-btn"
+                :class="{ active: selectedUnit === unit.id }"
+                @click="selectedUnit = unit.id"
+              >
+                {{ unit.name }}
+              </button>
             </div>
-          </q-carousel-slide>
-        </q-carousel>
-        </q-card>
-      </div>
-      <q-dialog v-model="isZoomModalOpen" maximized>
-        <q-card class="zoom-modal-card">
-          <q-card-section class="zoom-modal-header">
-            <q-space />
-            <q-btn icon="close" flat round dense @click="closeZoomModal" />
-          </q-card-section>
-          <q-separator />
-          <q-card-section class="zoom-modal-content">
-            <div
-              class="zoom-modal-container"
-              :class="{ 'is-zoomed': isZoomed, 'is-dragging': isDragging }"
-              @click="toggleZoom"
-              @mousedown.prevent="onDragStart"
-              @mousemove.prevent="onDragMove"
-              @mouseup="onDragEnd"
-              @mouseleave="onDragEnd"
-              @touchstart.passive="onTouchStart"
-              @touchmove.passive="onTouchMove"
-              @touchend="onDragEnd"
-            >
-              <img
-                v-if="zoomImageUrl"
-                :src="zoomImageUrl"
-                class="zoom-modal-image"
-                :class="{ 'is-zoomed': isZoomed }"
-                :style="zoomStyle"
-                :alt="item.name"
-                draggable="false"
+          </div>
+
+          <div class="info-section">
+            <div class="section-label">Price</div>
+            <div class="price-display">{{ getPriceRange(filteredItemPrice) }}</div>
+          </div>
+
+          <div class="purchase-section">
+            <div class="quantity-wrapper">
+              <div class="section-label">Quantity</div>
+              <div class="quantity-control">
+                <q-btn
+                  icon="remove"
+                  flat
+                  dense
+                  round
+                  size="sm"
+                  @click="qty > 1 ? qty-- : null"
+                  :disable="qty <= 1"
+                />
+                <span class="quantity-value">{{ qty }}</span>
+                <q-btn
+                  icon="add"
+                  flat
+                  dense
+                  round
+                  size="sm"
+                  @click="qty++"
+                />
+              </div>
+            </div>
+
+            <div class="action-buttons">
+              <q-btn
+                color="primary"
+                @click="userAddCart"
+                size="lg"
+                unelevated
+                class="add-cart-btn"
+                icon="shopping_cart"
+                label="Add to Cart"
               />
             </div>
-          </q-card-section>
-        </q-card>
-      </q-dialog>
-
-      <q-dialog v-model="agentChatDialogOpen" maximized @hide="onAgentChatDialogHide">
-        <q-card class="agent-call-dialog-card">
-          <q-bar class="bg-primary text-white">
-            <q-icon name="chat" class="q-mr-sm" />
-            <div>Chat Agent</div>
-            <q-space />
-            <q-btn flat dense round icon="close" v-close-popup />
-          </q-bar>
-          <q-card-section class="q-pa-md">
-            <div class="q-mb-sm text-caption text-grey-7">
-              Real-time one-on-one chat with your agent.
-            </div>
-            <div class="chat-box q-pa-sm q-mb-md" ref="agentChatBoxRef">
-              <div
-                v-for="msg in agentChatMessages"
-                :key="msg.id"
-                class="chat-row q-mb-sm"
-                :class="msg.sender === 'customer' ? 'mine' : 'theirs'"
-              >
-                <div class="bubble">
-                  <div class="text-caption text-grey-7 q-mb-xs">
-                    {{ msg.sender === 'customer' ? 'You' : 'Agent' }}
-                  </div>
-                  <div class="text-body2">{{ msg.text }}</div>
-                </div>
-              </div>
-            </div>
-            <q-input
-              v-model="agentChatDraft"
-              outlined
-              autogrow
-              type="textarea"
-              placeholder="Type a message..."
-              @keyup.enter.exact.prevent="sendCustomerChatMessage"
-            />
-            <div v-if="agentChatJoinUrl" class="text-caption q-mt-sm">
-              <strong>Agent chat link:</strong> {{ agentChatJoinUrl }}
-            </div>
-          </q-card-section>
-          <q-card-actions align="right" class="q-pa-md">
-            <q-btn
-              v-if="agentChatJoinUrl"
-              flat
-              color="primary"
-              label="Copy agent chat link"
-              icon="content_copy"
-              @click="copyAgentChatJoinLink"
-            />
-            <q-btn
-              flat
-              color="primary"
-              label="Send"
-              icon="send"
-              :loading="agentChatSending"
-              @click="sendCustomerChatMessage"
-            />
-          </q-card-actions>
-        </q-card>
-      </q-dialog>
-
-      <!-- Live call: Firebase (anonymous auth) + WebRTC — no third-party login -->
-      <q-dialog
-        v-model="agentCallDialogOpen"
-        maximized
-        transition-show="slide-up"
-        transition-hide="slide-down"
-        @show="onAgentCallDialogShow"
-        @hide="onAgentCallDialogHide"
-      >
-        <q-card class="agent-call-dialog-card">
-          <q-inner-loading :showing="agentCallWebRtcBusy" color="primary" label="Connecting camera and call room…" />
-          <q-bar class="bg-primary text-white">
-            <q-icon name="support_agent" class="q-mr-sm" />
-            <div>Talk to Agent — Live call</div>
-            <q-space />
-            <q-btn flat dense round icon="close" v-close-popup />
-          </q-bar>
-          <q-card-section class="q-pa-md">
-            <p class="text-body2 text-grey-8 q-mb-md">
-              Allow camera and microphone. Your agent can join using the link below (no login required for you).
-            </p>
-            <div class="row q-col-gutter-sm q-mb-md">
-              <div class="col-12 col-md-6">
-                <div class="text-caption text-grey-7 q-mb-xs">You</div>
-                <video ref="agentLocalVideoRef" class="agent-call-video" autoplay playsinline muted />
-              </div>
-              <div class="col-12 col-md-6">
-                <div class="text-caption text-grey-7 q-mb-xs">Agent</div>
-                <video ref="agentRemoteVideoRef" class="agent-call-video" autoplay playsinline />
-              </div>
-            </div>
-            <div v-if="agentJoinUrl" class="text-caption q-mb-sm">
-              <strong>Agent link:</strong> {{ agentJoinUrl }}
-            </div>
-          </q-card-section>
-          <q-card-actions align="right" class="q-pa-md">
-            <q-btn
-              v-if="agentJoinUrl"
-              flat
-              color="primary"
-              label="Copy agent link"
-              icon="content_copy"
-              @click="copyAgentJoinLink"
-            />
-          </q-card-actions>
-        </q-card>
-      </q-dialog>
-
-      <div class="col-lg-7 col-md-7 col-xs-12">
-        <q-card class="product-info-card q-mt-sm" flat bordered>
-          <q-card-section>
-            <div class="product-title text-h4 text-weight-bold q-mb-md">
-            {{ item.name }}
           </div>
-
-            <div class="product-description text-body1 text-grey-8 q-mb-lg">
-              {{ item.description }}
-            </div>
-
-            <q-separator class="q-mb-lg" />
-
-            <div class="q-mb-lg" v-if="units.length > 0">
-              <div class="text-subtitle2 text-weight-medium q-mb-sm">Select Unit:</div>
-              <div class="row q-col-gutter-sm">
-                <div class="col-auto" v-for="unit in units" :key="unit.id">
-                  <q-radio v-model="selectedUnit" :val="unit.id" :label="unit.name" color="primary" size="md"
-                    class="unit-radio" />
-                </div>
-              </div>
-          </div>
-
-            <div class="price-section q-mb-lg">
-              <div class="text-subtitle2 text-weight-medium q-mb-sm">Price:</div>
-              <div class="price-display text-h5 text-weight-bold text-primary">
-                {{ getPriceRange(filteredItemPrice) }}
         </div>
       </div>
-
-            <q-separator class="q-mb-lg" />
-
-            <div class="purchase-section">
-              <div class="row q-col-gutter-md items-center">
-                <div class="col-auto">
-                  <div class="text-subtitle2 text-weight-medium q-mb-xs">Quantity:</div>
-                  <q-input type="number" v-model="qty" outlined dense style="width: 120px" label="Qty" min="1"
-                    :rules="[val => val >= 1 || 'Quantity must be at least 1']" class="quantity-input">
-                    <template v-slot:prepend>
-                      <q-btn icon="remove" size="sm" flat dense @click="qty > 1 ? qty-- : null" />
-                    </template>
-                    <template v-slot:append>
-                      <q-btn icon="add" size="sm" flat dense @click="qty++" />
-                    </template>
-                  </q-input>
-                </div>
-                <div class="col">
-                  <q-btn color="primary" @click="userAddCart" size="lg" unelevated class="full-width add-to-cart-btn"
-                    icon="shopping_cart" label="Add to Cart" />
-                </div>
-                <div class="col">
-                  <q-btn
-                    color="primary"
-                    @click="needToChat"
-                    size="lg"
-                    unelevated
-                    class="full-width add-to-cart-btn"
-                    icon="support_agent"
-                    label="Chat Agent"
-                    :loading="agentChatLoading"
-                  />
-                </div>
-                <!-- <div class="col">
-                  <q-btn
-                    color="primary"
-                    @click="needToAssist"
-                    size="lg"
-                    unelevated
-                    class="full-width add-to-cart-btn"
-                    icon="support_agent"
-                    label="Talk to Agent"
-                    :loading="agentCallLoading"
-                  />
-                </div>
-                -->
-              </div>
-            </div>
-          </q-card-section>
-        </q-card>
-      </div>
     </div>
+
+    <!-- Zoom Modal -->
+    <q-dialog v-model="isZoomModalOpen" maximized>
+      <q-card class="zoom-modal-card">
+        <q-card-section class="zoom-modal-header">
+          <q-space />
+          <q-btn icon="close" flat round dense @click="closeZoomModal" />
+        </q-card-section>
+        <q-separator />
+        <q-card-section class="zoom-modal-content">
+          <div
+            class="zoom-modal-container"
+            :class="{ 'is-zoomed': isZoomed, 'is-dragging': isDragging }"
+            @click="toggleZoom"
+            @mousedown.prevent="onDragStart"
+            @mousemove.prevent="onDragMove"
+            @mouseup="onDragEnd"
+            @mouseleave="onDragEnd"
+            @touchstart.passive="onTouchStart"
+            @touchmove.passive="onTouchMove"
+            @touchend="onDragEnd"
+          >
+            <img
+              v-if="zoomImageUrl"
+              :src="zoomImageUrl"
+              class="zoom-modal-image"
+              :class="{ 'is-zoomed': isZoomed }"
+              :style="zoomStyle"
+              :alt="item.name"
+              draggable="false"
+            />
+          </div>
+        </q-card-section>
+      </q-card>
+    </q-dialog>
+
+    <!-- Agent Call Dialog -->
+    <q-dialog
+      v-model="agentCallDialogOpen"
+      maximized
+      transition-show="slide-up"
+      transition-hide="slide-down"
+      @show="onAgentCallDialogShow"
+      @hide="onAgentCallDialogHide"
+    >
+      <q-card class="agent-call-dialog-card">
+        <q-inner-loading :showing="agentCallWebRtcBusy" color="primary" label="Connecting camera and call room…" />
+        <q-bar class="bg-primary text-white">
+          <q-icon name="support_agent" class="q-mr-sm" />
+          <div>Talk to Agent — Live call</div>
+          <q-space />
+          <q-btn flat dense round icon="close" v-close-popup />
+        </q-bar>
+        <q-card-section class="q-pa-md">
+          <p class="text-body2 text-grey-8 q-mb-md">
+            Allow camera and microphone. Your agent can join using the link below (no login required for you).
+          </p>
+          <div class="row q-col-gutter-sm q-mb-md">
+            <div class="col-12 col-md-6">
+              <div class="text-caption text-grey-7 q-mb-xs">You</div>
+              <video ref="agentLocalVideoRef" class="agent-call-video" autoplay playsinline muted />
+            </div>
+            <div class="col-12 col-md-6">
+              <div class="text-caption text-grey-7 q-mb-xs">Agent</div>
+              <video ref="agentRemoteVideoRef" class="agent-call-video" autoplay playsinline />
+            </div>
+          </div>
+          <div v-if="agentJoinUrl" class="text-caption q-mb-sm">
+            <strong>Agent link:</strong> {{ agentJoinUrl }}
+          </div>
+        </q-card-section>
+        <q-card-actions align="right" class="q-pa-md">
+          <q-btn
+            v-if="agentJoinUrl"
+            flat
+            color="primary"
+            label="Copy agent link"
+            icon="content_copy"
+            @click="copyAgentJoinLink"
+          />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
   </div>
 </template>
 <script setup lang="ts">
@@ -270,12 +208,6 @@ import BreadCrumbsWrapper from 'src/components/BreadCrumbsWrapper.vue';
 import { startAgentCallSession } from 'src/helpers/agentCall';
 import { isFirebaseConfigured } from 'src/helpers/firebaseCore';
 import { startCallerSession } from 'src/helpers/webrtcFirebaseCall';
-import {
-  startAgentChatSession,
-  subscribeChatMessages,
-  sendChatMessage,
-  type ChatMessage,
-} from 'src/helpers/firebaseAgentChat';
 
 interface ItemPrice {
   id: number;
@@ -328,15 +260,6 @@ const store = ref({
 const route = useRoute();
 
 const agentCallLoading = ref(false);
-const agentChatLoading = ref(false);
-const agentChatDialogOpen = ref(false);
-const agentChatRoomId = ref('');
-const agentChatJoinUrl = ref('');
-const agentChatDraft = ref('');
-const agentChatSending = ref(false);
-const agentChatMessages = ref<ChatMessage[]>([]);
-const agentChatBoxRef = ref<HTMLElement | null>(null);
-let agentChatUnsub: (() => void) | null = null;
 const agentCallWebRtcBusy = ref(false);
 const agentCallDialogOpen = ref(false);
 const agentRoomId = ref('');
@@ -353,50 +276,6 @@ const copyAgentJoinLink = async () => {
   } catch {
     $q.notify({ message: agentJoinUrl.value, type: 'info', timeout: 8000 });
   }
-};
-
-const copyAgentChatJoinLink = async () => {
-  if (!agentChatJoinUrl.value) return;
-  try {
-    await navigator.clipboard.writeText(agentChatJoinUrl.value);
-    $q.notify({ message: 'Agent chat link copied.', type: 'positive' });
-  } catch {
-    $q.notify({ message: agentChatJoinUrl.value, type: 'info', timeout: 8000 });
-  }
-};
-
-const scrollChatToBottom = async () => {
-  await nextTick();
-  const box = agentChatBoxRef.value;
-  if (!box) return;
-  box.scrollTop = box.scrollHeight;
-};
-
-watch(agentChatMessages, () => {
-  void scrollChatToBottom();
-});
-
-const sendCustomerChatMessage = async () => {
-  if (!agentChatRoomId.value || !agentChatDraft.value.trim()) return;
-  agentChatSending.value = true;
-  try {
-    await sendChatMessage(agentChatRoomId.value, 'customer', agentChatDraft.value);
-    agentChatDraft.value = '';
-  } catch (e: unknown) {
-    const msg = e instanceof Error ? e.message : 'Could not send message.';
-    $q.notify({ message: msg, type: 'negative' });
-  } finally {
-    agentChatSending.value = false;
-  }
-};
-
-const onAgentChatDialogHide = () => {
-  agentChatUnsub?.();
-  agentChatUnsub = null;
-  agentChatRoomId.value = '';
-  agentChatJoinUrl.value = '';
-  agentChatDraft.value = '';
-  agentChatMessages.value = [];
 };
 
 /** QDialog mounts dialog content on @show — refs are often null on first nextTick() only. */
@@ -478,49 +357,6 @@ const needToAssist = async () => {
     });
   } finally {
     agentCallLoading.value = false;
-  }
-};
-
-const needToChat = async () => {
-  if (!isFirebaseConfigured()) {
-    $q.notify({
-      message: 'Chat requires Firebase. Add VITE_FIREBASE_* keys in .env and enable Anonymous sign-in.',
-      type: 'negative',
-      timeout: 6000,
-    });
-    return;
-  }
-  agentChatLoading.value = true;
-  try {
-    const { roomId, joinUrl } = startAgentChatSession({
-      storeOptimusId: route.params.id as string,
-      itemOptimusId: route.params.item_id as string,
-      storeName: store.value.name,
-      itemName: item.value.name,
-    });
-    agentChatRoomId.value = roomId;
-    agentChatJoinUrl.value = joinUrl;
-    agentChatUnsub?.();
-    agentChatUnsub = subscribeChatMessages(
-      roomId,
-      (messages) => {
-        agentChatMessages.value = messages;
-      },
-      (message) => {
-        $q.notify({ message, type: 'negative', timeout: 7000 });
-      }
-    );
-    agentChatDialogOpen.value = true;
-    $q.notify({
-      message: 'Chat opened. Share the agent chat link so an agent can join.',
-      type: 'positive',
-      timeout: 4000,
-    });
-  } catch (e: unknown) {
-    const msg = e instanceof Error ? e.message : 'Could not start chat. Please try again.';
-    $q.notify({ message: msg, type: 'negative' });
-  } finally {
-    agentChatLoading.value = false;
   }
 };
 
@@ -785,34 +621,209 @@ const zoomStyle = computed(() => {
 </script>
 
 <style scoped lang="scss">
-.store-page-container {
+.product-page {
+  background: #f8f9fa;
+  min-height: 100vh;
+}
+
+.product-container {
   max-width: 1400px;
   margin: 0 auto;
-  padding: 16px;
+  padding: 24px;
 }
 
-.store-header {
-  padding: 16px 0;
+.product-header {
+  margin-bottom: 24px;
 }
 
-.product-image-card {
+.product-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+  align-items: start;
+}
+
+.product-gallery {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+}
+
+.main-image-wrapper {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1;
+  background: #f5f5f5;
   border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 16px;
+  cursor: zoom-in;
+}
 
-  .q-carousel {
-    background: #fafafa;
+.main-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  transition: transform 0.3s ease;
+}
+
+.zoom-btn {
+  position: absolute;
+  bottom: 16px;
+  right: 16px;
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.thumbnail-list {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  padding: 4px;
+}
+
+.thumbnail-item {
+  width: 80px;
+  height: 80px;
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+
+  &.active {
+    border-color: var(--q-primary);
+    box-shadow: 0 2px 8px rgba(25, 118, 210, 0.3);
+  }
+
+  &:hover {
+    transform: scale(1.05);
+  }
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
   }
 }
 
-.product-image {
-  width: 100%;
-  max-width: 100%;
-  height: auto;
-  max-height: 380px;
-  object-fit: contain;
+.product-info {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 32px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+}
+
+.product-name {
+  font-size: 32px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 0 0 16px 0;
+  line-height: 1.3;
+}
+
+.product-description {
+  font-size: 16px;
+  line-height: 1.6;
+  color: #666;
+  margin: 0 0 32px 0;
+  white-space: pre-wrap;
+}
+
+.info-section {
+  margin-bottom: 32px;
+}
+
+.section-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.unit-selector {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.unit-btn {
+  padding: 10px 20px;
+  border: 2px solid #e0e0e0;
+  background: #ffffff;
   border-radius: 8px;
-  cursor: zoom-in;
+  font-size: 14px;
+  font-weight: 500;
+  color: #666;
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  &:hover {
+    border-color: #bdbdbd;
+    background: #f5f5f5;
+  }
+
+  &.active {
+    border-color: var(--q-primary);
+    background: var(--q-primary);
+    color: #ffffff;
+  }
+}
+
+.price-display {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--q-primary);
+}
+
+.purchase-section {
+  margin-top: 40px;
+  padding-top: 32px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.quantity-wrapper {
+  margin-bottom: 24px;
+}
+
+.quantity-control {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: #f5f5f5;
+  padding: 8px 16px;
+  border-radius: 8px;
+  width: fit-content;
+}
+
+.quantity-value {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1a1a1a;
+  min-width: 40px;
+  text-align: center;
+}
+
+.action-buttons {
+  display: flex;
+}
+
+.add-cart-btn {
+  width: 100%;
+  height: 52px;
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(25, 118, 210, 0.3);
+  }
 }
 
 .zoom-modal-card {
@@ -861,67 +872,6 @@ const zoomStyle = computed(() => {
 
 .zoom-modal-image.is-zoomed {
   transition: none;
-}
-
-.product-info-card {
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  min-height: 400px;
-}
-
-.product-title {
-  line-height: 1.3;
-  color: #1a1a1a;
-}
-
-.product-description {
-  line-height: 1.6;
-  white-space: pre-wrap;
-}
-
-.unit-radio {
-  padding: 8px 16px;
-  border-radius: 8px;
-  background: #f5f5f5;
-  transition: all 0.3s ease;
-
-  &:hover {
-    background: #eeeeee;
-  }
-}
-
-.price-section {
-  padding: 16px;
-  background: #f8f9fa;
-  border-radius: 8px;
-  border-left: 4px solid var(--q-primary);
-}
-
-.price-display {
-  letter-spacing: 0.5px;
-}
-
-.quantity-input {
-  .q-field__control {
-    border-radius: 8px;
-  }
-}
-
-.add-to-cart-btn {
-  height: 48px;
-  font-weight: 600;
-  letter-spacing: 0.5px;
-  border-radius: 8px;
-  transition: all 0.3s ease;
-
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  }
-}
-
-.purchase-section {
-  padding-top: 8px;
 }
 
 .agent-call-dialog-card {
@@ -975,21 +925,46 @@ const zoomStyle = computed(() => {
   border-color: #d3e7ff;
 }
 
-@media (max-width: 600px) {
-  .product-image-card .q-carousel {
-    height: 300px !important;
+@media (max-width: 1024px) {
+  .product-content {
+    grid-template-columns: 1fr;
+    gap: 24px;
   }
 
-  .product-title {
-    font-size: 1.5rem;
+  .product-info {
+    order: -1;
+  }
+}
+
+@media (max-width: 600px) {
+  .product-container {
+    padding: 16px;
+  }
+
+  .product-gallery,
+  .product-info {
+    padding: 20px;
+  }
+
+  .product-name {
+    font-size: 24px;
+  }
+
+  .product-description {
+    font-size: 14px;
   }
 
   .price-display {
-    font-size: 1.25rem;
+    font-size: 24px;
   }
 
-  .add-to-cart-btn {
-    margin-top: 16px;
+  .action-buttons {
+    flex-direction: column;
+  }
+
+  .thumbnail-item {
+    width: 60px;
+    height: 60px;
   }
 }
 </style>
