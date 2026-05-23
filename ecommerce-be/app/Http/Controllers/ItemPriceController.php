@@ -13,7 +13,7 @@ use Illuminate\Support\Arr;
 class ItemPriceController
 {
     protected ItemPriceRepository $repository;
-    protected $indexRequest, $storeRequest, $updateRequest;
+    protected string $indexRequest, $storeRequest, $updateRequest;
 
     public function __construct(ItemPriceRepository $repository)
     {
@@ -25,6 +25,6 @@ class ItemPriceController
     
     public function store(){
         $request = app($this->updateRequest);
-        $this->repository->setParameters($request->all())->createItemPrices();
+        $this->repository->createItemPrices($request->all());
     }
 }

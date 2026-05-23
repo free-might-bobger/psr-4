@@ -184,12 +184,17 @@
             </div>
 
             <div class="order-item-body">
-              <a v-if="order.store"  :href="`/public_stores/${order.store.optimus_id}/item/${order.optimus_item}`"
-                target="_blank">
+              <router-link
+                v-if="order.store"
+                :to="`/public_stores/${order.store.optimus_id}/item/${order.optimus_item}`"
+                target="_blank"
+                class="order-item-link"
+              >
               <div class="order-item-info">
                 <div class="order-item-name">
-                    <q-icon name="label" color="grey-6" size="sm" class="q-mr-xs" />
-                    <span class="text-weight-medium text-grey-8">{{ order.item_name }}</span>
+                    <q-icon name="label" color="primary" size="sm" class="q-mr-xs" />
+                    <span class="text-weight-medium">{{ order.item_name }}</span>
+                    <q-icon name="open_in_new" size="xs" color="primary" class="q-ml-xs" />
                 </div>
                 <div class="order-item-description" v-if="order.item_description">
                   <p class="text-body2 text-grey-7 q-mt-xs q-mb-none">
@@ -197,7 +202,7 @@
                   </p>
                 </div>
               </div>
-              </a>
+              </router-link>
 
               <div class="order-item-details">
                 <div class="order-detail-row">
@@ -486,12 +491,35 @@ const formatCurrency = (amount: number | string): string => {
   flex: 1;
 }
 
+.order-item-link {
+  text-decoration: none;
+  color: inherit;
+  transition: all 0.3s ease;
+  border-radius: 6px;
+  padding: 8px;
+  margin: -8px;
+
+  &:hover {
+    background: rgba(25, 118, 210, 0.05);
+    transform: translateX(4px);
+  }
+
+  &:active {
+    transform: translateX(2px);
+  }
+}
+
 .order-item-name {
   display: flex;
   align-items: center;
   font-size: 16px;
-  color: #1a1a1a;
+  color: var(--q-primary);
   margin-bottom: 8px;
+  transition: color 0.3s ease;
+
+  .order-item-link:hover & {
+    color: #1565c0;
+  }
 }
 
 .order-item-description {

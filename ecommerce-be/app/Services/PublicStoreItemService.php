@@ -11,10 +11,15 @@ class PublicStoreItemService {
 
     public function getPublicStoreItem(int $id) : Item
     {
-        /* April 3, 2026 TODO Remove hidden original and selling price */
-        return Item::where('id', $this->optimus()->decode($id))
-        ->with('images', 'itemPrice.unit')
-        ->first();
+        $item = Item::where('id', $this->optimus()->decode($id))
+            ->with('images', 'itemPrice.unit')
+            ->first();
+
+        if ($item->itemPrice) {
+            $item->itemPrice->makeHidden(['original_price', 'selling_price']);
+        }
+
+        return $item;
     }
 
 

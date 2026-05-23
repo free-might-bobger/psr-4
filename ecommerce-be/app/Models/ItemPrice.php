@@ -27,10 +27,6 @@ class ItemPrice extends Model implements Auditable
         'original_price'         => 'float'
     ];
 
-    protected $hidden = [
-        'original_price', 'selling_price'
-    ];
-
     public function item(){
         return $this->belongsTo(Item::class);
     }

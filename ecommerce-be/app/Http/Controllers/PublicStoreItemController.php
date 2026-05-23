@@ -10,7 +10,7 @@ use App\Http\Resources\BaseResource;
 use App\Services\PublicStoreItemService;
 class PublicStoreItemController extends ApiController
 {
-    private $publicStoreItemService; 
+    private PublicStoreItemService $publicStoreItemService; 
 
     public function __construct(PublicStoreItemRepository $repository, PublicStoreItemService $publicStoreItemService)
     {

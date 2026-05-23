@@ -90,7 +90,7 @@
           <q-td :props="props">
             <div class="action-buttons">
               <q-btn
-                v-if="props.row.status.name !== TRANSACTION_STATUS.COMPLETED"
+                v-if="props.row.status?.name !== TRANSACTION_STATUS.COMPLETED"
                 unelevated
                 dense
                 round
@@ -288,7 +288,7 @@ entityQuery.value = {
 
 const typedResult = result as unknown as CustomerTransactionRow[];
 
-const columns = [
+const columns: any[] = [
   {
     name: 'reference',
     required: true,
@@ -302,7 +302,7 @@ const columns = [
     required: true,
     label: 'Order Status',
     align: 'left',
-    field: row => row.status?.label || 'Pending',
+    field: (row: any) => row.status?.label || 'Pending',
     sortable: true
   },
   {

@@ -1,33 +1,34 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Http\Request;
 use App\Http\Controllers\ {
-    PublicStoreController,
-    UserController,
-    ProfileController,
-    UserValidationController,
-    RegisterController,
+    CategoryController,
+    CustomerTransactionController,
+    DeliveryChargeController,
+    ImageController,
+    InterConnectedCityController,
+    ItemController,
+    ItemPriceController,
     ListingApiController,
+    MobileActivationCodeController,
+    MyStoreController,
+    MyStoreTransactionController,
+    PaymentMethodController,
+    ProfileController,
+    PublicItemController,
+    PublicStoreController,
+    PublicStoreItemController,
+    ReceiveMethodController,
+    RegisterController,
     RoleController,
     RoleUserController,
-    CategoryController,
-    ItemController,
-    InterConnectedCityController,
-    ReceiveMethodController,
-    StoreController,
-    DeliveryChargeController,
-    MobileActivationCodeController,
-    PaymentMethodController,
-    TransactionController,
-    CustomerTransactionController,
-    MyStoreTransactionController,
-    MyStoreController,
-    ItemPriceController,
-    PublicStoreItemController,
-    StoreMenuAccessController,
     StatusController,
-    PublicItemController,
-    ImageController
+    StoreController,
+    StoreMenuAccessController,
+    TransactionController,
+    UserController,
+    UserValidationController
 };
 
 /* Route resouce */
@@ -45,6 +46,15 @@ Route::group(['middleware' => 'auth:api', 'myTransactionMiddleware'], function (
   Route::patch('my-transactions-marked-as-received/{transactionId}', [MyStoreTransactionController::class, 'markedAsReceived']);
 });
 
+Route::group(['middleware' => 'auth:api', 'itemMiddleware'], function () {
+  Route::resource('items', ItemController::class);
+  Route::delete('images/{id}', [ImageController::class, 'destroy']);
+  Route::post('update-primary-image', [ImageController::class, 'updatePrimaryImage']);
+  Route::resource('item-prices', ItemPriceController::class);
+  Route::post('item-update', [ItemController::class, 'itemUpdate']);
+  Route::post('item-update/{id}', [ItemController::class, 'itemUpdate']);
+});
+
 Route::group( [ 'middleware' => 'auth:api' ], function () {
   /* Route resouce */
   Route::resource('all-transactions', TransactionController::class)->middleware(['superAdminMiddleware', 'allTransactionsMiddleware']);
@@ -53,13 +63,8 @@ Route::group( [ 'middleware' => 'auth:api' ], function () {
   Route::resource('my-stores', MyStoreController::class)->middleware(['storeAdminMiddleware', 'myStoreMiddleware']);
   Route::resource('users', UserController::class)->middleware('superAdminMiddleware');
   Route::resource('roles', RoleController::class)->middleware('superAdminMiddleware');
-  Route::resource('items', ItemController::class)->middleware('itemMiddleware');
-  Route::resource('item-prices', ItemPriceController::class);
   Route::resource('store-menu-access', StoreMenuAccessController::class);
   Route::resource('statuses', StatusController::class);
-  Route::post('item-update', [ItemController::class, 'itemUpdate']);
-  Route::post('update-primary-image', [ImageController::class, 'updatePrimaryImage']);
-  Route::delete('images/{id}', [ImageController::class, 'destroy']);
   /* Route get */
   Route::get('profile', [ProfileController::class, 'show']);
   Route::delete('role-user', [RoleUserController::class, 'destroyByPair'])->middleware('superAdminMiddleware');
@@ -68,7 +73,7 @@ Route::group( [ 'middleware' => 'auth:api' ], function () {
   ', [ProfileController::class, 'update'])->middleware('superAdminMiddleware');
   Route::post('role-user', [RoleUserController::class, 'store'])->middleware('superAdminMiddleware');
   Route::post('logout', [RegisterController::class, 'logout']);
-  Route::post('item-update/{id}', [ItemController::class, 'itemUpdate'])->middleware('itemMiddleware');
+
  
 });
 

@@ -80,33 +80,31 @@ export const computePrice = (price: number, qty: number): number => {
 };
 
 export const getOrderDetail = (
-  itemPrice: Array<{ item_price: Array<{ unit_id: number; price: number; unit: { name: string } }> }>,
+  itemPrice: Array<{ unit_id: number; online_price?: number; price: number; unit: { id: number; name: string } }>,
   variations: Array<{ unit: number; count: number }>
-): Array<{ unit_id: number; count: number; price: number,  unit_name: string;  }> => {
+): Array<{ unit_id: number; count: number; price: number; unit_name: string; }> => {
   const result: Array<{ unit_id: number; count: number; price: number; unit_name: string; }> = [];
 
   // Iterate over each variation to find the corresponding price
   variations.forEach(variation => {
       // Look through all itemPrice entries to find a matching unit_id
-      for (const item of itemPrice) {
-          for (const priceItem of item.item_price) {
-              const matchingPrice = priceItem.unit_id === variation.unit;
-              if (matchingPrice) {
-                //find it in the result and add the count because it is already exist.
-                 const unitExist = result.find(v => v.unit_id === variation.unit)
-                 if(unitExist){
-                  unitExist.count += variation.count;
-                  return
-                 }
-                  // Add the result with the found price
-                  result.push({
-                      unit_id: variation.unit,
-                      count: variation.count,
-                      price: priceItem.price,
-                      unit_name: priceItem.unit.name
-                  });
-                  return; // Exit the loop once a matching price is found
-              }
+      for (const priceItem of itemPrice) {
+          const matchingPrice = priceItem.unit_id === variation.unit;
+          if (matchingPrice) {
+            //find it in the result and add the count because it is already exist.
+             const unitExist = result.find(v => v.unit_id === variation.unit)
+             if(unitExist){
+              unitExist.count += variation.count;
+              return
+             }
+              // Add the result with the found price (use online_price if available, otherwise price)
+              result.push({
+                  unit_id: variation.unit,
+                  count: variation.count,
+                  price: priceItem.online_price ?? priceItem.price,
+                  unit_name: priceItem.unit.name
+              });
+              return; // Exit the loop once a matching price is found
           }
       }
   });
@@ -125,7 +123,7 @@ export function getLocation(): Promise<GeolocationPosition> {
   const timeoutVal = 10 * 1000 * 1000;
   return new Promise((resolve, reject) => {
     if (!navigator.geolocation) {
-      return reject(new Error("Geolocation is not supported by this browser."));
+      return reject(new Error('Geolocation is not supported by this browser.'));
     }
 
     navigator.geolocation.getCurrentPosition(
