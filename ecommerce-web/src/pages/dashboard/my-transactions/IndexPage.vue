@@ -40,6 +40,8 @@
         :columns="columns"
         row-key="optimus_id"
         class="transactions-table"
+        :rows-per-page-options="[0]"
+        hide-pagination
       >
         <template v-slot:body-cell-reference="props">
           <q-td :props="props">
@@ -400,11 +402,43 @@ const markedAsReceived = async (transactionId: string) => {
 
 .transactions-table {
   width: 100%;
+
+  :deep(.q-table) {
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  :deep(.q-table th) {
+    font-weight: 600;
+    font-size: 14px;
+    padding: 16px 24px;
+    background: linear-gradient(135deg, #f5f7fa 0%, #ffffff 100%);
+    color: #1a1a1a;
+  }
+
+  :deep(.q-table td) {
+    padding: 20px 24px;
+    font-size: 15px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  }
+
+  :deep(.q-table tbody tr) {
+    transition: all 0.3s ease;
+
+    &:hover {
+      background: rgba(25, 118, 210, 0.04);
+    }
+  }
+
+  :deep(.q-table tbody tr:last-child td) {
+    border-bottom: none;
+  }
 }
 
 .transaction-reference-link {
   text-decoration: none;
   color: inherit;
+  transition: all 0.3s ease;
 
   &:hover {
     color: #1976d2;
@@ -412,34 +446,34 @@ const markedAsReceived = async (transactionId: string) => {
 }
 
 .transaction-reference-id {
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 600;
   color: #1a1a1a;
 }
 
 .transaction-date {
-  font-size: 12px;
+  font-size: 13px;
   color: #666;
   display: flex;
   align-items: center;
-  margin-top: 2px;
+  margin-top: 4px;
 }
 
 .status-badge {
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 600;
-  padding: 4px 10px;
+  padding: 6px 12px;
   border-radius: 12px;
 }
 
 .transaction-summary {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
 }
 
 .transaction-total {
-  font-size: 13px;
+  font-size: 15px;
   color: #1a1a1a;
   font-weight: 600;
 
@@ -451,9 +485,9 @@ const markedAsReceived = async (transactionId: string) => {
 .transaction-meta {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 6px;
   color: #666;
-  font-size: 12px;
+  font-size: 13px;
 }
 
 .transaction-meta-item {
@@ -463,7 +497,7 @@ const markedAsReceived = async (transactionId: string) => {
 
 .action-buttons {
   display: flex;
-  gap: 4px;
+  gap: 8px;
   justify-content: center;
 }
 

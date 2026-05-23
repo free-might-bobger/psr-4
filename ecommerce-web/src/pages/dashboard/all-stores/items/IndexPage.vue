@@ -80,6 +80,8 @@
         :columns="columns"
         row-key="optimus_id"
         class="items-table"
+        :rows-per-page-options="[0]"
+        hide-pagination
       >
         <template v-slot:body-cell-name="props">
           <q-td :props="props">
@@ -290,6 +292,18 @@ const search = ref('');
 // Type the result
 const typedResult = result as unknown as Array<{ optimus_id: number; name: string }>;
 
+interface Category {
+  id: number;
+  name: string;
+  optimus_id?: number;
+}
+
+interface ApiResponse<T> {
+  data: {
+    data: T[];
+  };
+}
+
 const columns = [
   {
     name: 'name',
@@ -333,7 +347,7 @@ const goToLastPage = () => {
   lastPage(entityQuery.value, pagination.value);
 };
 
-const handleCategoryChange = (value: any) => {
+const handleCategoryChange = (value: Category | number | null) => {
   selectedCategory.value = value;
   requestItems();
 };
@@ -352,7 +366,7 @@ onMounted(() => {
   entityQuery.value.query.page = 1;
 });
 
-const categories = ref<Array<{ id: number; name: string; [key: string]: any }>>([]);
+const categories = ref<Category[]>([]);
 const getCategories = async () => {
   try {
     const cat = await get(
@@ -365,7 +379,7 @@ const getCategories = async () => {
         },
       },
       false
-    ) as any;
+    ) as ApiResponse<Category>;
 
     if (cat && cat.data && cat.data.data) {
       categories.value = cat.data.data;
@@ -384,7 +398,7 @@ const requestItems = async () => {
 
   if (selectedCategory.value) {
     const categoryId = typeof selectedCategory.value === 'object' && 'id' in selectedCategory.value 
-      ? (selectedCategory.value as any).id 
+      ? (selectedCategory.value as Category).id 
       : selectedCategory.value;
     if (categoryId) {
       filters += ',category_id:' + categoryId;
@@ -419,6 +433,37 @@ watch(search, (newValue) => {
 
 .items-table {
   width: 100%;
+
+  :deep(.q-table) {
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  :deep(.q-table th) {
+    font-weight: 600;
+    font-size: 14px;
+    padding: 16px 24px;
+    background: linear-gradient(135deg, #f5f7fa 0%, #ffffff 100%);
+    color: #1a1a1a;
+  }
+
+  :deep(.q-table td) {
+    padding: 20px 24px;
+    font-size: 15px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  }
+
+  :deep(.q-table tbody tr) {
+    transition: all 0.3s ease;
+
+    &:hover {
+      background: rgba(25, 118, 210, 0.04);
+    }
+  }
+
+  :deep(.q-table tbody tr:last-child td) {
+    border-bottom: none;
+  }
 }
 
 .item-name-link {
@@ -426,17 +471,19 @@ watch(search, (newValue) => {
   color: inherit;
   display: flex;
   align-items: center;
-  font-size: 16px;
-  font-weight: normal;
+  font-weight: 500;
+  font-size: 15px;
+  transition: all 0.3s ease;
 
   &:hover {
     color: #1976d2;
+    transform: translateX(4px);
   }
 }
 
 .action-buttons {
   display: flex;
-  gap: 4px;
+  gap: 8px;
   justify-content: center;
 }
 

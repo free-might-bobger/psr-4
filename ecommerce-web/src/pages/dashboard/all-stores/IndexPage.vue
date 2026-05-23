@@ -40,6 +40,8 @@
         :columns="columns"
         row-key="optimus_id"
         class="stores-table"
+        :rows-per-page-options="[0]"
+        hide-pagination
       >
         <template v-slot:body-cell-name="props">
           <q-td :props="props">
@@ -313,6 +315,37 @@ watch(search, (newValue) => {
 
 .stores-table {
   width: 100%;
+
+  :deep(.q-table) {
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  :deep(.q-table th) {
+    font-weight: 600;
+    font-size: 14px;
+    padding: 16px 24px;
+    background: linear-gradient(135deg, #f5f7fa 0%, #ffffff 100%);
+    color: #1a1a1a;
+  }
+
+  :deep(.q-table td) {
+    padding: 20px 24px;
+    font-size: 15px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  }
+
+  :deep(.q-table tbody tr) {
+    transition: all 0.3s ease;
+
+    &:hover {
+      background: rgba(25, 118, 210, 0.04);
+    }
+  }
+
+  :deep(.q-table tbody tr:last-child td) {
+    border-bottom: none;
+  }
 }
 
 .store-name-link {
@@ -320,22 +353,26 @@ watch(search, (newValue) => {
   color: inherit;
   display: flex;
   align-items: center;
-  font-weight: normal;
-  font-size: 16px;
+  font-weight: 500;
+  font-size: 15px;
+  transition: all 0.3s ease;
 
   &:hover {
     color: #1976d2;
+    transform: translateX(4px);
   }
 }
 
 .mobile-cell {
   display: flex;
   align-items: center;
+  font-size: 15px;
+  color: #1a1a1a;
 }
 
 .action-buttons {
   display: flex;
-  gap: 4px;
+  gap: 8px;
   justify-content: center;
 }
 
