@@ -1,7 +1,8 @@
 <template>
-  <div class="checkout-container">
-    <div class="row q-gutter-md q-mb-md">
-      <div class="col-12">
+  <div class="checkout-page">
+    <div class="checkout-container">
+      <!-- Header -->
+      <div class="checkout-header">
         <BreadCrumbsWrapper :bread-crumbs="[
           {
             name: 'Cart',
@@ -13,69 +14,103 @@
           },
         ]" />
       </div>
-    </div>
 
-    <div class="text-h5 text-weight-bold q-mb-md">
-      <q-icon name="location_on" class="q-mr-sm" />
-      Delivery Location
-    </div>
-
-    <!-- Map Section -->
-    <q-card flat bordered class="map-card q-mb-lg">
-      <q-card-section class="q-pa-none">
-        <GoogleMap ref="mapRef" :api-key="GOOGLE_MAP_API_KEY" :map-id="GOOGLE_MAP_ID" class="checkout-map"
-          :center="{ lat: lat, lng: lng }" :zoom="currentZoom" :draggable="true" :clickable-icons="false">
-          <AdvancedMarker :options="getDeliveryMarkerOptions()" @drag="markerDrag">
-            <InfoWindow v-model="showInfoWindow" :options="{
-              position: { lat: lat, lng: lng },
-              headerContent: 'Delivery Location',
-              disableAutoPan: false
-            }">
-              <div class="info-window-content">
-                <div class="info-window-header">
-                  <q-icon name="local_shipping" color="primary" size="sm" class="q-mr-xs" />
-                  <span class="text-weight-bold">Delivery Location</span>
-                </div>
-                <!-- <div class="info-window-body">
-                  <p class="text-caption text-grey-7 q-ma-none">
-                    Drag the marker to set your delivery location
-                  </p>
-                </div> -->
+      <!-- Main Content -->
+      <div class="checkout-content">
+        <!-- Left Column: Map -->
+        <div class="checkout-main">
+          <div class="section-card map-section">
+            <div class="section-header">
+              <div class="section-title">
+                <q-icon name="location_on" color="primary" size="24px" class="q-mr-sm" />
+                <span>Delivery Location</span>
               </div>
-            </InfoWindow>
-          </AdvancedMarker>
-        </GoogleMap>
-      </q-card-section>
-      <q-card-section class="q-pt-sm">
-        <div class="text-caption text-grey-7">
-          <q-icon name="info" size="xs" class="q-mr-xs" />
-          Drag the marker to set your delivery location
+              <q-chip size="sm" color="primary" text-color="white" icon="edit">
+                Adjust on Map
+              </q-chip>
+            </div>
+            <div class="map-wrapper">
+              <GoogleMap ref="mapRef" :api-key="GOOGLE_MAP_API_KEY" :map-id="GOOGLE_MAP_ID" class="checkout-map"
+                :center="{ lat: lat, lng: lng }" :zoom="currentZoom" :draggable="true" :clickable-icons="false">
+                <AdvancedMarker :options="getDeliveryMarkerOptions()" @drag="markerDrag">
+                  <InfoWindow v-model="showInfoWindow" :options="{
+                    position: { lat: lat, lng: lng },
+                    headerContent: 'Delivery Location',
+                    disableAutoPan: false
+                  }">
+                    <div class="info-window-content">
+                      <div class="info-window-header">
+                        <q-icon name="local_shipping" color="primary" size="sm" class="q-mr-xs" />
+                        <span class="text-weight-bold">Delivery Location</span>
+                      </div>
+                    </div>
+                  </InfoWindow>
+                </AdvancedMarker>
+              </GoogleMap>
+            </div>
+            <div class="map-hint">
+              <q-icon name="info" size="xs" color="grey-6" class="q-mr-xs" />
+              <span class="text-caption text-grey-7">Drag the marker to set your delivery location</span>
+            </div>
+          </div>
         </div>
-      </q-card-section>
-    </q-card>
 
-    <!-- Authentication Section -->
-    <div class="auth-section q-mb-lg">
-      <q-card flat bordered class="auth-card">
-        <q-card-section>
-          <q-form @submit="processCustomerOrder" ref="myForm">
-            <q-input v-model="mobile" class="full-width q-mb-md" outlined label="Enter receiver's mobile number"
-              placeholder="9XX XXX XXXX" :rules="[
-                async (val) =>
-                  isValidMobileNumber(val) ||
-                  'Please enter a valid mobile number.',
-              ]" hide-bottom-space prefix="+63">
-              <template v-slot:prepend>
-                <q-icon name="phone" />
-              </template>
-            </q-input>
-            <q-btn type="submit" class="complete-order-btn full-width" label="Complete My Order" color="primary"
-         unelevated size="lg" icon="check_circle" />
-          </q-form>
-        </q-card-section>
-      </q-card>
+        <!-- Right Column: Order Summary & Form -->
+        <div class="checkout-sidebar">
+          <!-- Order Summary -->
+          <div class="section-card order-summary-card">
+            <div class="section-header">
+              <div class="section-title">
+                <q-icon name="shopping_cart" color="primary" size="24px" class="q-mr-sm" />
+                <span>Order Summary</span>
+              </div>
+              <q-chip size="sm" color="grey-3" text-color="grey-8">
+                {{ countTotalItems }} items
+              </q-chip>
+            </div>
+            <div class="order-summary-content">
+              <div class="summary-row">
+                <span class="summary-label">Subtotal</span>
+                <span class="summary-value">{{ total }}</span>
+              </div>
+              <div class="summary-row">
+                <span class="summary-label">Delivery Charge</span>
+                <span class="summary-value">{{ deliveryCharge }}</span>
+              </div>
+              <q-separator class="q-my-md" />
+              <div class="summary-row summary-total">
+                <span class="summary-label total-label">Total</span>
+                <span class="summary-value total-value">{{ total }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Contact Information -->
+          <div class="section-card contact-card">
+            <div class="section-header">
+              <div class="section-title">
+                <q-icon name="contact_phone" color="primary" size="24px" class="q-mr-sm" />
+                <span>Contact Information</span>
+              </div>
+            </div>
+            <q-form @submit="processCustomerOrder" ref="myForm">
+              <q-input v-model="mobile" class="mobile-input" outlined label="Receiver's Mobile Number"
+                placeholder="9XX XXX XXXX" :rules="[
+                  async (val) =>
+                    isValidMobileNumber(val) ||
+                    'Please enter a valid mobile number.',
+                ]" hide-bottom-space prefix="+63" dense>
+                <template v-slot:prepend>
+                  <q-icon name="phone" color="grey-7" />
+                </template>
+              </q-input>
+              <q-btn type="submit" class="complete-order-btn full-width" label="Complete Order" color="primary"
+                unelevated size="lg" icon="check_circle" />
+            </q-form>
+          </div>
+        </div>
+      </div>
     </div>
-
   </div>
 </template>
 
@@ -374,22 +409,141 @@ const processCustomerOrder = async () => {
 </script>
 
 <style scoped lang="scss">
+.checkout-page {
+  background: #f5f7fa;
+  min-height: 100vh;
+}
+
 .checkout-container {
-  max-width: 1200px;
+  max-width: 1400px;
   margin: 0 auto;
-  padding: 16px;
+  padding: 24px;
 }
 
-.map-card {
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+.checkout-header {
+  margin-bottom: 24px;
+}
+
+.checkout-content {
+  display: grid;
+  grid-template-columns: 1fr 400px;
+  gap: 24px;
+  align-items: start;
+}
+
+.section-card {
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
   overflow: hidden;
+  transition: all 0.3s ease;
+
+  &:hover {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  }
 }
 
-.checkout-map {
-  height: 400px;
-  width: 100%;
-  border-radius: 12px 12px 0 0;
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  font-size: 18px;
+  font-weight: 600;
+  color: #1a1a1a;
+}
+
+.map-section {
+  .map-wrapper {
+    padding: 0;
+  }
+
+  .checkout-map {
+    height: 500px;
+    width: 100%;
+  }
+
+  .map-hint {
+    padding: 16px 24px;
+    background: #fafafa;
+    border-top: 1px solid #f0f0f0;
+    display: flex;
+    align-items: center;
+  }
+}
+
+.order-summary-card {
+  margin-bottom: 24px;
+}
+
+.order-summary-content {
+  padding: 24px;
+}
+
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+}
+
+.summary-label {
+  font-size: 14px;
+  color: #666;
+  font-weight: 500;
+}
+
+.summary-value {
+  font-size: 16px;
+  color: #1a1a1a;
+  font-weight: 600;
+}
+
+.summary-total {
+  padding: 16px 0 8px;
+}
+
+.total-label {
+  font-size: 16px;
+  color: #1a1a1a;
+  font-weight: 600;
+}
+
+.total-value {
+  font-size: 20px;
+  color: var(--q-primary);
+  font-weight: 700;
+}
+
+.contact-card {
+  .q-card-section {
+    padding: 24px;
+  }
+}
+
+.mobile-input {
+  margin-bottom: 20px;
+}
+
+.complete-order-btn {
+  height: 52px;
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 10px;
+  letter-spacing: 0.5px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(25, 118, 210, 0.2);
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(25, 118, 210, 0.3);
+  }
 }
 
 // Custom animated marker styles
@@ -489,34 +643,6 @@ const processCustomerOrder = async () => {
   padding-top: 4px;
 }
 
-.auth-section {
-  margin-top: 32px;
-}
-
-.auth-card {
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-}
-
-.complete-order-section {
-  margin-top: 32px;
-}
-
-.complete-order-btn {
-  height: 56px;
-  font-size: 18px;
-  font-weight: 600;
-  border-radius: 8px;
-  letter-spacing: 0.5px;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
-  }
-}
-
 .passcode-modal {
   min-width: 400px;
   border-radius: 12px;
@@ -527,23 +653,44 @@ const processCustomerOrder = async () => {
   }
 }
 
+@media (max-width: 1024px) {
+  .checkout-content {
+    grid-template-columns: 1fr;
+  }
+
+  .checkout-sidebar {
+    order: -1;
+  }
+}
+
 @media (max-width: 600px) {
   .checkout-container {
-    padding: 8px;
+    padding: 16px;
   }
 
-  .checkout-map {
-    height: 300px;
+  .section-header {
+    padding: 16px;
   }
 
-  .passcode-modal {
-    min-width: 90%;
-    margin: 16px;
+  .section-title {
+    font-size: 16px;
+  }
+
+  .map-section .checkout-map {
+    height: 350px;
+  }
+
+  .order-summary-content {
+    padding: 16px;
+  }
+
+  .contact-card .q-card-section {
+    padding: 16px;
   }
 
   .complete-order-btn {
     height: 48px;
-    font-size: 16px;
+    font-size: 15px;
   }
 }
 </style>
