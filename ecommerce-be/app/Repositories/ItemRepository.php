@@ -39,6 +39,12 @@ class ItemRepository extends BaseRepository
             array_flip($this->fillable)
         );
         unset($data['store_id']);
+
+        // Sanitize description to prevent XSS attacks
+        if (isset($data['description'])) {
+            $data['description'] = $this->sanitizeHtml($data['description']);
+        }
+
         $this->filesUpload();
         $this->model->update($data);
         return $this->model->fresh();
@@ -122,6 +128,44 @@ class ItemRepository extends BaseRepository
         }
 
         $this->updatePrimaryImageFromRequest($request);
+    }
+
+    /**
+     * Sanitize HTML to prevent XSS attacks
+     * @param string $html
+     * @return string
+     */
+    private function sanitizeHtml(string $html): string
+    {
+        if (empty($html)) {
+            return $html;
+        }
+
+        // Remove dangerous tags
+        $dangerousTags = ['script', 'iframe', 'object', 'embed', 'form', 'input', 'button', 'style', 'meta', 'link'];
+        foreach ($dangerousTags as $tag) {
+            $html = preg_replace('#</?' . $tag . '[^>]*>#is', '', $html);
+        }
+
+        // Remove dangerous event handlers
+        $dangerousEvents = ['onclick', 'onload', 'onerror', 'onmouseover', 'onmouseout', 'onfocus', 'onblur', 'onchange', 'onsubmit'];
+        foreach ($dangerousEvents as $event) {
+            $html = preg_replace('#\s' . $event . '\s*=\s*["\'][^"\']*["\']#is', '', $html);
+            $html = preg_replace('#\s' . $event . '\s*=\s*[^>\s]*#is', '', $html);
+        }
+
+        // Remove javascript: protocol from href and src attributes
+        $html = preg_replace('#(href|src)\s*=\s*["\']\s*javascript:#is', '$1=""', $html);
+        $html = preg_replace('#(href|src)\s*=\s*javascript:#is', '$1=""', $html);
+
+        // Remove data: protocol from src attributes (can be used for XSS)
+        $html = preg_replace('#src\s*=\s*["\']\s*data:#is', 'src=""', $html);
+
+        // Remove any on* attributes
+        $html = preg_replace('#\son[a-z]+\s*=\s*["\'][^"\']*["\']#is', '', $html);
+        $html = preg_replace('#\son[a-z]+\s*=\s*[^>\s]*#is', '', $html);
+
+        return $html;
     }
 
 

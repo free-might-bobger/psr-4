@@ -50,7 +50,7 @@
         <!-- Right: Product Info -->
         <div class="product-info">
           <h1 class="product-name">{{ item.name }}</h1>
-          <p class="product-description">{{ item.description }}</p>
+          <div class="product-description" v-html="sanitizeHtml(item.description || '')"></div>
 
           <div class="info-section">
             <div class="section-label">Select Unit</div>
@@ -617,6 +617,42 @@ const zoomStyle = computed(() => {
     transformOrigin: 'center center',
   };
 });
+
+// Sanitize HTML to prevent XSS attacks
+const sanitizeHtml = (html: string) => {
+  if (!html) return '';
+
+  // Create a temporary div to parse HTML
+  const tempDiv = document.createElement('div');
+  tempDiv.innerHTML = html;
+
+  // Remove dangerous tags and attributes
+  const dangerousTags = ['script', 'iframe', 'object', 'embed', 'form', 'input', 'button'];
+  dangerousTags.forEach(tag => {
+    const elements = tempDiv.getElementsByTagName(tag);
+    while (elements[0]) {
+      elements[0].parentNode?.removeChild(elements[0]);
+    }
+  });
+
+  // Remove dangerous attributes
+  const allElements = tempDiv.getElementsByTagName('*');
+  for (let i = 0; i < allElements.length; i++) {
+    const element = allElements[i];
+    const attributes = element.attributes;
+    const dangerousAttrs = ['onclick', 'onload', 'onerror', 'onmouseover', 'onmouseout', 'onfocus', 'onblur'];
+    for (let j = attributes.length - 1; j >= 0; j--) {
+      const attr = attributes[j];
+      if (dangerousAttrs.some(da => attr.name.toLowerCase().startsWith(da)) ||
+          attr.name.toLowerCase().startsWith('on') ||
+          attr.name.toLowerCase() === 'href' && attr.value?.toLowerCase().startsWith('javascript:')) {
+        element.removeAttribute(attr.name);
+      }
+    }
+  }
+
+  return tempDiv.innerHTML;
+};
 
 </script>
 
