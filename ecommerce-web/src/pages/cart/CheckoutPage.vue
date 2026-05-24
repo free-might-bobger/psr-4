@@ -35,7 +35,7 @@
                 v-model="searchLocation"
                 outlined
                 dense
-                placeholder="Search for a location (e.g., Tayud Consolacion)"
+                placeholder="Search for a location ..."
                 class="location-search-input"
               >
                 <template v-slot:prepend>
@@ -550,6 +550,7 @@ const processCustomerOrder = async () => {
 .map-section {
   .search-location-wrapper {
     padding: 0 0 16px 0;
+    margin: 0 12px;
   }
 
   .location-search-input {

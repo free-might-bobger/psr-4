@@ -53,5 +53,6 @@ trait Maps {
         
         return number_format($distance, 2);
     }
+    
 
 }

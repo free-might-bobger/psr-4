@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Collection;
 
 class StoreRepository extends BaseRepository implements BaseInterface
 {
+    protected string $modelClassName;
     public function __construct()
     {
         $this->model = new Store;

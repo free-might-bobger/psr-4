@@ -4,23 +4,12 @@
     <div class="page-header q-mb-md">
       <div class="header-content">
         <div class="header-title-section">
-          <q-icon name="receipt_long" size="32px" color="primary" class="q-mr-sm" />
-          <h2 class="page-title">All Transactions</h2>
+          <q-icon name="local_shipping" size="32px" color="primary" class="q-mr-sm" />
+          <h2 class="page-title">Deliveries Near Me</h2>
         </div>
         <div class="header-actions">
-          <q-input
-            v-model="search"
-            placeholder="Search transactions..."
-            outlined
-            dense
-            clearable
-            debounce="300"
-            class="search-input"
-          >
-            <template v-slot:prepend>
-              <q-icon name="search" />
-            </template>
-          </q-input>
+          <q-btn color="primary" icon="my_location" label="Refresh Location" unelevated @click="refreshLocation"
+            class="refresh-location-btn" size="md" />
         </div>
       </div>
     </div>
@@ -29,8 +18,8 @@
     <div class="desktop-only">
       <div v-if="typedResult.length === 0" class="empty-state-desktop">
         <q-icon name="receipt_long" size="80px" color="grey-4" />
-        <div class="text-h5 q-mt-md text-grey-6">No transactions found</div>
-        <div class="text-body2 text-grey-5 q-mt-sm">Your transaction history will appear here</div>
+        <div class="text-h5 q-mt-md text-grey-6">No deliverues found</div>
+        <div class="text-body2 text-grey-5 q-mt-sm">Your deliveries history will appear here</div>
       </div>
       <q-table
         v-else
@@ -244,19 +233,21 @@ import { useCommonStore } from 'src/stores/common';
 import { onMounted, ref, watch } from 'vue';
 import { storeToRefs } from 'pinia';
 import { CustomerTransactionRow } from 'src/boot/interfaces';
+import { getLocation } from 'src/boot/utilities';
 
 const search = ref('');
 const useCommon = useCommonStore();
 const { entityQuery, pagination, result } = storeToRefs(useCommon);
 
 entityQuery.value = {
-  message: 'Getting transactions...',
-  entity: 'all-transactions',
+  message: 'Getting deliveries...',
+  entity: 'deliveries',
   query: {
-    with: 'status,paymentMethod,receiveMethod',
-    orderBy: 'created_at:desc',
+    latitude: 1,
+    longitude: 1,
     page: pagination.value.page,
     limit: 12,
+    with: 'orders'
   },
 };
 
@@ -336,6 +327,14 @@ const goToLastPage = () => {
   lastPage(entityQuery.value, pagination.value);
 };
 
+const refreshLocation = () => {
+  getLocation().then((position) => {
+    entityQuery.value.query.latitude = position.coords.latitude;
+    entityQuery.value.query.longitude = position.coords.longitude;
+    onRequest(entityQuery.value, true);
+  });
+};
+
 // Helper functions for UI
 const getStatusColor = (status: string | undefined): string => {
   if (!status) return 'grey';
@@ -360,6 +359,33 @@ const formatDate = (dateString: string | undefined): string => {
 
 <style scoped lang="scss">
 @import 'src/css/dashboard/all-stores/index.scss';
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header-title-section {
+  display: flex;
+  align-items: center;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+}
+
+.refresh-location-btn {
+  font-weight: 600;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+}
 
 .transactions-table {
   width: 100%;
