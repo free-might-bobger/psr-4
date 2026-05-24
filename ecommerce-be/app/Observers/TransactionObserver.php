@@ -6,13 +6,15 @@ use App\Http\Requests\TransactionRequest;
 use App\Models\Order;
 use App\Models\Item;
 use App\Models\ItemPrice;
-use App\Traits\Obfuscate\OptimusRequiredToModel;
+use App\Traits\Obfuscate\OptimusId;
 
 class TransactionObserver {
-    use OptimusRequiredToModel;
+    use OptimusId;
     public function created( Transaction $transaction ): void {
 
         $request = app( TransactionRequest::class );
+        $transaction->store_id = $this->optimus()->decode($request->store_id);
+        $transaction->save();
         foreach ( $request->items as $requestItem ) {
 
             foreach ( $requestItem[ 'items' ] as $item ) {

@@ -10,7 +10,7 @@ use App\Http\Requests\Transaction\UpdateRequest;
 
 class TransactionController extends ApiController {
 
-    protected $model;
+    protected string $model;
     public function __construct( TransactionRepository $repository ) {
         $this->model =  Transaction::class;
         $this->repository = $repository;

@@ -29,6 +29,31 @@
                 Adjust on Map
               </q-chip>
             </div>
+            <div class="search-location-wrapper">
+              <q-input
+                ref="searchInputRef"
+                v-model="searchLocation"
+                outlined
+                dense
+                placeholder="Search for a location (e.g., Tayud Consolacion)"
+                class="location-search-input"
+              >
+                <template v-slot:prepend>
+                  <q-icon name="search" />
+                </template>
+                <template v-slot:append>
+                  <q-btn
+                    v-if="searchLocation"
+                    icon="close"
+                    flat
+                    round
+                    dense
+                    size="sm"
+                    @click="clearSearch"
+                  />
+                </template>
+              </q-input>
+            </div>
             <div class="map-wrapper">
               <GoogleMap ref="mapRef" :api-key="GOOGLE_MAP_API_KEY" :map-id="GOOGLE_MAP_ID" class="checkout-map"
                 :center="{ lat: lat, lng: lng }" :zoom="currentZoom" :draggable="true" :clickable-icons="false">
@@ -71,16 +96,16 @@
             <div class="order-summary-content">
               <div class="summary-row">
                 <span class="summary-label">Subtotal</span>
-                <span class="summary-value">{{ total }}</span>
+                <span class="summary-value">{{ formatMoney(total) }}</span>
               </div>
               <div class="summary-row">
                 <span class="summary-label">Delivery Charge</span>
-                <span class="summary-value">{{ deliveryCharge }}</span>
+                <span class="summary-value">{{ formatMoney(deliveryCharge) }}</span>
               </div>
               <q-separator class="q-my-md" />
               <div class="summary-row summary-total">
                 <span class="summary-label total-label">Total</span>
-                <span class="summary-value total-value">{{ total }}</span>
+                <span class="summary-value total-value">{{ decimalThousandSeparator(total + deliveryCharge) }}</span>
               </div>
             </div>
           </div>
@@ -133,6 +158,7 @@ import {
   GroupStoreItemInterface,
 } from 'src/boot/interfaces';
 import type { QForm } from 'quasar';
+import { formatMoney, decimalThousandSeparator } from 'boot/utilities';
 
 const $q = useQuasar();
 const userCart = useUserCartStore();
@@ -152,6 +178,9 @@ const { profile } = storeToRefs(useUserStore());
 const showInfoWindow = ref(true);
 const mapRef = ref<any>(null);
 const currentZoom = ref(15);
+const searchLocation = ref('');
+const searchInputRef = ref<any>(null);
+let autocomplete: google.maps.places.Autocomplete | null = null;
 
 const hasVerificationCode = ref(false);
 
@@ -183,6 +212,64 @@ const getDeliveryMarkerOptions = () => {
 const markerDrag = (e: { latLng: google.maps.LatLng }) => {
   lat.value = e.latLng.lat();
   lng.value = e.latLng.lng();
+};
+
+// Initialize Google Places Autocomplete
+const initAutocomplete = () => {
+  if (searchInputRef.value && searchInputRef.value.$el) {
+    const inputElement = searchInputRef.value.$el.querySelector('input');
+    if (inputElement && window.google && window.google.maps && window.google.maps.places) {
+      autocomplete = new google.maps.places.Autocomplete(inputElement, {
+        fields: ['formatted_address', 'geometry', 'name'],
+        types: ['geocode', 'establishment'],
+      });
+
+      autocomplete.addListener('place_changed', onPlaceChanged);
+    }
+  }
+};
+
+// Handle place selection from autocomplete
+const onPlaceChanged = () => {
+  if (!autocomplete) return;
+
+  const place = autocomplete.getPlace();
+  if (!place.geometry || !place.geometry.location) {
+    $q.notify({
+      message: 'No details available for input: \'' + place.name + '\'',
+      type: 'warning',
+      position: 'top',
+      icon: 'warning'
+    });
+    return;
+  }
+
+  // Update lat/lng
+  lat.value = place.geometry.location.lat();
+  lng.value = place.geometry.location.lng();
+
+  // Update search input with formatted address
+  searchLocation.value = place.formatted_address || place.name || '';
+
+  // Update map center
+  const map = mapRef.value?.$mapObject || mapRef.value?.map || mapRef.value?.$map;
+  if (map) {
+    map.setCenter({ lat: lat.value, lng: lng.value });
+    map.setZoom(16);
+    currentZoom.value = 16;
+  }
+
+  $q.notify({
+    message: 'Location updated successfully',
+    type: 'positive',
+    position: 'top',
+    icon: 'check_circle'
+  });
+};
+
+// Clear search input
+const clearSearch = () => {
+  searchLocation.value = '';
 };
 
 // Zoom functions
@@ -339,6 +426,7 @@ const addZoomControls = (map: google.maps.Map) => {
 onMounted(async () => {
   await nextTick();
   await waitForMapReady();
+  await initAutocomplete();
 });
 
 const myForm = ref<QForm | null>(null);
@@ -460,6 +548,27 @@ const processCustomerOrder = async () => {
 }
 
 .map-section {
+  .search-location-wrapper {
+    padding: 0 0 16px 0;
+  }
+
+  .location-search-input {
+    :deep(.q-field__control) {
+      border-radius: 8px;
+      border: 1px solid #e0e0e0;
+      background: #fafafa;
+    }
+
+    :deep(.q-field__control:hover) {
+      border-color: #d0d0d0;
+    }
+
+    :deep(.q-field--focused .q-field__control) {
+      background: white;
+      border-color: var(--q-primary);
+    }
+  }
+
   .map-wrapper {
     padding: 0;
   }

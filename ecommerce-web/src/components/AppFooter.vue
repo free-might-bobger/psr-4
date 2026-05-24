@@ -33,12 +33,8 @@
                 <div class="footer-contact">
                     <div class="footer-link-title">Contact Us</div>
                     <div class="footer-contact-item">
-                        <q-icon name="phone" size="sm" class="q-mr-sm" />
-                        <span>+63 XXX XXX XXXX</span>
-                    </div>
-                    <div class="footer-contact-item">
                         <q-icon name="email" size="sm" class="q-mr-sm" />
-                        <span>support@mynearshops.com</span>
+                        <span>admin@mynearshops.com</span>
                     </div>
                     <div class="footer-contact-item">
                         <q-icon name="location_on" size="sm" class="q-mr-sm" />

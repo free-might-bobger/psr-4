@@ -5,6 +5,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\ {
     CategoryController,
     CustomerTransactionController,
+    DeliveryController,
     DeliveryChargeController,
     ImageController,
     InterConnectedCityController,
@@ -57,6 +58,7 @@ Route::group(['middleware' => 'auth:api', 'itemMiddleware'], function () {
 
 Route::group( [ 'middleware' => 'auth:api' ], function () {
   /* Route resouce */
+  Route::resource('deliveries', DeliveryController::class);
   Route::resource('all-transactions', TransactionController::class)->middleware(['superAdminMiddleware', 'allTransactionsMiddleware']);
   Route::resource('my-transactions', CustomerTransactionController::class)->middleware(['customerMiddleware', 'myTransactionsMiddleware']);
   Route::resource('my-store-transactions', MyStoreTransactionController::class)->middleware(['storeAdminMiddleware', 'myStoreMiddleware']);
@@ -100,8 +102,7 @@ Route::post('send-email-invitation', [UserController::class, 'inviteByEmail']);
 Route::post('create-new-activation-code', [MobileActivationCodeController::class, 'createNewActivationcode']);
 Route::get('verify/activation_code/{activation_code}', [RegisterController::class, 'verifyActivationCode']);
 Route::get('login', [RegisterController::class, 'loginPageRedirect']);
-Route::post('login', [RegisterController::class, 'login']);
-Route::post( 'login', [ RegisterController::class, 'login' ] );
+Route::post('login', [RegisterController::class, 'login'])->middleware('throttle:5,10');
 
 Route::middleware('auth:sanctum')->get('/me', function (Request $request) {
     return $request->user();

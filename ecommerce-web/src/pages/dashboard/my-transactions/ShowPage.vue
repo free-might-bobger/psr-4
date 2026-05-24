@@ -196,11 +196,6 @@
                     <span class="text-weight-medium">{{ order.item_name }}</span>
                     <q-icon name="open_in_new" size="xs" color="primary" class="q-ml-xs" />
                 </div>
-                <div class="order-item-description" v-if="order.item_description">
-                  <p class="text-body2 text-grey-7 q-mt-xs q-mb-none">
-                    {{ order.item_description }}
-                  </p>
-                </div>
               </div>
               </router-link>
 

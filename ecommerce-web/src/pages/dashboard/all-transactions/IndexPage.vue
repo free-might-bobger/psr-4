@@ -39,6 +39,7 @@
         :rows="typedResult"
         :columns="columns"
         row-key="optimus_id"
+        :pagination="{ rowsPerPage: 0 }"
         class="transactions-table"
       >
         <template v-slot:body-cell-reference="props">
@@ -89,18 +90,6 @@
         <template v-slot:body-cell-actions="props">
           <q-td :props="props">
             <div class="action-buttons">
-              <q-btn
-                unelevated
-                dense
-                round
-                color="negative"
-                icon="check_circle"
-                :to="`${$route.path}/${props.row.optimus_id}`"
-                size="sm"
-                class="q-mr-xs"
-              >
-                <q-tooltip>Mark as received</q-tooltip>
-              </q-btn>
               <q-btn
                 unelevated
                 dense
@@ -353,7 +342,8 @@ const getStatusColor = (status: string | undefined): string => {
   const statusLower = status.toLowerCase();
   if (statusLower.includes('completed') || statusLower.includes('delivered')) return 'positive';
   if (statusLower.includes('preparing') || statusLower.includes('processing')) return 'warning';
-  if (statusLower.includes('cancelled') || statusLower.includes('rejected')) return 'negative';
+  if (statusLower.includes('cancelled') || statusLower.includes('rejected')) return 'warning';
+  if (statusLower.includes('refund') || statusLower.includes('rejected')) return 'negative';
   return 'primary';
 };
 

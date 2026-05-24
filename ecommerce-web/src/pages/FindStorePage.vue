@@ -176,7 +176,7 @@ const { lat, lng } = storeToRefs(useCommon);
 const showInfoWindow = ref(true);
 
 
-const mapRef = ref<any>(null)
+const mapRef = ref<unknown>(null)
 const mapSectionRef = ref<HTMLElement | null>(null)
 const directions = ref<google.maps.DirectionsResult | null>(null)
 const directionsRenderer = ref<google.maps.DirectionsRenderer | null>(null)
@@ -294,7 +294,7 @@ const getNearestStore = async () => {
   );
 
   if (result && typeof result === 'object' && 'data' in result) {
-    nearestStores.value = (result as any).data.data;
+    nearestStores.value = (result as { data: { data: unknown[] } }).data.data;
     showStoreList.value = true;
   }
 };
@@ -585,7 +585,7 @@ watch(searchString, async () => {
     );
 
     if (result && typeof result === 'object' && 'data' in result) {
-      nearestStores.value = (result as any).data.data;
+      nearestStores.value = (result as { data: { data: unknown[] } }).data.data;
       showStoreList.value = true;
     }
   }

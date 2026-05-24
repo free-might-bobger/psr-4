@@ -334,7 +334,7 @@ function statusOptionLabel(opt: Status): string {
   return opt.label || opt.name || '';
 }
 
-onMounted(async () => {
+async function fetchTransactionData() {
   const result = await show<TransactionDetail>({
     message: 'Getting transaction...',
     entity: 'all-transactions',
@@ -354,6 +354,10 @@ onMounted(async () => {
   if (statusesRes?.data?.data) {
     localStatuses.value = statusesRes.data.data;
   }
+}
+
+onMounted(async () => {
+  await fetchTransactionData();
 });
 
 async function onStatusChange(newStatusId: number | null) {
@@ -386,6 +390,7 @@ async function onStatusChange(newStatusId: number | null) {
     }
   } finally {
     statusUpdateLoading.value = false;
+    await fetchTransactionData();
   }
 }
 

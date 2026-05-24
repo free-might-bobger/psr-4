@@ -155,7 +155,7 @@ const useItem = useItemStore();
 const { searchString, selectedCategory } = storeToRefs(useItem);
 const useCommon = useCommonStore();
 
-const { pagination, result: resultRef, entityQuery } = storeToRefs(useCommon);
+const { pagination, result: resultRef } = storeToRefs(useCommon);
 const result = computed(() => resultRef.value as ItemInterface[]);
 const store = ref<{
   id?: number;
@@ -207,7 +207,7 @@ const getCategories = async () => {
   );
 
   if (cat && typeof cat === 'object' && 'data' in cat) {
-    categories.value = (cat as any).data.data;
+    categories.value = (cat as { data: { data: unknown[] } }).data.data;
   }
 };
 
@@ -218,7 +218,7 @@ const onRequest = async () => {
   }
 
   if (selectedCategory.value && typeof selectedCategory.value === 'object' && 'id' in selectedCategory.value) {
-    filters += ',category_id:' + (selectedCategory.value as any).id;
+    filters += ',category_id:' + (selectedCategory.value as { id: number }).id;
   }
 
   useCommon.setResultPagination(
@@ -242,7 +242,7 @@ onMounted(() => {
   onRequest();
 });
 
-useCommon.$subscribe(async (mutation, state) => {
+useCommon.$subscribe(async (mutation) => {
   if (mutation.events) {
     const events = Array.isArray(mutation.events) ? mutation.events : [mutation.events];
     if (events.some(event => event.key === 'page')) {

@@ -9,7 +9,7 @@
           </div>
           <div class="logo-text">
             <span class="logo-brand-name">My Near Shops</span>
-            <span class="logo-tagline">Your Trusted Shop</span>
+            <span class="logo-tagline">Your Community Marketplace</span>
           </div>
         </router-link>
 
@@ -18,20 +18,21 @@
         <!-- Action Buttons -->
         <div class="header-actions">
           <!-- Cart Button -->
-          <q-btn to="/cart" icon="shopping_cart" flat round class="header-btn cart-btn" size="md">
+          <q-btn to="/cart" icon="shopping_cart" flat class="header-btn cart-btn" size="md">
+            <span class="btn-label">Cart</span>
             <q-badge v-if="countTotalItems > 0" color="negative" text-color="white" floating rounded class="cart-badge">
               {{ countTotalItems }}
             </q-badge>
-            <q-tooltip>View Cart</q-tooltip>
           </q-btn>
 
           <!-- Login Button -->
-          <q-btn v-if="!profile.token" to="/login" icon="login" flat round class="header-btn" size="md">
-            <q-tooltip>Login</q-tooltip>
+          <q-btn v-if="!profile.token" to="/login" icon="login" flat class="header-btn" size="md">
+            <span class="btn-label">Login</span>
           </q-btn>
 
           <!-- User Menu -->
-          <q-btn v-if="profile.token" icon="account_circle" flat round class="header-btn user-btn" size="md">
+          <q-btn v-if="profile.token" icon="account_circle" flat class="header-btn user-btn" size="md">
+            <span class="btn-label">Account</span>
             <q-menu class="user-menu" anchor="bottom right" self="top right" :offset="[0, 8]">
               <q-list class="user-menu-list" padding>
                 <q-item-label header class="user-menu-header">
@@ -59,7 +60,6 @@
                 </q-item>
               </q-list>
             </q-menu>
-            <q-tooltip>Account Menu</q-tooltip>
           </q-btn>
         </div>
       </q-toolbar>
@@ -139,18 +139,20 @@ const { countTotalItems } = storeToRefs(useUserCartStore());
 }
 
 .logo-brand-name {
-  font-size: 20px;
-  font-weight: 700;
-  color: #1a1a1a;
-  line-height: 1.2;
-  letter-spacing: -0.5px;
+  font-size: 22px;
+  font-weight: 600;
+  color: #424242;
+  line-height: 1.3;
+  letter-spacing: -0.3px;
 }
 
 .logo-tagline {
-  font-size: 11px;
-  color: #666;
-  line-height: 1;
-  margin-top: 2px;
+  font-size: 12px;
+  color: #757575;
+  line-height: 1.2;
+  margin-top: 4px;
+  font-weight: 400;
+  letter-spacing: 0.1px;
 }
 
 .logo-avatar {
@@ -166,22 +168,32 @@ const { countTotalItems } = storeToRefs(useUserCartStore());
 .header-actions {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 12px;
 }
 
 .header-btn {
   position: relative;
   transition: all 0.3s ease;
-  margin: 0 4px;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-weight: 500;
+  min-width: 100px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 
   &:hover {
     background-color: #f5f5f5;
-    transform: scale(1.1);
+    transform: translateY(-1px);
   }
 
   &:active {
-    transform: scale(0.95);
+    transform: translateY(0);
   }
+}
+
+.btn-label {
+  font-size: 14px;
 }
 
 .cart-btn {
