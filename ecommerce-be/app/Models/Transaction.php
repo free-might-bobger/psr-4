@@ -58,43 +58,13 @@ class Transaction extends Model implements Auditable
         return $this->hasMany(Order::class, 'transaction_id', 'id');
     }
 
+    public function store(){
+        return $this->belongsTo(Store::class, 'store_id', 'id');
+    }
+
     public function getDeliveryChargeAttribute($value){
         return number_format( $value ,2,".",",");
     }
-    // public function pickupTime(){
-    //     return $this->hasMany(PickupTime::class, 'transaction_id', 'id');
-    // }
-
-    // public function getFormatDeliveryAttribute(){
-    //     return number_format($this->delivery_charge,2,".",",");
-    // }
-
-    // public function getDateTimeAttribute(){
-
-    //     $request = app(BaseIndexRequest::class)->all();
-    //     $storeId = Arr::get($request, 'pickup_store_id', null);
-    //     if( count($this->pickupTime) && $storeId ){
-    //        $dateTime = $this->pickupTime->filter(function($value) use ($storeId) {
-    //             return $value['transaction_id'] == $this->id && $value['store_id'] == $this->optimus()->decode( $storeId);
-    //         })->last();
-    //        if($dateTime){
-    //         return $dateTime->date_time;
-    //        }
-    //     }
-    //     return null;
-    // }
-
-    // //ref_number
-    // public function getMaskReferenceAttribute(){
-    //     return '*****' . substr($this->ref_number, -5);
-    // }
-
-
-    // public function getFormattedReceiveDateAttribute(){
-    //     if($this->receive_date){
-    //         return Carbon::parse($this->receive_date)->toDayDateTimeString();
-    //     }
-    // }
 
     public function scopeWithinKm(Builder $query, string $latitude, string $longitude, string $radius ): void {
 
@@ -107,17 +77,23 @@ class Transaction extends Model implements Auditable
 
         $earthRaidusInKm = 6371;
 
-        $query->select('*', DB::raw("
+        $query->select('transactions.*', DB::raw("
             ($earthRaidusInKm * acos(cos(radians($latitude)) 
-            * cos(radians(latitude)) 
-            * cos(radians(longitude) - radians($longitude)) 
+            * cos(radians(stores.latitude)) 
+            * cos(radians(stores.longitude) - radians($longitude)) 
             + sin(radians($latitude)) 
-            * sin(radians(latitude)))) AS distance
+            * sin(radians(stores.latitude)))) AS distance
         "))
-        ->whereBetween('latitude', [$minLat, $maxLat])
-        ->whereBetween('longitude', [$minLon, $maxLon])
+        ->join('stores', 'transactions.store_id', '=', 'stores.id')
+        ->join('orders', function($join) {
+            $join->on('transactions.id', '=', 'orders.transaction_id')
+                 ->whereColumn('orders.store_id', '=', 'transactions.store_id');
+        })
+        ->whereBetween('stores.latitude', [$minLat, $maxLat])
+        ->whereBetween('stores.longitude', [$minLon, $maxLon])
         ->having('distance', '<=', $radius)
-        ->orderBy('distance', 'asc');
+        ->orderBy('distance', 'asc')
+        ->distinct();
     }
 
     public function getDistanceAttribute(): float
@@ -128,8 +104,8 @@ class Transaction extends Model implements Auditable
         if ($request->latitude && $request->longitude) {
 
             $distance = Maps::calculateDistance(
-                $this->latitude,
-                $this->longitude,
+                $this->store->latitude,
+                $this->store->longitude,
                 $request->latitude,
                 $request->longitude
             );

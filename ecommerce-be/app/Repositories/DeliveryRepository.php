@@ -3,6 +3,7 @@
 namespace App\Repositories;
 
 use App\Models\Transaction;
+use Illuminate\Database\Eloquent\Collection;
 
 class DeliveryRepository extends BaseRepository implements BaseInterface
 {
@@ -11,6 +12,19 @@ class DeliveryRepository extends BaseRepository implements BaseInterface
     {
         $this->setModel(new Transaction());
         $this->cacheKey = 'Delivery-get';
+    }
+
+    public function getWithinKm():void{
+        $this->model = $this->model->withinKm($this->params['latitude'], $this->params['longitude'], $this->params['radius']);
+    }
+
+    public function applyFilters(): Collection{
+
+        if(isset($this->params['latitude']) && isset($this->params['longitude']) && isset($this->params['radius'])){
+            $this->getWithinKm();
+        }
+        $this->model = $this->model->with($this->params['with'] ?? []);
+        return $this->model->get();
     }
 
 }

@@ -27,6 +27,7 @@ class DeliveryRequest extends BaseRequest
             'page'      => 'required|integer',
             'limit'     => 'required|integer',
             'with'      => 'required|string',
+            'radius'    => 'required'
         ];
     }
 }

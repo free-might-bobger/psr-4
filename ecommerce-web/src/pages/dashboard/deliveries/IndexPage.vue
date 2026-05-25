@@ -31,66 +31,27 @@
         :pagination="{ rowsPerPage: 0 }"
         class="transactions-table"
       >
-        <template v-slot:body-cell-reference="props">
+        <template v-slot:body-cell-distance="props">
           <q-td :props="props">
-            <router-link
-              :to="`${$route.path}/${props.row.optimus_id}`"
-              class="transaction-reference-link"
-            >
-              <div class="transaction-reference-id">{{ props.row.reference_id }}</div>
-              <div class="transaction-date">
-                <q-icon name="calendar_today" size="xs" class="q-mr-xs" />
-                {{ formatDate(props.row.created_at) }}
-              </div>
-            </router-link>
+            {{ Number(props.row.distance).toFixed(2) }} km
           </q-td>
         </template>
 
-        <template v-slot:body-cell-status="props">
+        <template v-slot:body-cell-delivery_charge="props">
           <q-td :props="props">
-            <q-badge
-              :color="getStatusColor(props.row.status?.label)"
-              :label="props.row.status?.label || 'Pending'"
-              class="status-badge"
-            />
+            {{ props.row.delivery_charge }}
           </q-td>
         </template>
 
-        <template v-slot:body-cell-summary="props">
+        <template v-slot:body-cell-total="props">
           <q-td :props="props">
-            <div class="transaction-summary">
-              <div class="transaction-total">
-                Grand Total: <span>{{ props.row.grand_total }}</span>
-              </div>
-              <div class="transaction-meta">
-                <div class="transaction-meta-item">
-                  <q-icon name="payment" size="xs" class="q-mr-xs" />
-                  {{ props.row.payment_method?.name || 'N/A' }}
-                </div>
-                <div class="transaction-meta-item">
-                  <q-icon name="local_shipping" size="xs" class="q-mr-xs" />
-                  {{ props.row.receive_method?.name || 'N/A' }}
-                </div>
-              </div>
-            </div>
+            {{ props.row.total }}
           </q-td>
         </template>
 
-        <template v-slot:body-cell-actions="props">
+        <template v-slot:body-cell-grand_total="props">
           <q-td :props="props">
-            <div class="action-buttons">
-              <q-btn
-                unelevated
-                dense
-                round
-                color="primary"
-                icon="visibility"
-                :to="`${$route.path}/${props.row.optimus_id}`"
-                size="sm"
-              >
-                <q-tooltip>View details</q-tooltip>
-              </q-btn>
-            </div>
+            {{ props.row.grand_total }}
           </q-td>
         </template>
 
@@ -247,7 +208,8 @@ entityQuery.value = {
     longitude: 1,
     page: pagination.value.page,
     limit: 12,
-    with: 'orders'
+    with: 'orders',
+    radius: 3
   },
 };
 
@@ -255,34 +217,36 @@ const typedResult = result as unknown as CustomerTransactionRow[];
 
 const columns = [
   {
-    name: 'reference',
+    name: 'distance',
     required: true,
-    label: 'Reference',
+    label: 'Distance (km)',
     align: 'left' as const,
-    field: 'reference_id',
+    field: 'distance',
     sortable: true
   },
   {
-    name: 'status',
+    name: 'delivery_charge',
     required: true,
-    label: 'Order Status',
+    label: 'Delivery Charge',
     align: 'left' as const,
-    field: (row: any) => row.status?.label || 'Pending',
+    field: 'delivery_charge',
     sortable: true
   },
   {
-    name: 'summary',
+    name: 'total',
     required: true,
-    label: 'Summary',
+    label: 'Total',
     align: 'left' as const,
-    field: 'grand_total'
+    field: 'total',
+    sortable: true
   },
   {
-    name: 'actions',
+    name: 'grand_total',
     required: true,
-    label: 'Actions',
-    align: 'center' as const,
-    field: ''
+    label: 'Grand Total',
+    align: 'left' as const,
+    field: 'grand_total',
+    sortable: true
   }
 ];
 

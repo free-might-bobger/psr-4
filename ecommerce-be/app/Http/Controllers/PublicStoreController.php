@@ -2,12 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Resources\PublicStoreResource;
 use App\Repositories\StoreRepository;
-use App\Http\Requests\BaseIndexRequest; 
 use App\Http\Requests\Store\StoreRequest;
 use App\Http\Requests\Store\StoreIndexRequest;
-use Illuminate\Support\Arr;
 use App\Http\Resources\BaseResource;
 
 class PublicStoreController extends ApiController
