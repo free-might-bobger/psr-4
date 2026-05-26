@@ -1,675 +1,317 @@
 <template>
-  <div class="transaction-detail-container">
-    <!-- Header Section -->
-    <div class="transaction-header-section q-mb-lg">
-      <div class="row items-center">
-        <div class="col">
-          <div class="text-h4 text-weight-bold">
-            <q-icon name="receipt_long" color="primary" class="q-mr-sm" />
-            Transaction Details
-          </div>
-          <div class="text-body2 text-grey-7 q-mt-xs">
-            View complete transaction information
-          </div>
-        </div>
-        <q-btn outline color="primary" icon="arrow_back" label="Back" @click="$router.back()" />
+  <div class="delivery-detail-container">
+    <div class="page-header q-mb-lg">
+      <q-btn flat color="primary" icon="arrow_back" label="Back" @click="$router.back()" class="q-mr-md" />
+      <div class="header-title">
+        <h2 class="text-h4 text-weight-bold">Delivery Navigation</h2>
+        <div class="text-body2 text-grey-7">Navigate to store with Google Maps</div>
       </div>
     </div>
 
-    <!-- Transaction Card -->
-    <q-card flat bordered class="transaction-detail-card">
-      <!-- Header with Reference and Date -->
-      <q-card-section class="transaction-detail-header">
-        <div class="row items-center justify-between">
-          <div class="col-auto">
-            <div class="text-h6 text-weight-bold q-mb-xs">
-              <q-icon name="tag" color="primary" class="q-mr-sm" />
-              Reference: {{ localResult.reference_id }}
-            </div>
-            <div class="text-body2 text-grey-7">
-              <q-icon name="calendar_today" size="xs" class="q-mr-xs" />
-              {{ localResult.created_at }}
+    <div v-if="loading" class="loading-container">
+      <q-spinner size="50px" color="primary" />
+      <div class="text-body1 q-mt-md">Loading delivery details...</div>
+    </div>
+
+    <div v-else-if="error" class="error-container">
+      <q-icon name="error" size="50px" color="negative" />
+      <div class="text-h6 q-mt-md text-negative">{{ error }}</div>
+    </div>
+
+    <div v-else-if="transaction" class="delivery-content">
+      <q-card flat bordered class="delivery-card q-mb-md">
+        <q-card-section class="card-header">
+          <div class="row items-center">
+            <q-icon name="store" size="32px" color="primary" class="q-mr-sm" />
+            <div>
+              <div class="text-h6 text-weight-bold">{{ transaction.store?.name || 'Unknown Store' }}</div>
+              <div class="text-body2 text-grey-7">Reference: {{ transaction.reference_id }}</div>
             </div>
           </div>
-          <div class="col-auto status-select-wrap">
-            <q-select
-              v-model="selectedStatusId"
-              :options="localStatuses"
-              option-value="id"
-              :option-label="statusOptionLabel"
-              emit-value
-              map-options
-              outlined
-              dense
-              label="Status"
-              :loading="statusUpdateLoading"
-              :disable="localStatuses.length === 0"
-              class="status-select"
-              @update:model-value="onStatusChange"
+        </q-card-section>
+
+        <q-separator />
+
+        <q-card-section class="card-content">
+          <div class="info-row">
+            <q-icon name="location_on" color="primary" class="q-mr-sm" />
+            <span class="info-label">Store Location:</span>
+            <span class="info-value">{{ transaction.store?.latitude }}, {{ transaction.store?.longitude }}</span>
+          </div>
+          <div class="info-row">
+            <q-icon name="local_shipping" color="primary" class="q-mr-sm" />
+            <span class="info-label">Delivery Location:</span>
+            <span class="info-value">{{ transaction.lat }}, {{ transaction.lng }}</span>
+          </div>
+          <div class="info-row">
+            <q-icon name="attach_money" color="primary" class="q-mr-sm" />
+            <span class="info-label">Delivery Charge:</span>
+            <span class="info-value">{{ transaction.delivery_charge }}</span>
+          </div>
+          <div class="info-row">
+            <q-icon name="receipt_long" color="primary" class="q-mr-sm" />
+            <span class="info-label">Total:</span>
+            <span class="info-value">{{ transaction.grand_total }}</span>
+          </div>
+        </q-card-section>
+
+        <q-separator />
+
+        <q-card-section class="card-actions">
+          <q-btn
+            v-if="!userLocation"
+            color="grey-7"
+            icon="my_location"
+            label="Get My Location"
+            size="lg"
+            class="full-width"
+            @click="getCurrentLocation"
+          />
+          <template v-else>
+            <q-btn
+              color="primary"
+              icon="store"
+              label="Navigate to Store"
+              size="lg"
+              class="full-width navigate-btn q-mb-sm"
+              @click="navigateToStore"
             >
-              <template v-slot:prepend>
-                <q-icon name="flag" color="primary" />
-              </template>
-            </q-select>
+              <q-tooltip>Open Google Maps to navigate to store</q-tooltip>
+            </q-btn>
+            <q-btn
+              color="secondary"
+              icon="local_shipping"
+              label="Navigate to Delivery"
+              size="lg"
+              class="full-width navigate-btn"
+              @click="navigateToDelivery"
+            >
+              <q-tooltip>Open Google Maps to navigate to delivery location</q-tooltip>
+            </q-btn>
+          </template>
+        </q-card-section>
+      </q-card>
+
+      <q-card flat bordered class="info-card">
+        <q-card-section>
+          <div class="text-subtitle1 text-weight-bold q-mb-sm">
+            <q-icon name="info" color="primary" class="q-mr-xs" />
+            Navigation Instructions
           </div>
-        </div>
-      </q-card-section>
-
-      <q-separator />
-
-      <!-- Transaction Information -->
-      <q-card-section class="transaction-info-section">
-        <div class="row q-col-gutter-md">
-          <!-- Left Column -->
-          <div class="col-12 col-md-6">
-            <div class="info-group">
-              <div class="text-subtitle2 text-weight-bold text-grey-8 q-mb-md">
-                <q-icon name="info" size="sm" class="q-mr-xs" />
-                Transaction Information
-              </div>
-
-              <q-list dense class="info-list">
-                <q-item class="info-item">
-                  <q-item-section avatar>
-                    <q-icon name="payment" color="primary" />
-                  </q-item-section>
-                  <q-item-section>
-                    <q-item-label class="info-label">Payment Method</q-item-label>
-                    <q-item-label caption class="info-value">
-                      {{ localResult.payment_method?.name || 'N/A' }}
-                    </q-item-label>
-                  </q-item-section>
-                </q-item>
-
-                <q-item class="info-item">
-                  <q-item-section avatar>
-                    <q-icon name="local_shipping" color="primary" />
-                  </q-item-section>
-                  <q-item-section>
-                    <q-item-label class="info-label">Receive Method</q-item-label>
-                    <q-item-label caption class="info-value">
-                      {{ localResult.receive_method?.name || 'N/A' }}
-                    </q-item-label>
-                  </q-item-section>
-                </q-item>
-
-                <q-item class="info-item">
-                  <q-item-section avatar>
-                    <q-icon name="phone" color="primary" />
-                  </q-item-section>
-                  <q-item-section>
-                    <q-item-label class="info-label">Contact Number</q-item-label>
-                    <q-item-label caption class="info-value">
-                      {{ localResult.contact_number || 'N/A' }}
-                    </q-item-label>
-                  </q-item-section>
-                </q-item>
-
-                <q-item class="info-item" v-if="localResult.lat && localResult.lng">
-                  <q-item-section avatar>
-                    <q-icon name="location_on" color="primary" />
-                  </q-item-section>
-                  <q-item-section>
-                    <q-item-label class="info-label">Location</q-item-label>
-                    <q-item-label caption class="info-value">
-                      {{ localResult.lat }}, {{ localResult.lng }}
-                    </q-item-label>
-                  </q-item-section>
-                </q-item>
-              </q-list>
-            </div>
-          </div>
-
-          <!-- Right Column - Pricing -->
-          <div class="col-12 col-md-6">
-            <div class="info-group">
-              <div class="text-subtitle2 text-weight-bold text-grey-8 q-mb-md">
-                <q-icon name="attach_money" size="sm" class="q-mr-xs" />
-                Pricing Summary
-              </div>
-
-              <q-list dense class="info-list">
-                <q-item class="info-item">
-                  <q-item-section>
-                    <q-item-label class="info-label">Subtotal</q-item-label>
-                  </q-item-section>
-                  <q-item-section side>
-                    <q-item-label class="info-value text-weight-medium">
-                      ₱{{ formatCurrency(localResult.total) }}
-                    </q-item-label>
-                  </q-item-section>
-                </q-item>
-
-                <q-item class="info-item">
-                  <q-item-section>
-                    <q-item-label class="info-label">Delivery Charge</q-item-label>
-                  </q-item-section>
-                  <q-item-section side>
-                    <q-item-label class="info-value text-weight-medium">
-                      ₱{{ localResult.delivery_charge || '0.00' }}
-                    </q-item-label>
-                  </q-item-section>
-                </q-item>
-
-                <q-separator class="q-my-sm" />
-
-                <q-item class="info-item grand-total">
-                  <q-item-section>
-                    <q-item-label class="info-label text-h6 text-weight-bold">Grand Total</q-item-label>
-                  </q-item-section>
-                  <q-item-section side>
-                    <q-item-label class="info-value text-h6 text-weight-bold text-primary">
-                      ₱{{ formatCurrency(localResult.grand_total) }}
-                    </q-item-label>
-                  </q-item-section>
-                </q-item>
-              </q-list>
-            </div>
-          </div>
-        </div>
-      </q-card-section>
-    </q-card>
-
-    <!-- Orders Section -->
-    <q-card flat bordered class="orders-card q-mt-lg" v-if="localResult.orders && localResult.orders.length > 0">
-      <q-card-section class="orders-header">
-        <div class="text-h5 text-weight-bold">
-          <q-icon name="shopping_bag" color="primary" class="q-mr-sm" />
-          Order Items ({{ localResult.orders.length }})
-        </div>
-        <div class="text-body2 text-grey-7 q-mt-xs">
-          Items included in this transaction
-        </div>
-      </q-card-section>
-
-      <q-separator />
-
-      <q-card-section class="orders-content">
-        <div class="orders-list">
-          <div v-for="(order, index) in localResult.orders" :key="order.id || index" class="order-item">
-            <div class="order-item-header">
-              <div class="order-item-number">
-                <q-icon name="inventory_2" color="primary" size="sm" class="q-mr-xs" />
-                <span class="text-weight-bold">Item {{ index + 1 }}</span>
-              </div>
-              <a v-if="order.store" :href="`/public_stores/${order.store.optimus_id}`" target="_blank">
-                <q-chip color="primary" text-color="white" size="sm" outline>
-                  <q-icon name="store" size="xs" class="q-mr-xs" />
-                  {{ order.store.name }}
-                </q-chip>
-              </a>
-            </div>
-
-            <div class="order-item-body">
-              <a v-if="order.store"  :href="`/public_stores/${order.store.optimus_id}/item/${order.optimus_item}`"
-                target="_blank" class="item-link">
-              <div class="order-item-info">
-                <div class="order-item-name">
-                    <q-icon name="label" color="primary" size="sm" class="q-mr-xs" />
-                    <span class="text-weight-medium">{{ order.item_name }}</span>
-                    <q-icon name="open_in_new" color="primary" size="xs" class="q-ml-xs external-link-icon" />
-                </div>
-              </div>
-              </a>
-
-              <div class="order-item-details">
-                <div class="order-detail-row">
-                  <span class="order-detail-label">
-                    <q-icon name="shopping_cart" size="xs" class="q-mr-xs" />
-                    Quantity:
-                  </span>
-                  <span class="order-detail-value text-weight-medium">{{ order.qty }}</span>
-                </div>
-                <div class="order-detail-row">
-                  <span class="order-detail-label">
-                    <q-icon name="attach_money" size="xs" class="q-mr-xs" />
-                    Unit Price:
-                  </span>
-                  <span class="order-detail-value">₱{{ formatCurrency(order.online_price) }}</span>
-                </div>
-                <div class="order-detail-row order-subtotal">
-                  <span class="order-detail-label text-weight-bold">
-                    <q-icon name="receipt" size="xs" class="q-mr-xs" />
-                    Subtotal:
-                  </span>
-                  <span class="order-detail-value text-weight-bold text-primary">
-                    ₱{{ formatCurrency(order.subtotal) }}
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </q-card-section>
-    </q-card>
+          <ul class="instruction-list">
+            <li>Click "Get My Location" to enable location services</li>
+            <li>Then click "Navigate with Motorcycle" to open Google Maps</li>
+            <li>Google Maps will open with motorcycle as the travel mode</li>
+            <li>Follow the navigation to reach the store</li>
+          </ul>
+        </q-card-section>
+      </q-card>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { show, get, update } from 'src/boot/axios-call';
+import { show } from 'src/boot/axios-call';
 import { onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
-import type { AxiosResponse } from 'axios';
+import { getLocation } from 'src/boot/utilities';
 
-interface OrderItem {
-  id: number;
-  transaction_id: number;
-  store_id: number;
-  item_id: number;
-  optimus_item?: number;
-  item_name: string;
-  item_description?: string;
-  unit_id: number;
-  base_price: number;
-  store_price: number;
-  online_price: number;
-  qty: number;
-  subtotal: number;
-  format_subtotal?: string;
-  format_price?: string;
-  store?: {
-    id: number;
-    name: string;
-    optimus_id: number;
-  };
-}
+const route = useRoute();
+const loading = ref(true);
+const error = ref('');
+const transaction = ref<any>(null);
+const userLocation = ref<{ latitude: number; longitude: number } | null>(null);
 
 interface TransactionDetail {
   id: number;
-  user_id: number;
   reference_id: string;
-  status_id: number;
-  payment_method_id: number;
-  receive_method_id: number;
   lat: number | null;
   lng: number | null;
-  contact_number: string;
   delivery_charge: string;
   total: number;
   grand_total: number;
-  created_at: string;
-  payment_method?: { name: string };
-  receive_method?: { name: string };
-  status?: { label: string; name: string };
-  orders?: OrderItem[];
-}
-
-/** Matches API `statuses` list (Status model: id, name, label, value). */
-interface Status {
-  id: number;
-  name?: string;
-  label?: string;
-  value?: number;
-  optimus_id?: number;
-}
-
-const route = useRoute();
-
-const localResult = ref<TransactionDetail>({
-  id: 0,
-  user_id: 0,
-  reference_id: '',
-  status_id: 0,
-  payment_method_id: 0,
-  receive_method_id: 0,
-  lat: null,
-  lng: null,
-  contact_number: '',
-  delivery_charge: '0.00',
-  total: 0,
-  grand_total: 0,
-  created_at: '',
-  orders: []
-});
-
-const localStatuses = ref<Status[]>([]);
-const selectedStatusId = ref<number | null>(null);
-const statusUpdateLoading = ref(false);
-
-function statusOptionLabel(opt: Status): string {
-  return opt.label || opt.name || '';
+  store?: {
+    id: number;
+    name: string;
+    latitude: number;
+    longitude: number;
+  };
 }
 
 async function fetchTransactionData() {
-  const result = await show<TransactionDetail>({
-    message: 'Getting transaction...',
-    entity: 'all-transactions',
-    optimus_id: Number(route.params.id),
-    query: {
-      with: 'paymentMethod,receiveMethod,status,orders.store',
-    },
-  });
-  if (result) {
-    localResult.value = result;
-    selectedStatusId.value = result.status_id;
+  try {
+    const result = await show<TransactionDetail>({
+      message: 'Getting transaction...',
+      entity: 'all-transactions',
+      optimus_id: Number(route.params.id),
+      query: {
+        with: 'store',
+      },
+    });
+    if (result) {
+      transaction.value = result;
+    } else {
+      error.value = 'Transaction not found';
+    }
+  } catch (err) {
+    error.value = 'Failed to load transaction details';
+    console.error(err);
+  } finally {
+    loading.value = false;
   }
-  const statusesRes = (await get(
-    { entity: 'statuses', query: { limit: 500 } },
-    false
-  )) as AxiosResponse<{ data: Status[] }> | undefined;
-  if (statusesRes?.data?.data) {
-    localStatuses.value = statusesRes.data.data;
+}
+
+async function getCurrentLocation() {
+  try {
+    const position = await getLocation();
+    userLocation.value = {
+      latitude: position.coords.latitude,
+      longitude: position.coords.longitude,
+    };
+  } catch (err) {
+    error.value = 'Failed to get your location. Please enable location services.';
+    console.error(err);
   }
+}
+
+function navigateToStore() {
+  if (!userLocation.value || !transaction.value?.store) {
+    error.value = 'Location or store information not available';
+    return;
+  }
+
+  const { latitude: originLat, longitude: originLng } = userLocation.value;
+  const { latitude: destLat, longitude: destLng } = transaction.value.store;
+
+  // Google Maps URL with directions in driving mode to store
+  const url = `https://www.google.com/maps/dir/${originLat},${originLng}/${destLat},${destLng}?dirflg=d`;
+
+  window.open(url, '_blank');
+}
+
+function navigateToDelivery() {
+  if (!userLocation.value || !transaction.value?.lat || !transaction.value?.lng) {
+    error.value = 'Location or delivery information not available';
+    return;
+  }
+
+  const { latitude: originLat, longitude: originLng } = userLocation.value;
+  const destLat = transaction.value.lat;
+  const destLng = transaction.value.lng;
+
+  // Google Maps URL with directions in driving mode to delivery location
+  const url = `https://www.google.com/maps/dir/${originLat},${originLng}/${destLat},${destLng}?dirflg=d`;
+
+  window.open(url, '_blank');
 }
 
 onMounted(async () => {
   await fetchTransactionData();
 });
-
-async function onStatusChange(newStatusId: number | null) {
-  if (newStatusId == null || newStatusId === localResult.value.status_id) return;
-  const previousId = localResult.value.status_id;
-  const previousStatus = localResult.value.status;
-  statusUpdateLoading.value = true;
-  try {
-    const updated = await update(
-      {
-        entity: 'all-transactions',
-        optimus_id: Number(route.params.id),
-        data: { status_id: newStatusId },
-      },
-      true,
-      true
-    );
-    if (updated) {
-      localResult.value.status_id = newStatusId;
-      const s = localStatuses.value.find((x) => x.id === newStatusId);
-      if (s) {
-        localResult.value.status = {
-          label: s.label || s.name || '',
-          name: s.name || '',
-        };
-      }
-    } else {
-      selectedStatusId.value = previousId;
-      localResult.value.status = previousStatus;
-    }
-  } finally {
-    statusUpdateLoading.value = false;
-    await fetchTransactionData();
-  }
-}
-
-const formatCurrency = (amount: number | string): string => {
-  if (typeof amount === 'string') {
-    return parseFloat(amount).toFixed(2);
-  }
-  return amount.toFixed(2);
-};
 </script>
 
 <style scoped lang="scss">
-.transaction-detail-container {
+.delivery-detail-container {
   padding: 24px;
-  max-width: 1200px;
+  max-width: 800px;
   margin: 0 auto;
 }
 
-.transaction-header-section {
-  padding: 16px 0;
-}
-
-.transaction-detail-card {
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
-}
-
-.transaction-detail-header {
-  background: linear-gradient(135deg, #f5f7fa 0%, #ffffff 100%);
-  padding: 24px;
-}
-
-.status-select-wrap {
-  min-width: 200px;
-  max-width: 300px;
-}
-
-.status-select {
-  width: 100%;
-}
-
-.transaction-info-section {
-  padding: 24px;
-}
-
-.info-group {
-  background: #f8f9fa;
-  border-radius: 8px;
-  padding: 20px;
-  height: 100%;
-}
-
-.info-list {
-  background: transparent;
-}
-
-.info-item {
-  padding: 12px 0;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-
-  &:last-child {
-    border-bottom: none;
-  }
-}
-
-.info-label {
-  font-size: 13px;
-  color: #666;
-  margin-bottom: 4px;
-}
-
-.info-value {
-  font-size: 15px;
-  color: #1a1a1a;
-}
-
-.grand-total {
-  background: rgba(25, 118, 210, 0.05);
-  border-radius: 8px;
-  padding: 16px !important;
-  margin-top: 8px;
-  border: 2px solid rgba(25, 118, 210, 0.2);
-
-  .info-label,
-  .info-value {
-    font-size: 18px;
-  }
-}
-
-@media (max-width: 768px) {
-  .transaction-detail-container {
-    padding: 16px;
-  }
-
-  .transaction-detail-header {
-    padding: 16px;
-  }
-
-  .transaction-info-section {
-    padding: 16px;
-  }
-
-  .info-group {
-    padding: 16px;
-    margin-bottom: 16px;
-  }
-}
-
-.orders-card {
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
-}
-
-.orders-header {
-  background: linear-gradient(135deg, #f5f7fa 0%, #ffffff 100%);
-  padding: 24px;
-}
-
-.orders-content {
-  padding: 24px;
-}
-
-.orders-list {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.order-item {
-  background: #f8f9fa;
-  border-radius: 8px;
-  padding: 20px;
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  transition: all 0.3s ease;
-
-  &:hover {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    transform: translateY(-2px);
-  }
-}
-
-.order-item-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 16px;
-  padding-bottom: 12px;
-  border-bottom: 2px solid rgba(0, 0, 0, 0.1);
-}
-
-.order-item-number {
+.page-header {
   display: flex;
   align-items: center;
-  font-size: 16px;
-  color: #1a1a1a;
 }
 
-.order-item-body {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.order-item-info {
+.header-title {
   flex: 1;
 }
 
-.item-link {
-  text-decoration: none;
-  display: block;
-  transition: all 0.2s ease;
-  border-radius: 8px;
-  padding: 4px;
-  margin: -4px;
-
-  &:hover {
-    background: #f5f5f5;
-    text-decoration: none;
-
-    .order-item-name {
-      color: var(--q-primary);
-    }
-
-    .external-link-icon {
-      transform: translateX(2px);
-    }
-  }
-}
-
-.order-item-name {
-  display: flex;
-  align-items: center;
-  font-size: 16px;
-  color: var(--q-primary);
-  margin-bottom: 8px;
-  cursor: pointer;
-  transition: color 0.2s ease;
-}
-
-.external-link-icon {
-  transition: transform 0.2s ease;
-  opacity: 0.7;
-}
-
-.order-item-description {
-  padding-left: 24px;
-}
-
-.order-item-details {
+.loading-container,
+.error-container {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  background: white;
-  padding: 16px;
-  border-radius: 8px;
-  border: 1px solid rgba(0, 0, 0, 0.05);
+  align-items: center;
+  justify-content: center;
+  padding: 60px 24px;
 }
 
-.order-detail-row {
+.delivery-content {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.delivery-card,
+.info-card {
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.card-header {
+  background: linear-gradient(135deg, #f5f7fa 0%, #ffffff 100%);
+  padding: 20px;
+}
+
+.card-content {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.info-row {
+  display: flex;
   align-items: center;
   padding: 8px 0;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
 
-  &:last-child {
-    border-bottom: none;
+.info-label {
+  font-weight: 600;
+  color: #666;
+  margin-left: 8px;
+  margin-right: 8px;
+}
+
+.info-value {
+  color: #1a1a1a;
+  font-weight: 500;
+}
+
+.card-actions {
+  padding: 20px;
+}
+
+.navigate-btn {
+  font-weight: 600;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(25, 118, 210, 0.3);
   }
 }
 
-.order-detail-label {
-  display: flex;
-  align-items: center;
-  font-size: 14px;
+.instruction-list {
+  margin: 0;
+  padding-left: 20px;
   color: #666;
-}
 
-.order-detail-value {
-  font-size: 15px;
-  color: #1a1a1a;
-}
-
-.order-subtotal {
-  margin-top: 8px;
-  padding-top: 12px;
-  border-top: 2px solid rgba(25, 118, 210, 0.2);
-  background: rgba(25, 118, 210, 0.05);
-  border-radius: 6px;
-  padding: 12px 16px;
-
-  .order-detail-label,
-  .order-detail-value {
-    font-size: 16px;
+  li {
+    margin-bottom: 8px;
+    line-height: 1.5;
   }
 }
 
 @media (max-width: 768px) {
-  .orders-header {
+  .delivery-detail-container {
     padding: 16px;
   }
 
-  .orders-content {
-    padding: 16px;
-  }
-
-  .order-item {
-    padding: 16px;
-  }
-
-  .order-item-header {
+  .page-header {
     flex-direction: column;
     align-items: flex-start;
     gap: 12px;
-  }
-
-  .order-item-body {
-    gap: 12px;
-  }
-
-  .order-item-details {
-    padding: 12px;
   }
 }
 </style>

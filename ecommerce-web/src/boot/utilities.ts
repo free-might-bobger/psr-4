@@ -133,3 +133,30 @@ export function getLocation(): Promise<GeolocationPosition> {
     );
   });
 }
+
+export function watchLocation(
+  onSuccess: (position: GeolocationPosition) => void,
+  onError?: (error: GeolocationPositionError) => void
+): number {
+  const timeoutVal = 10 * 1000 * 1000;
+  if (!navigator.geolocation) {
+    if (onError) {
+      onError(new Error('Geolocation is not supported by this browser.') as unknown as GeolocationPositionError);
+    }
+    return -1;
+  }
+
+  return navigator.geolocation.watchPosition(
+    onSuccess,
+    onError,
+    { enableHighAccuracy: true, timeout: timeoutVal, maximumAge: 0 }
+  );
+}
+
+export function clearWatch(watchId: number): void {
+  if (navigator.geolocation && watchId !== -1) {
+    navigator.geolocation.clearWatch(watchId);
+  }
+}
+
+

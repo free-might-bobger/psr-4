@@ -85,15 +85,10 @@ class Transaction extends Model implements Auditable
             * sin(radians(stores.latitude)))) AS distance
         "))
         ->join('stores', 'transactions.store_id', '=', 'stores.id')
-        ->join('orders', function($join) {
-            $join->on('transactions.id', '=', 'orders.transaction_id')
-                 ->whereColumn('orders.store_id', '=', 'transactions.store_id');
-        })
         ->whereBetween('stores.latitude', [$minLat, $maxLat])
         ->whereBetween('stores.longitude', [$minLon, $maxLon])
         ->having('distance', '<=', $radius)
-        ->orderBy('distance', 'asc')
-        ->distinct();
+        ->orderBy('distance', 'asc');
     }
 
     public function getDistanceAttribute(): float

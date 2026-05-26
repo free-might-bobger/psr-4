@@ -26,7 +26,7 @@ export default [
           path: 'deliveries',
           children: [
             { path: '', component: () => import('src/pages/dashboard/deliveries/IndexPage.vue') },
-            { path: ':id', component: () => import('src/pages/dashboard/users/EditPage.vue') },
+            { path: ':id', component: () => import('src/pages/dashboard/deliveries/ShowPage.vue') },
           ]
         },
         {

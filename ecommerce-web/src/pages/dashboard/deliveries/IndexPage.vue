@@ -7,10 +7,7 @@
           <q-icon name="local_shipping" size="32px" color="primary" class="q-mr-sm" />
           <h2 class="page-title">Deliveries Near Me</h2>
         </div>
-        <div class="header-actions">
-          <q-btn color="primary" icon="my_location" label="Refresh Location" unelevated @click="refreshLocation"
-            class="refresh-location-btn" size="md" />
-        </div>
+       
       </div>
     </div>
 
@@ -31,6 +28,12 @@
         :pagination="{ rowsPerPage: 0 }"
         class="transactions-table"
       >
+        <template v-slot:body-cell-store_name="props">
+          <q-td :props="props">
+            {{ props.row.store?.name || 'N/A' }}
+          </q-td>
+        </template>
+
         <template v-slot:body-cell-distance="props">
           <q-td :props="props">
             {{ Number(props.row.distance).toFixed(2) }} km
@@ -52,6 +55,22 @@
         <template v-slot:body-cell-grand_total="props">
           <q-td :props="props">
             {{ props.row.grand_total }}
+          </q-td>
+        </template>
+
+        <template v-slot:body-cell-actions="props">
+          <q-td :props="props">
+            <q-btn
+              unelevated
+              dense
+              color="primary"
+              icon="directions_bike"
+              label="Navigate"
+              :to="`${$route.path}/${props.row.optimus_id}`"
+              size="sm"
+            >
+              <q-tooltip>Navigate with Google Maps</q-tooltip>
+            </q-btn>
           </q-td>
         </template>
 
@@ -191,12 +210,13 @@
 <script setup lang="ts">
 import { onRequest, firstPage, previousPage, nextPage, lastPage } from 'src/boot/axios-call';
 import { useCommonStore } from 'src/stores/common';
-import { onMounted, ref, watch } from 'vue';
+import { onMounted, onUnmounted, ref, watch } from 'vue';
 import { storeToRefs } from 'pinia';
 import { CustomerTransactionRow } from 'src/boot/interfaces';
-import { getLocation } from 'src/boot/utilities';
+import { getLocation, watchLocation, clearWatch } from 'src/boot/utilities';
 
 const search = ref('');
+const watchId = ref<number>(-1);
 const useCommon = useCommonStore();
 const { entityQuery, pagination, result } = storeToRefs(useCommon);
 
@@ -208,7 +228,7 @@ entityQuery.value = {
     longitude: 1,
     page: pagination.value.page,
     limit: 12,
-    with: 'orders',
+    with: 'orders.store',
     radius: 3
   },
 };
@@ -216,6 +236,14 @@ entityQuery.value = {
 const typedResult = result as unknown as CustomerTransactionRow[];
 
 const columns = [
+  {
+    name: 'store_name',
+    required: true,
+    label: 'Store Name',
+    align: 'left' as const,
+    field: (row: any) => row.store?.name || 'N/A',
+    sortable: true
+  },
   {
     name: 'distance',
     required: true,
@@ -247,6 +275,13 @@ const columns = [
     align: 'left' as const,
     field: 'grand_total',
     sortable: true
+  },
+  {
+    name: 'actions',
+    required: true,
+    label: 'Actions',
+    align: 'center' as const,
+    field: ''
   }
 ];
 
@@ -257,7 +292,27 @@ const handlePageChange = (page: number) => {
 
 onMounted(() => {
   entityQuery.value.query.page = 1;
-  onRequest(entityQuery.value, true);
+  refreshLocation();
+  
+  watchId.value = watchLocation(
+    (position) => {
+      entityQuery.value.query.latitude = position.coords.latitude;
+      entityQuery.value.query.longitude = position.coords.longitude;
+      debouncedRefreshLocation();
+    },
+    (error) => {
+      console.error('Location watch error:', error);
+    }
+  );
+});
+
+onUnmounted(() => {
+  if (refreshTimeout) {
+    clearTimeout(refreshTimeout);
+  }
+  if (watchId.value !== -1) {
+    clearWatch(watchId.value);
+  }
 });
 
 watch(search, (newValue) => {
@@ -297,6 +352,17 @@ const refreshLocation = () => {
     entityQuery.value.query.longitude = position.coords.longitude;
     onRequest(entityQuery.value, true);
   });
+};
+
+let refreshTimeout: ReturnType<typeof setTimeout> | null = null;
+
+const debouncedRefreshLocation = () => {
+  if (refreshTimeout) {
+    clearTimeout(refreshTimeout);
+  }
+  refreshTimeout = setTimeout(() => {
+    refreshLocation();
+  }, 5000);
 };
 
 // Helper functions for UI
