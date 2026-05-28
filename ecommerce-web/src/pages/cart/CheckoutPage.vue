@@ -146,7 +146,7 @@ import BreadCrumbsWrapper from 'src/components/BreadCrumbsWrapper.vue';
 import { ref, watch, nextTick, onMounted } from 'vue';
 import { useCommonStore } from 'src/stores/common';
 import { storeToRefs } from 'pinia';
-import { create, isMobileExist, login } from 'src/boot/axios-call';
+import { create, isMobileExist } from 'src/boot/axios-call';
 import { isValidMobileNumber } from 'src/boot/validators';
 import { useQuasar } from 'quasar';
 import { useRouter } from 'vue-router';
@@ -174,15 +174,12 @@ const {
 const router = useRouter();
 const useCommon = useCommonStore();
 const { lat, lng, mobile } = storeToRefs(useCommon);
-const { profile } = storeToRefs(useUserStore());
 const showInfoWindow = ref(true);
-const mapRef = ref<any>(null);
+const mapRef = ref<HTMLElement | null>(null);
 const currentZoom = ref(15);
 const searchLocation = ref('');
-const searchInputRef = ref<any>(null);
+const searchInputRef = ref<HTMLInputElement | null>(null);
 let autocomplete: google.maps.places.Autocomplete | null = null;
-
-const hasVerificationCode = ref(false);
 
 // Create animated delivery location marker element
 const createDeliveryMarkerElement = (): HTMLElement => {
@@ -431,7 +428,6 @@ onMounted(async () => {
 
 const myForm = ref<QForm | null>(null);
 
-const showPassCodeModal = ref(false);
 const showOldPasscode = ref(false);
 
 watch(mobile, async (currentVal) => {
@@ -443,9 +439,6 @@ watch(mobile, async (currentVal) => {
     showOldPasscode.value = true;
   }
 });
-
-
-const passCode = ref('');
 
 const storeId = ref(0);
 const processCustomerOrder = async () => {

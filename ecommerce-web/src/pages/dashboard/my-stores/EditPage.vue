@@ -88,18 +88,34 @@
 
             <div class="form-row q-mt-md">
               <div class="form-col">
-                <q-input
-                  type="textarea"
-                  v-model="store.desc"
-                  dense
-                  outlined
-                  label="Description"
-                  :rules="[
-                    (val) => (val && val.length > 0) || 'Description is required.',
-                  ]"
-                  hide-bottom-space
-                  class="form-input"
-                />
+                <label class="field-label">Description</label>
+                <div class="wysiwyg-editor">
+                  <div class="editor-toolbar">
+                    <q-btn flat dense size="sm" @click="execCommand('bold')" icon="format_bold">
+                      <q-tooltip>Bold</q-tooltip>
+                    </q-btn>
+                    <q-btn flat dense size="sm" @click="execCommand('italic')" icon="format_italic">
+                      <q-tooltip>Italic</q-tooltip>
+                    </q-btn>
+                    <q-btn flat dense size="sm" @click="execCommand('underline')" icon="format_underlined">
+                      <q-tooltip>Underline</q-tooltip>
+                    </q-btn>
+                    <q-btn flat dense size="sm" @click="execCommand('insertUnorderedList')" icon="format_list_bulleted">
+                      <q-tooltip>Bullet List</q-tooltip>
+                    </q-btn>
+                    <q-btn flat dense size="sm" @click="execCommand('insertOrderedList')" icon="format_list_numbered">
+                      <q-tooltip>Numbered List</q-tooltip>
+                    </q-btn>
+                  </div>
+                  <div
+                    class="editor-content"
+                    contenteditable="true"
+                    @input="onEditorInput"
+                    ref="editorRef"
+                    data-placeholder="Enter store description..."
+                  ></div>
+                </div>
+                <div v-if="!store.desc" class="field-error">Description is required.</div>
               </div>
             </div>
           </div>
@@ -211,7 +227,7 @@
 <script lang="ts" setup>
 import { GOOGLE_MAP_API_KEY, GOOGLE_MAP_ID } from 'src/boot/constant';
 import { GoogleMap, AdvancedMarker, InfoWindow } from 'vue3-google-map';
-import { ref, onBeforeMount, onMounted, nextTick } from 'vue';
+import { ref, onBeforeMount, onMounted, nextTick, watch } from 'vue';
 import { update, show } from 'src/boot/axios-call';
 import { useRoute } from "vue-router"
 import type { QForm } from 'quasar';
@@ -230,8 +246,28 @@ const currentZoom = ref(15)
 const showInfoWindow = ref(true)
 const mapRef = ref<any>(null)
 const isSubmitting = ref(false)
+const editorRef = ref<HTMLElement | null>(null);
 
-// Get store marker options
+// WYSIWYG Editor Functions
+const execCommand = (command: string) => {
+  document.execCommand(command, false, undefined);
+  editorRef.value?.focus();
+};
+
+const onEditorInput = () => {
+  if (editorRef.value) {
+    store.value.desc = editorRef.value.innerHTML;
+  }
+};
+
+// Watch for desc changes to update editor content
+watch(() => store.value.desc, async (newDesc) => {
+  if (editorRef.value && newDesc && editorRef.value.innerHTML !== newDesc) {
+    await nextTick();
+    editorRef.value.innerHTML = newDesc;
+  }
+});
+
 const getStoreMarkerOptions = () => {
   return {
     position: { lat: store.value.latitude || 14.5995, lng: store.value.longitude || 120.9842 },
@@ -270,7 +306,6 @@ const onSubmit = async () => {
   });
 };
 
-// Create store marker element
 const createStoreMarkerElement = (): HTMLElement => {
   const markerDiv = document.createElement('div')
   markerDiv.className = 'custom-marker store-marker'
@@ -332,7 +367,6 @@ const waitForGoogleMaps = () => {
 const waitForMapReady = () => {
   return new Promise((resolve) => {
     const checkMapReady = () => {
-      // Try different ways to access the map
       const map = mapRef.value?.$mapObject || mapRef.value?.map || mapRef.value?.$map
       if (map) {
         addZoomControls(map)
@@ -346,7 +380,6 @@ const waitForMapReady = () => {
 }
 
 const addZoomControls = (map: google.maps.Map) => {
-  // Create container for zoom controls
   const zoomControlDiv = document.createElement('div')
   zoomControlDiv.style.cssText = `
     display: flex;
@@ -363,7 +396,6 @@ const addZoomControls = (map: google.maps.Map) => {
     pointer-events: auto;
   `
 
-  // Zoom In Button
   const zoomInButton = document.createElement('button')
   zoomInButton.style.cssText = `
     width: 40px;
@@ -404,7 +436,6 @@ const addZoomControls = (map: google.maps.Map) => {
     zoomInButton.style.transform = 'scale(1)'
   })
 
-  // Zoom Out Button
   const zoomOutButton = document.createElement('button')
   zoomOutButton.style.cssText = `
     width: 40px;
@@ -447,7 +478,6 @@ const addZoomControls = (map: google.maps.Map) => {
   zoomControlDiv.appendChild(zoomInButton)
   zoomControlDiv.appendChild(zoomOutButton)
 
-  // Position the control
   setTimeout(() => {
     const mapContainer = map.getDiv()
     if (mapContainer) {
@@ -474,17 +504,62 @@ onBeforeMount(async () => {
 });
 
 onMounted(async () => {
-  // Wait for the next tick to ensure the GoogleMap component is mounted
   await nextTick()
-
-  // Wait for Google Maps API to be fully loaded
   await waitForGoogleMaps()
-
-  // Wait for the map to be fully initialized
   await waitForMapReady()
+  
+  // Initialize editor content
+  if (editorRef.value && store.value.desc) {
+    editorRef.value.innerHTML = store.value.desc;
+  }
 });
 </script>
 
 <style scoped lang="scss">
 @import 'src/css/dashboard/all-stores/edit.scss';
+
+.field-label {
+  display: block;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 8px;
+  font-size: 14px;
+}
+
+.field-error {
+  color: #c10015;
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+.wysiwyg-editor {
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  overflow: hidden;
+  background: white;
+
+  &:focus-within {
+    border-color: #1976d2;
+  }
+}
+
+.editor-toolbar {
+  display: flex;
+  gap: 4px;
+  padding: 8px;
+  background: #f5f5f5;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.editor-content {
+  min-height: 150px;
+  padding: 16px;
+  outline: none;
+  line-height: 1.6;
+
+  &[contenteditable]:empty::before {
+    content: attr(data-placeholder);
+    color: #999;
+  }
+}
 </style>

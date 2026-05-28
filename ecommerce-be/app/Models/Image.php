@@ -30,13 +30,19 @@ class Image extends Model
 
     public function getPathUrlAttribute()
     {
-        return url($this->path);
+        $path = $this->path;
+        if (str_contains(env('APP_URL', ''), 'mynearshops')) {
+            $path = 'public/' . $this->path;
+        }
+        return url($path);
     }
 
     public function getPathThumbnailAttribute()
     {
-
-         return url($this->path);
-
+        $path = $this->path;
+        if (str_contains(env('APP_URL', ''), 'mynearshops')) {
+            $path = 'public/' . $this->path;
+        }
+        return url($path);
     }
 }

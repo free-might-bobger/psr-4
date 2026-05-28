@@ -223,6 +223,8 @@ export interface CustomerTransactionRow {
   optimus_id: number,
   created_at: string
   status?: { label: string; name: string }
+  store?: StoreInterface
+  distance: number
 }
 
 export interface StoreRow {

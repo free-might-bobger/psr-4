@@ -95,7 +95,8 @@
               <div class="feature-icon-wrapper">
                 <q-icon name="store" size="40px" color="primary" />
               </div>
-              <h3 class="feature-title">Multiple Shops</h3>
+                <h3 class="feature-title">Multiple Shops</h3>
+            
               <p class="feature-description">
                 Browse products from various local shops all in one place. Compare prices and find the best deals.
               </p>

@@ -59,36 +59,25 @@
 
         <q-card-section class="card-actions">
           <q-btn
-            v-if="!userLocation"
-            color="grey-7"
-            icon="my_location"
-            label="Get My Location"
+            color="primary"
+            icon="store"
+            label="Navigate to Store"
             size="lg"
-            class="full-width"
-            @click="getCurrentLocation"
-          />
-          <template v-else>
-            <q-btn
-              color="primary"
-              icon="store"
-              label="Navigate to Store"
-              size="lg"
-              class="full-width navigate-btn q-mb-sm"
-              @click="navigateToStore"
-            >
-              <q-tooltip>Open Google Maps to navigate to store</q-tooltip>
-            </q-btn>
-            <q-btn
-              color="secondary"
-              icon="local_shipping"
-              label="Navigate to Delivery"
-              size="lg"
-              class="full-width navigate-btn"
-              @click="navigateToDelivery"
-            >
-              <q-tooltip>Open Google Maps to navigate to delivery location</q-tooltip>
-            </q-btn>
-          </template>
+            class="full-width navigate-btn q-mb-sm"
+            @click="navigateToStore"
+          >
+            <q-tooltip>Open Google Maps to navigate to store</q-tooltip>
+          </q-btn>
+          <q-btn
+            color="secondary"
+            icon="local_shipping"
+            label="Navigate to Delivery"
+            size="lg"
+            class="full-width navigate-btn"
+            @click="navigateToDelivery"
+          >
+            <q-tooltip>Open Google Maps to navigate to delivery location</q-tooltip>
+          </q-btn>
         </q-card-section>
       </q-card>
 
@@ -99,10 +88,10 @@
             Navigation Instructions
           </div>
           <ul class="instruction-list">
-            <li>Click "Get My Location" to enable location services</li>
-            <li>Then click "Navigate with Motorcycle" to open Google Maps</li>
-            <li>Google Maps will open with motorcycle as the travel mode</li>
-            <li>Follow the navigation to reach the store</li>
+            <li>Your location is automatically retrieved when the page loads</li>
+            <li>Click "Navigate to Store" to open Google Maps for store navigation</li>
+            <li>Click "Navigate to Delivery" to open Google Maps for delivery navigation</li>
+            <li>Follow the navigation to reach your destination</li>
           </ul>
         </q-card-section>
       </q-card>
@@ -207,6 +196,7 @@ function navigateToDelivery() {
 
 onMounted(async () => {
   await fetchTransactionData();
+  await getCurrentLocation();
 });
 </script>
 

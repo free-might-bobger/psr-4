@@ -19,7 +19,7 @@
         <div class="header-actions">
           <!-- Cart Button -->
           <q-btn to="/cart" icon="shopping_cart" flat class="header-btn cart-btn" size="md">
-            <span class="btn-label">Cart</span>
+            <span class="btn-label gt-xs">Cart</span>
             <q-badge v-if="countTotalItems > 0" color="negative" text-color="white" floating rounded class="cart-badge">
               {{ countTotalItems }}
             </q-badge>
@@ -27,12 +27,12 @@
 
           <!-- Login Button -->
           <q-btn v-if="!profile.token" to="/login" icon="login" flat class="header-btn" size="md">
-            <span class="btn-label">Login</span>
+            <span class="btn-label gt-xs">Login</span>
           </q-btn>
 
           <!-- User Menu -->
           <q-btn v-if="profile.token" icon="account_circle" flat class="header-btn user-btn" size="md">
-            <span class="btn-label">Account</span>
+            <span class="btn-label gt-xs">Account</span>
             <q-menu class="user-menu" anchor="bottom right" self="top right" :offset="[0, 8]">
               <q-list class="user-menu-list" padding>
                 <q-item-label header class="user-menu-header">
@@ -272,12 +272,26 @@ const { countTotalItems } = storeToRefs(useUserCartStore());
     padding: 0 8px;
   }
 
+  .header-actions {
+    gap: 4px;
+  }
+
   .header-btn {
-    margin: 0 2px;
+    margin: 0;
+    padding: 8px;
+    min-width: auto;
   }
 
   .user-menu-list {
     min-width: 200px;
+  }
+
+  .logo-brand-name {
+    font-size: 18px;
+  }
+
+  .logo-tagline {
+    font-size: 10px;
   }
 }
 </style>

@@ -290,7 +290,7 @@ entityQuery.value = {
 
 const typedResult = result as unknown as CustomerTransactionRow[];
 
-const columns: any[] = [
+const columns = [
   {
     name: 'reference',
     required: true,
@@ -304,7 +304,7 @@ const columns: any[] = [
     required: true,
     label: 'Order Status',
     align: 'left',
-    field: (row: any) => row.status?.label || 'Pending',
+    field: (row: CustomerTransactionRow) => row.status?.label || 'Pending',
     sortable: true
   },
   {

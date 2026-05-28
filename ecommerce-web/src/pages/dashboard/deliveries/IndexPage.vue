@@ -229,7 +229,7 @@ entityQuery.value = {
     page: pagination.value.page,
     limit: 12,
     with: 'orders.store',
-    radius: 3
+    radius: 15
   },
 };
 
@@ -241,7 +241,7 @@ const columns = [
     required: true,
     label: 'Store Name',
     align: 'left' as const,
-    field: (row: any) => row.store?.name || 'N/A',
+    field: (row: CustomerTransactionRow) => row.store?.name || 'N/A',
     sortable: true
   },
   {
@@ -293,7 +293,6 @@ const handlePageChange = (page: number) => {
 onMounted(() => {
   entityQuery.value.query.page = 1;
   refreshLocation();
-  
   watchId.value = watchLocation(
     (position) => {
       entityQuery.value.query.latitude = position.coords.latitude;

@@ -261,6 +261,21 @@ interface PaymentMethod {
   name: string;
 }
 
+interface ApiResponse<T> {
+  data: {
+    data: T;
+  };
+}
+
+interface DeliveryCharge {
+  delivery_amount: number;
+}
+
+interface CartItem {
+  item_price: number | string;
+  variations: any;
+}
+
 const receiveMethods = ref<ReceiveMethod[]>([]);
 
 const getReceiveMethods = async () => {
@@ -275,7 +290,7 @@ const getReceiveMethods = async () => {
     false
   );
 
-  receiveMethods.value = (result as any).data?.data || [];
+  receiveMethods.value = (result as ApiResponse<ReceiveMethod[]>).data?.data || [];
 };
 
 const paymentMethods = ref<PaymentMethod[]>([]);
@@ -291,7 +306,7 @@ const getPaymentMethods = async () => {
     false
   );
 
-  paymentMethods.value = (result as any).data?.data || [];
+  paymentMethods.value = (result as ApiResponse<PaymentMethod[]>).data?.data || [];
 };
 
 const disabledCheckout = ref(true);
@@ -304,7 +319,7 @@ onMounted(() => {
 });
 
 
-watch(selectedReceiveMethod, async (currentVal) => {
+watch(selectedReceiveMethod, async () => {
   updateDeliveryCharge();
 });
 
@@ -323,7 +338,7 @@ const updateDeliveryCharge = async () => {
       },
       true
     );
-    const delivery = (result as any).data?.data?.find((v: any) => v);
+    const delivery = (result as ApiResponse<DeliveryCharge[]>).data?.data?.find((v) => v);
     if (delivery) {
       deliveryCharge.value = delivery.delivery_amount;
       disabledCheckout.value = false;
@@ -335,8 +350,8 @@ const updateDeliveryCharge = async () => {
 };
 
 // Calculate total for a single item
-const getItemTotal = (item: any): number => {
-  const orderDetails = getOrderDetail(item.item_price as any, item.variations);
+const getItemTotal = (item: CartItem): number => {
+  const orderDetails = getOrderDetail(Number(item.item_price), item.variations);
   return orderDetails.reduce((sum, detail) => {
     return sum + computePrice(detail.count, detail.price);
   }, 0);
