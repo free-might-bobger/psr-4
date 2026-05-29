@@ -5,7 +5,7 @@ namespace App\Traits;
 use App\Enum\Role;
 use Illuminate\Support\Facades\Auth;
 
-trait UtilsTrait
+trait RoleTrait
  {
 
     /**

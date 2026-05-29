@@ -1,53 +1,33 @@
 <template>
   <div class="item-price-container">
     <!-- Header Section -->
-    <div class="item-price-header-section q-mb-lg">
-      <div class="row items-center">
-        <div class="col">
-          <div class="text-h4 text-weight-bold">
-            <q-icon name="attach_money" color="primary" class="q-mr-sm" />
-            Item Prices
-          </div>
-          <div class="text-body2 text-grey-7 q-mt-xs">
-            Manage pricing options and inventory for this item
+    <div class="header-section">
+      <div class="header-content">
+        <div class="header-left">
+          <q-btn
+            flat
+            round
+            dense
+            color="grey-7"
+            icon="arrow_back"
+            @click="router.back()"
+            class="back-btn"
+          />
+          <div class="header-title">
+            <h1 class="page-title">Item Prices</h1>
+            <p class="page-subtitle">Manage pricing options and inventory</p>
           </div>
         </div>
-        <q-btn outline color="primary" icon="arrow_back" label="Back" @click="router.back()" />
       </div>
     </div>
 
-    <!-- Price Form Card -->
-    <q-card flat bordered class="item-price-card">
-      <q-card-section class="item-price-header">
-        <div class="row items-center justify-between">
-          <div class="col-auto">
-            <div class="text-h6 text-weight-bold q-mb-xs">
-              <q-icon name="inventory_2" color="primary" class="q-mr-sm" />
-              Item Information
-            </div>
-            <div class="text-body2 text-grey-7">
-              Add or update price variations for this item
-            </div>
-          </div>
-          <q-btn
-            flat
-            color="primary"
-            icon="add"
-            label="Add Item Price"
-            @click="addItemPrice"
-          />
-        </div>
-      </q-card-section>
-
-      <q-separator />
-
-      <q-card-section class="item-price-content">
-        <q-form @reset="onReset" class="q-gutter-md" ref="myForm">
-          <div class="info-group">
-            <div class="text-subtitle2 text-weight-bold text-grey-8 q-mb-md">
-              <q-icon name="info" size="sm" class="q-mr-xs" />
-              Item Details
-            </div>
+    <!-- Content Card -->
+    <q-card flat bordered class="main-card">
+      <q-card-section class="card-content">
+        <q-form @reset="onReset" class="price-form" ref="myForm">
+          <!-- Item Details -->
+          <div class="section-group">
+            <div class="section-label">Item Details</div>
             <q-input
               v-model="item.name"
               outlined
@@ -55,101 +35,134 @@
               label="Item Name"
               hide-bottom-space
               disable
+              class="item-name-input"
             />
           </div>
 
-          <div class="info-group q-mt-lg">
-            <div class="text-subtitle2 text-weight-bold text-grey-8 q-mb-md">
-              <q-icon name="price_change" size="sm" class="q-mr-xs" />
-              Price Variations
+          <!-- Price Variations -->
+          <div class="section-group">
+            <div class="section-header">
+              <div class="section-label">Price Variations</div>
+              <q-btn
+                unelevated
+                color="primary"
+                icon="add"
+                label="Add Price"
+                @click="addItemPrice"
+                class="add-price-btn"
+              />
             </div>
 
-            <div v-if="item.item_price?.length === 0" class="empty-prices">
-              <q-icon name="sell" size="48px" color="grey-4" />
-              <div class="text-body2 text-grey-6 q-mt-md">No prices added yet</div>
-              <div class="text-caption text-grey-5 q-mt-xs">Click "Add Item Price" to begin</div>
+            <div v-if="item.item_price?.length === 0" class="empty-state">
+              <q-icon name="sell" size="64px" color="grey-3" />
+              <p class="empty-text">No prices added yet</p>
+              <p class="empty-subtext">Click "Add Price" to begin</p>
             </div>
 
-            <q-card
+            <div
               v-for="(itemPrice, index) in item.item_price"
               :key="itemPrice.id || index"
-              flat
-              bordered
-              class="price-item-card q-mt-sm"
+              class="price-card"
             >
-              <div class="price-item-header">
-                <div class="text-weight-bold text-grey-8">Price Option {{ Number(index) + 1 }}</div>
+              <div class="price-card-header">
+                <span class="price-card-title">Price Option {{ index + 1 }}</span>
                 <q-btn
                   flat
-                  color="negative"
-                  icon="delete"
+                  round
+                  dense
+                  color="grey-6"
+                  icon="close"
                   @click="deleteItemPrice(Number(index))"
-                  class="delete-price-btn"
-                />
+                  class="delete-btn"
+                >
+                  <q-tooltip>Remove</q-tooltip>
+                </q-btn>
               </div>
 
-              <div class="price-grid">
+              <div class="price-fields">
                 <q-select
                   dense
                   v-model="itemPrice.unit"
                   :options="units"
-                  label="Units"
+                  label="Unit"
                   hide-bottom-space
                   use-input
                   outlined
                   :rules="[(val) => !!val || 'Unit is required.']"
+                  class="field"
                 />
                 <q-select
                   dense
                   v-model="itemPrice.color"
                   :options="colors"
-                  label="Colors"
+                  label="Color"
                   hide-bottom-space
                   use-input
                   outlined
                   clearable
+                  class="field"
                 />
                 <q-select
                   dense
                   v-model="itemPrice.size"
                   :options="sizes"
-                  label="Sizes"
+                  label="Size"
                   hide-bottom-space
                   use-input
                   outlined
                   clearable
+                  class="field"
                 />
                 <input-amount
                   label="Original Price"
                   :value="itemPrice.original_price"
                   @input="(amount) => changeOriginalPrice(itemPrice, amount)"
+                  class="field"
                 />
                 <input-amount
                   label="Online Price"
                   :value="itemPrice.online_price"
                   @input="(amount) => changeOnlinePrice(itemPrice, amount)"
+                  class="field"
                 />
                 <input-amount
                   label="Selling Price"
                   :value="itemPrice.selling_price"
                   @input="(amount) => changeSellingPrice(itemPrice, amount)"
+                  class="field"
                 />
                 <q-input
                   v-model="itemPrice.qty"
-                  label="Qty"
+                  label="Quantity"
                   outlined
                   dense
                   type="number"
                   min="0"
-                  :rules="[(val) => (val !== null && val !== undefined && val !== '') || 'Qty is required.']"
+                  :rules="[(val) => (val !== null && val !== undefined && val !== '') || 'Quantity is required.']"
+                  class="field"
                 />
               </div>
-            </q-card>
+            </div>
           </div>
 
+          <!-- Form Actions -->
           <div class="form-actions">
-            <q-btn color="primary" unelevated icon="save" label="Update Item Price" @click="createItemPrice" />
-            <q-btn outline color="grey-8" icon="cancel" label="Cancel" @click="router.back()" />
+            <q-btn
+              unelevated
+              color="primary"
+              icon="save"
+              label="Save Changes"
+              @click="createItemPrice"
+              class="save-btn"
+            />
+            <q-btn
+              outline
+              color="grey-7"
+              icon="cancel"
+              label="Cancel"
+              @click="router.back()"
+              class="cancel-btn"
+            />
           </div>
         </q-form>
       </q-card-section>
@@ -283,80 +296,176 @@ const changeSellingPrice = (itemPrice: any, amount: number) => {
 
 <style scoped lang="scss">
 .item-price-container {
-  padding: 24px;
-  max-width: 1200px;
+  max-width: 1000px;
   margin: 0 auto;
+  padding: 24px;
 }
 
-.item-price-header-section {
-  padding: 16px 0;
+.header-section {
+  margin-bottom: 24px;
 }
 
-.item-price-card {
+.header-content {
+  display: flex;
+  align-items: center;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.back-btn {
+  margin-right: 0;
+}
+
+.header-title {
+  .page-title {
+    font-size: 24px;
+    font-weight: 600;
+    margin: 0;
+    color: #1a1a1a;
+  }
+
+  .page-subtitle {
+    font-size: 14px;
+    color: #666;
+    margin: 4px 0 0 0;
+  }
+}
+
+.main-card {
   border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e0e0e0;
   overflow: hidden;
 }
 
-.item-price-header {
-  background: linear-gradient(135deg, #f5f7fa 0%, #ffffff 100%);
-  padding: 24px;
+.card-content {
+  padding: 32px;
 }
 
-.item-price-content {
-  padding: 24px;
+.price-form {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
 }
 
-.info-group {
-  background: #f8f9fa;
-  border-radius: 8px;
-  padding: 20px;
+.section-group {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
-.empty-prices {
+.section-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+  letter-spacing: 0.25px;
+  text-transform: uppercase;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.item-name-input {
+  background: #f5f5f5;
+}
+
+.add-price-btn {
+  height: 36px;
+}
+
+.empty-state {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 32px 16px;
-  text-align: center;
-}
-
-.price-item-card {
+  padding: 48px 24px;
+  border: 2px dashed #e0e0e0;
   border-radius: 8px;
-  padding: 16px;
-  background: white;
+
+  .empty-text {
+    font-size: 16px;
+    color: #666;
+    margin: 16px 0 4px 0;
+  }
+
+  .empty-subtext {
+    font-size: 13px;
+    color: #999;
+    margin: 0;
+  }
 }
 
-.price-item-header {
+.price-card {
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 20px;
+  background: white;
+  transition: box-shadow 0.2s ease;
+
+  &:hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  }
+}
+
+.price-card-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  margin-bottom: 16px;
   padding-bottom: 12px;
-  margin-bottom: 12px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  border-bottom: 1px solid #f0f0f0;
 }
 
-.delete-price-btn {
-  min-width: 32px;
+.price-card-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
 }
 
-.price-grid {
+.delete-btn {
+  &:hover {
+    color: #f44336;
+    background: #ffebee;
+  }
+}
+
+.price-fields {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 12px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+.field {
+  width: 100%;
 }
 
 .form-actions {
   display: flex;
   justify-content: flex-end;
   gap: 12px;
-  margin-top: 16px;
+  padding-top: 24px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.save-btn {
+  height: 40px;
+  padding: 0 24px;
+}
+
+.cancel-btn {
+  height: 40px;
+  padding: 0 24px;
 }
 
 @media (max-width: 1024px) {
-  .price-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+  .price-fields {
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 
@@ -365,25 +474,31 @@ const changeSellingPrice = (itemPrice: any, amount: number) => {
     padding: 16px;
   }
 
-  .item-price-header {
-    padding: 16px;
+  .card-content {
+    padding: 20px;
   }
 
-  .item-price-content {
-    padding: 16px;
+  .header-title .page-title {
+    font-size: 20px;
   }
 
-  .info-group {
-    padding: 16px;
+  .section-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
   }
 
-  .price-grid {
+  .price-fields {
     grid-template-columns: 1fr;
   }
 
   .form-actions {
     flex-direction: column;
-    align-items: stretch;
+  }
+
+  .save-btn,
+  .cancel-btn {
+    width: 100%;
   }
 }
 </style>

@@ -70,11 +70,10 @@
               <q-btn
                 unelevated
                 dense
-                round
                 color="primary"
                 icon="edit_note"
                 :to="`${$route.path}/${props.row.optimus_id}`"
-                size="sm"
+                size="md"
                 class="q-mr-xs"
               >
                 <q-tooltip>Edit User</q-tooltip>
@@ -82,11 +81,10 @@
               <q-btn
                 unelevated
                 dense
-                round
                 color="negative"
                 icon="delete_forever"
                 @click="handleDeleteUser(props.row)"
-                size="sm"
+                size="md"
               >
                 <q-tooltip>Delete User</q-tooltip>
               </q-btn>

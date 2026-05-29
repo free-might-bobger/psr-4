@@ -4,10 +4,10 @@ namespace App\Repositories;
 
 use App\Models\Item;
 use App\Repositories\BaseRepository;
-use App\Traits\UtilsTrait;
+use App\Traits\RoleTrait;
 class PublicStoreItemRepository extends BaseRepository
 {
-    use UtilsTrait;
+    use RoleTrait;
     public function __construct()
     {
         $this->setModel(new Item);

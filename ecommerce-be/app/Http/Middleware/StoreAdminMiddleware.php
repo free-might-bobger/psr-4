@@ -6,9 +6,9 @@ use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
-use App\Traits\UtilsTrait;
+use App\Traits\RoleTrait;
 class StoreAdminMiddleware {
-    use UtilsTrait;
+    use RoleTrait;
     /**
     * Handle an incoming request.
     *

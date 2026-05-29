@@ -7,14 +7,14 @@ use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Support\Facades\Auth;
 use App\Models\StoreMenuAccess;
-use App\Traits\UtilsTrait;
+use App\Traits\RoleTrait;
 use App\Enum\HttpAccessRight;
 use App\Traits\Obfuscate\OptimusRequiredToModel;
 use App\Enum\StoreMenu;
 
 
 class ItemMiddleware {
-    use UtilsTrait, OptimusRequiredToModel;
+    use RoleTrait, OptimusRequiredToModel;
     /**
     * Handle an incoming request.
     *

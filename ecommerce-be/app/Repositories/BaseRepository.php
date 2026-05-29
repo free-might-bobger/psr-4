@@ -8,7 +8,7 @@ use App\Traits\Obfuscate\OptimusRequiredToModel;
 use Illuminate\Support\Arr;
 use App\Traits\Support\BaseSupportRepository;
 use App\Models\Image;
-use App\Traits\UtilsTrait;
+use App\Traits\RoleTrait;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
 class BaseRepository implements BaseInterface
 {
-    use UtilsTrait, SearchFieldSupport, OptimusRequiredToModel, BaseSupportRepository;
+    use RoleTrait, SearchFieldSupport, OptimusRequiredToModel, BaseSupportRepository;
 
     protected Model|Builder|null $model;
     protected array $params;

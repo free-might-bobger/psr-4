@@ -47,7 +47,7 @@
             </div>
           </div>
 
-          <div class="q-mt-md description-full-width">
+          <div class="q-mt-md">
             <div class="form-col">
               <label class="field-label">Description</label>
               <div class="wysiwyg-editor">
@@ -76,7 +76,7 @@
                   data-placeholder="Enter store description..."
                 ></div>
               </div>
-              <div v-if="!localStore.desc" class="field-error">Description is required.</div>
+              <div v-if="!store.desc" class="field-error">Description is required.</div>
             </div>
           </div>
 

@@ -65,7 +65,7 @@
                 color="primary"
                 icon="edit_note"
                 :to="`${$route.path}/${props.row.optimus_id}`"
-                size="sm"
+                size="md"
                 class="q-mr-xs"
               >
                 <q-tooltip>Edit Store</q-tooltip>
@@ -76,7 +76,7 @@
                 color="negative"
                 icon="delete_forever"
                 @click="handleDeleteStore(props.row)"
-                size="sm"
+                size="md"
               >
                 <q-tooltip>Delete Store</q-tooltip>
               </q-btn>

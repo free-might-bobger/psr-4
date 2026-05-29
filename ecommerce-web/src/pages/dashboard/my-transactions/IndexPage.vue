@@ -95,23 +95,21 @@
                 v-if="props.row.status?.name !== TRANSACTION_STATUS.COMPLETED"
                 unelevated
                 dense
-                round
                 color="secondary"
-                icon="check_circle"
+                icon="inventory_2"
                 @click="markedAsReceived(props.row.optimus_id)"
-                size="sm"
+                size="md"
                 class="q-mr-xs"
               >
                 <q-tooltip>Mark as received</q-tooltip>
               </q-btn>
               <q-btn
-                round
                 unelevated
                 dense
                 color="primary"
-                icon="visibility"
+                icon="info"
                 :to="`${$route.path}/${props.row.optimus_id}`"
-                size="sm"
+                size="md"
                 class="q-mr-xs"
               >
                 <q-tooltip>View details</q-tooltip>
@@ -120,11 +118,10 @@
                 v-if="props.row.status"
                 unelevated
                 dense
-                round
                 color="negative"
-                icon="undo"
+                icon="currency_exchange"
                 :to="`${$route.path}/${props.row.optimus_id}`"
-                size="sm"
+                size="md"
               >
                 <q-tooltip>Request refund</q-tooltip>
               </q-btn>

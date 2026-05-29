@@ -4,7 +4,7 @@ namespace App\Repositories;
 
 use App\Models\Item;
 use App\Repositories\BaseRepository;
-use App\Traits\UtilsTrait;
+use App\Traits\RoleTrait;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Arr;
 use App\Repositories\Support\SearchFieldSupport;
@@ -13,7 +13,7 @@ use App\Models\Image;
 
 class ItemRepository extends BaseRepository
 {
-    use UtilsTrait, SearchFieldSupport;
+    use RoleTrait, SearchFieldSupport;
 
     protected Collection $collection;
 

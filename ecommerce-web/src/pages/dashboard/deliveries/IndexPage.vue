@@ -291,6 +291,7 @@ const handlePageChange = (page: number) => {
 };
 
 onMounted(() => {
+  result.value = []
   entityQuery.value.query.page = 1;
   refreshLocation();
   watchId.value = watchLocation(
@@ -345,12 +346,11 @@ const goToLastPage = () => {
   lastPage(entityQuery.value, pagination.value);
 };
 
-const refreshLocation = () => {
-  getLocation().then((position) => {
-    entityQuery.value.query.latitude = position.coords.latitude;
-    entityQuery.value.query.longitude = position.coords.longitude;
-    onRequest(entityQuery.value, true);
-  });
+const refreshLocation = async () => {
+  const position = await getLocation();
+  entityQuery.value.query.latitude = position.coords.latitude;
+  entityQuery.value.query.longitude = position.coords.longitude;
+  onRequest(entityQuery.value, true);
 };
 
 let refreshTimeout: ReturnType<typeof setTimeout> | null = null;
