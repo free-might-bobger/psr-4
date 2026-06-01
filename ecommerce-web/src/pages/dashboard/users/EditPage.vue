@@ -176,9 +176,9 @@
   </template>
   <script setup lang="ts">
   import { computed, onMounted, ref } from 'vue';
-  import { get, show, update } from 'src/boot/axios-call';
+  import { get, show } from 'src/boot/axios-call';
   import { axios } from 'src/boot/axios';
-  import { useRoute } from "vue-router"
+  import { useRoute } from 'vue-router'
   import { Notify, Loading, useQuasar } from 'quasar';
   import type { AxiosResponse } from 'axios';
   
