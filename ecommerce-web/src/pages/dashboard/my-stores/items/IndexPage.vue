@@ -79,8 +79,9 @@
         :rows="typedResult"
         :columns="columns"
         row-key="optimus_id"
-        :pagination="{ rowsPerPage: 0 }"
         class="items-table"
+        :rows-per-page-options="[0]"
+        hide-pagination
       >
         <template v-slot:body-cell-name="props">
           <q-td :props="props">
@@ -403,6 +404,8 @@ const handleCategoryChange = (value: any) => {
 .item-name-link {
   text-decoration: none;
   color: inherit;
+  font-weight: normal;
+  font-size: 14px;
 
   &:hover {
     color: #1976d2;
@@ -413,6 +416,16 @@ const handleCategoryChange = (value: any) => {
   display: flex;
   gap: 4px;
   justify-content: center;
+}
+
+.items-table {
+  :deep(.q-table .q-tbody tr) {
+    height: 60px;
+  }
+
+  :deep(.q-table .q-td) {
+    padding: 16px;
+  }
 }
 
 .table-pagination {

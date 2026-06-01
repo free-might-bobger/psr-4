@@ -101,11 +101,10 @@
               <q-btn
                 unelevated
                 dense
-                round
-                color="primary"
+                color="secondary"
                 icon="attach_money"
                 :to="`${$route.path}/${props.row.optimus_id}/item-prices?filters=store_id:${store.optimus_id}`"
-                size="sm"
+                size="md"
                 class="q-mr-xs"
               >
                 <q-tooltip>Item Prices</q-tooltip>
@@ -113,11 +112,10 @@
               <q-btn
                 unelevated
                 dense
-                round
                 color="primary"
                 icon="edit_note"
                 :to="`${$route.path}/${props.row.optimus_id}?filters=store_id:${store.optimus_id}`"
-                size="sm"
+                size="md"
                 class="q-mr-xs"
               >
                 <q-tooltip>Edit Item</q-tooltip>
@@ -125,11 +123,10 @@
               <q-btn
                 unelevated
                 dense
-                round
                 color="negative"
                 icon="delete_forever"
                 @click="handleDeleteItem(props.row)"
-                size="sm"
+                size="md"
               >
                 <q-tooltip>Delete Item</q-tooltip>
               </q-btn>
@@ -471,8 +468,8 @@ watch(search, (newValue) => {
   color: inherit;
   display: flex;
   align-items: center;
-  font-weight: 500;
-  font-size: 15px;
+  font-weight: normal;
+  font-size: 14px;
   transition: all 0.3s ease;
 
   &:hover {

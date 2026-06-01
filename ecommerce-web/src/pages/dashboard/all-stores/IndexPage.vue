@@ -70,11 +70,10 @@
               <q-btn
                 unelevated
                 dense
-                round
                 color="primary"
                 icon="edit_note"
-                :to="`/dashboard/all-stores/${props.row.optimus_id}`"
-                size="sm"
+                :to="`${$route.path}/${props.row.optimus_id}`"
+                size="md"
                 class="q-mr-xs"
               >
                 <q-tooltip>Edit Store</q-tooltip>
@@ -82,11 +81,10 @@
               <q-btn
                 unelevated
                 dense
-                round
                 color="negative"
                 icon="delete_forever"
                 @click="handleDeleteStore(props.row)"
-                size="sm"
+                size="md"
               >
                 <q-tooltip>Delete Store</q-tooltip>
               </q-btn>
@@ -353,8 +351,8 @@ watch(search, (newValue) => {
   color: inherit;
   display: flex;
   align-items: center;
-  font-weight: 500;
-  font-size: 15px;
+  font-weight: normal;
+  font-size: 14px;
   transition: all 0.3s ease;
 
   &:hover {

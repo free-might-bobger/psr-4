@@ -326,6 +326,8 @@ watch(search, (newValue) => {
 .store-name-link {
   text-decoration: none;
   color: inherit;
+  font-weight: normal;
+  font-size: 14px;
 
   &:hover {
     color: #1976d2;
@@ -404,8 +406,8 @@ watch(search, (newValue) => {
 .store-name-link {
   text-decoration: none;
   color: inherit;
-  font-weight: 600;
-  font-size: 16px;
+  font-weight: normal;
+  font-size: 14px;
 
   &:hover {
     color: #1976d2;
