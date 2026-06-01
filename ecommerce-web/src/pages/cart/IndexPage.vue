@@ -351,7 +351,7 @@ const updateDeliveryCharge = async () => {
 
 // Calculate total for a single item
 const getItemTotal = (item: CartItem): number => {
-  const orderDetails = getOrderDetail(Number(item.item_price), item.variations);
+  const orderDetails = getOrderDetail(item.item_price, item.variations);
   return orderDetails.reduce((sum, detail) => {
     return sum + computePrice(detail.count, detail.price);
   }, 0);

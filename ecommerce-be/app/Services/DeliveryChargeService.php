@@ -11,7 +11,7 @@ class DeliveryChargeService {
 
     use OptimusRequiredToModel;
 
-    public function calculateTotalDeliveryCharge($baseAmount, $storeIds): float {
+    public function calculateTotalDeliveryCharge(float $baseAmount, string $storeIds): float {
         $totalDeliveryCharge = 0;
         foreach ( explode( ',', $storeIds ) as $storeId ) {
             $totalDeliveryCharge += $this->calculateStoreDelivery( $baseAmount, $storeId );
@@ -19,7 +19,7 @@ class DeliveryChargeService {
         return $totalDeliveryCharge;
     }
 
-    public function calculateStoreDelivery($baseAmount, int $storeId): float{
+    public function calculateStoreDelivery(float $baseAmount, int $storeId): float{
         $request = app()->make( 'request' );
         $store = Store::where( 'id', $this->optimus()->decode( $storeId ) )->first();
         $distance = Maps::calculateDistance( $store->latitude, $store->longitude, $request->latitude, $request->longitude );

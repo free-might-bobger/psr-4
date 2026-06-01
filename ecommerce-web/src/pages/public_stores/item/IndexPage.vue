@@ -195,6 +195,26 @@
         </q-card-actions>
       </q-card>
     </q-dialog>
+
+    <!-- Store Conflict Dialog -->
+    <q-dialog v-model="storeConflictDialog" persistent>
+      <q-card>
+        <q-card-section class="row items-center">
+          <div class="text-h6">Multiple Stores Detected</div>
+          <q-space />
+          <q-btn icon="close" flat round dense v-close-popup />
+        </q-card-section>
+
+        <q-card-section>
+          Your cart contains items from another store. Adding this item will remove the existing items from your cart. Do you want to proceed?
+        </q-card-section>
+
+        <q-card-actions align="right">
+          <q-btn flat label="Cancel" color="grey-7" v-close-popup @click="handleStoreConflictCancel" />
+          <q-btn unelevated label="OK" color="primary" @click="handleStoreConflictOk" />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
   </div>
 </template>
 <script setup lang="ts">
@@ -267,6 +287,8 @@ const agentJoinUrl = ref('');
 const agentLocalVideoRef = ref<HTMLVideoElement | null>(null);
 const agentRemoteVideoRef = ref<HTMLVideoElement | null>(null);
 let agentCallHangUp: (() => void) | null = null;
+
+const storeConflictDialog = ref(false);
 
 const copyAgentJoinLink = async () => {
   if (!agentJoinUrl.value) return;
@@ -436,6 +458,38 @@ const userAddCart = () => {
     });
     return;
   }
+
+  const currentStoreId = item.value.store?.optimus_id || Number(route.params.id);
+
+  // Check if cart is not empty and store IDs don't match
+  if (useUserCart.cart.length > 0) {
+    const existingStoreId = useUserCart.cart[0].store_id;
+    if (existingStoreId !== currentStoreId) {
+      storeConflictDialog.value = true;
+      return;
+    }
+  }
+
+  // If cart is empty or store IDs match, add the item directly
+  addItemToCart(currentStoreId);
+};
+
+const handleStoreConflictOk = () => {
+  const currentStoreId = item.value.store?.optimus_id || Number(route.params.id);
+  useUserCart.emptyCart();
+  addItemToCart(currentStoreId);
+  storeConflictDialog.value = false;
+};
+
+const handleStoreConflictCancel = () => {
+  $q.notify({
+    message: 'Item was not added to the cart.',
+    type: 'negative',
+  });
+  storeConflictDialog.value = false;
+};
+
+const addItemToCart = (storeId: number) => {
   // Transform item_price to match CartItem structure
   const transformedItemPrice = (item.value.item_price || []).map((price) => ({
     unit_id: price.unit_id,
@@ -449,7 +503,7 @@ const userAddCart = () => {
     optimus_id: item.value.optimus_id,
     name: item.value.name,
       count: qty.value,
-    store_id: item.value.store?.optimus_id || Number(route.params.id),
+    store_id: storeId,
     item_price: transformedItemPrice,
       variations: [
         {
@@ -463,7 +517,7 @@ const userAddCart = () => {
         : '',
     },
     store: {
-      optimus_id: item.value.store?.optimus_id || Number(route.params.id),
+      optimus_id: storeId,
     },
   };
   useUserCart.addQty(cartItem);

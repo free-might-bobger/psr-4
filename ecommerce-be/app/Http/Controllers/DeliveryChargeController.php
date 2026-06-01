@@ -17,9 +17,4 @@ class DeliveryChargeController extends ApiController
         $this->indexRequest = BaseIndexRequest::class;
     }
 
-
-    public function isPublicRoute(string $routeName): Bool {
-        return true;
-    }
-
 }

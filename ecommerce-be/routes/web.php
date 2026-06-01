@@ -58,7 +58,7 @@ Route::group(['middleware' => 'auth:api', 'itemMiddleware'], function () {
 
 Route::group( [ 'middleware' => 'auth:api' ], function () {
   /* Route resouce */
-  Route::resource('deliveries', DeliveryController::class);
+  Route::resource('deliveries', DeliveryController::class)->middleware('deliveryMiddleware');
   Route::resource('all-transactions', TransactionController::class)->middleware(['superAdminMiddleware', 'allTransactionsMiddleware']);
   Route::resource('my-transactions', CustomerTransactionController::class)->middleware(['customerMiddleware', 'myTransactionsMiddleware']);
   Route::resource('my-store-transactions', MyStoreTransactionController::class)->middleware(['storeAdminMiddleware', 'myStoreMiddleware']);
