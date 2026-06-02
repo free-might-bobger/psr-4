@@ -19,7 +19,7 @@ return [
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => ['https://mynearshops.com', 'https://www.mynearshops.com', 'http://localhost:9000'],
+    'allowed_origins' => ['https://mynearshops.com', 'https://www.mynearshops.com', 'http://localhost:9000', 'http://localhost:9100'],
 
     'allowed_origins_patterns' => [],
 
