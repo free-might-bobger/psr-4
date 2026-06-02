@@ -18,13 +18,14 @@
             <span class="brand-name">Near You</span>
           </h1>
           <p class="hero-subtitle">
-            Your trusted marketplace for daily essentials. Browse products from multiple shops, compare prices, and get fast delivery to your doorstep.
+            Your trusted marketplace for daily essentials. Browse products from multiple shops, compare prices, and get
+            fast delivery to your doorstep.
           </p>
           <div class="hero-actions">
-            <q-btn to="/find-shops" color="white" text-color="primary" size="lg" unelevated class="hero-btn primary-btn" icon="store"
-              label="Find Shops Near Me" />
-            <q-btn to="/find-items" style="color: #fee140; background: transparent; border: 2px solid #fee140;" size="lg" unelevated class="hero-btn outline-btn" icon="shopping_bag"
-              label="Find Items Near Me" />
+            <q-btn to="/find-shops" color="white" text-color="primary" size="lg" unelevated class="hero-btn primary-btn"
+              icon="store" label="Find Shops Near Me" />
+            <q-btn to="/find-items" style="color: #fee140; background: transparent; border: 2px solid #fee140;"
+              size="lg" unelevated class="hero-btn outline-btn" icon="shopping_bag" label="Find Items Near Me" />
           </div>
           <div class="hero-stats">
             <div class="stat-item">
@@ -95,8 +96,8 @@
               <div class="feature-icon-wrapper">
                 <q-icon name="store" size="40px" color="primary" />
               </div>
-                <h3 class="feature-title">Multiple Shops</h3>
-            
+              <h3 class="feature-title">Multiple Shops</h3>
+
               <p class="feature-description">
                 Browse products from various local shops all in one place. Compare prices and find the best deals.
               </p>
@@ -179,10 +180,10 @@
             Join thousands of happy customers and discover the convenience of local shopping.
           </p>
           <div class="cta-actions">
-            <q-btn to="/find-shops" color="white" text-color="primary" size="lg" unelevated class="cta-button" icon="store"
-              label="Find Shops Now" />
-            <q-btn to="/register" style="color: #fee140; background: transparent; border: 2px solid #fee140;" size="lg" unelevated class="cta-button outline" icon="person_add"
-              label="Sign Up Free" />
+            <q-btn to="/find-shops" color="white" text-color="primary" size="lg" unelevated class="cta-button"
+              icon="store" label="Find Shops Now" />
+            <q-btn to="/register" style="color: #fee140; background: transparent; border: 2px solid #fee140;" size="lg"
+              unelevated class="cta-button outline" icon="person_add" label="Sign Up Free" />
           </div>
         </div>
       </div>
@@ -195,10 +196,9 @@ import BiliscartLogo from 'src/components/BiliscartLogo.vue';
 import { useQuasar } from 'quasar';
 
 const $q = useQuasar();
-const urlParams = new URLSearchParams(window.location.search);
-const success = urlParams.get('success')?.trim();
+const success = process.env.SERVER ? null : new URLSearchParams(window.location.search).get('success')?.trim();
 
-if (success === 'true') {
+if (process.env.CLIENT && success === 'true') {
   $q.notify({
     type: 'positive',
     message: 'Account activated successfully',
@@ -267,9 +267,12 @@ if (success === 'true') {
 }
 
 @keyframes float {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: translateY(0) rotate(0deg);
   }
+
   50% {
     transform: translateY(-20px) rotate(5deg);
   }
@@ -311,6 +314,7 @@ if (success === 'true') {
     opacity: 0;
     transform: translateY(-20px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -336,6 +340,7 @@ if (success === 'true') {
     opacity: 0;
     transform: translateY(30px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -439,6 +444,7 @@ if (success === 'true') {
     opacity: 0;
     transform: scale(0.8);
   }
+
   to {
     opacity: 1;
     transform: scale(1);

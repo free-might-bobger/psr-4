@@ -20,24 +20,18 @@
             </div>
             <p class="map-header-description">
               Discover stores near you and get directions instantly. Click on store markers to view
-              details. <br /> Looking for items? <router-link to="/find-items" class="find-items-link">FIND NEAREST ITEMS HERE</router-link>
+              details. <br /> Looking for items? <router-link to="/find-items" class="find-items-link">FIND NEAREST
+                ITEMS HERE</router-link>
             </p>
           </div>
         </div>
         <div class="map-header-actions">
           <q-btn color="primary" icon="my_location" label="Refresh Location" unelevated @click="localGetLocation"
             class="refresh-location-btn" size="md" />
-           <q-btn color="secondary" icon="search" label="Find Nearest Shops" outline @click="getNearestStore"
+          <q-btn color="secondary" icon="search" label="Find Nearest Shops" outline @click="getNearestStore"
             class="find-stores-btn" size="md" :loading="false" />
-          <q-input 
-            v-model="searchString" 
-            placeholder="Search shops..." 
-            outlined 
-            dense 
-            debounce="300"
-            class="search-input"
-            clearable
-          >
+          <q-input v-model="searchString" placeholder="Search shops..." outlined dense debounce="300"
+            class="search-input" clearable>
             <template v-slot:prepend>
               <q-icon name="search" />
             </template>
@@ -92,8 +86,9 @@
         <q-card flat bordered class="map-card">
           <q-card-section class="q-pa-none">
             <div class="map-wrapper">
-              <GoogleMap ref="mapRef" :api-key="GOOGLE_MAP_API_KEY" :map-id="GOOGLE_MAP_ID" class="google-map"
-                :center="{ lat: lat, lng: lng }" :zoom="currentZoom" :draggable="true" :clickable-icons="false">
+              <GoogleMap v-if="isClient" ref="mapRef" :api-key="GOOGLE_MAP_API_KEY" :map-id="GOOGLE_MAP_ID"
+                class="google-map" :center="{ lat: lat, lng: lng }" :zoom="currentZoom" :draggable="true"
+                :clickable-icons="false">
                 <!-- My Location Marker -->
                 <AdvancedMarker :options="getLocationMarkerOptions()" @drag="markerDrag">
                   <InfoWindow v-model="showInfoWindow"
@@ -134,6 +129,10 @@
                   </InfoWindow>
                 </AdvancedMarker>
               </GoogleMap>
+              <div v-else class="map-loading-placeholder">
+                <q-spinner color="primary" size="3em" />
+                <p class="text-center q-mt-md">Loading map...</p>
+              </div>
             </div>
           </q-card-section>
         </q-card>
@@ -163,7 +162,7 @@
 <script setup lang="ts">
 import { GOOGLE_MAP_API_KEY, GOOGLE_MAP_ID } from 'src/boot/constant';
 import { GoogleMap, AdvancedMarker, InfoWindow } from 'vue3-google-map';
-import { onMounted, ref, nextTick, watch } from 'vue';
+import { onMounted, ref, nextTick, watch, computed } from 'vue';
 import { useCommonStore } from 'src/stores/common';
 import { storeToRefs } from 'pinia';
 import { getLocation } from 'src/boot/utilities';
@@ -174,6 +173,7 @@ import { StoreInterface } from 'src/boot/interfaces';
 const useCommon = useCommonStore();
 const { lat, lng } = storeToRefs(useCommon);
 const showInfoWindow = ref(true);
+const isClient = computed(() => process.env.CLIENT);
 
 
 const mapRef = ref<unknown>(null)
@@ -194,6 +194,10 @@ const initialShowInfoWindow = ref(showInfoWindow.value)
 
 // Create animated location marker element
 const createLocationMarkerElement = (): HTMLElement => {
+  if (typeof document === 'undefined') {
+    // Return a placeholder during SSR
+    return {} as HTMLElement
+  }
   const markerDiv = document.createElement('div')
   markerDiv.className = 'custom-marker location-marker'
   markerDiv.innerHTML = `
@@ -209,6 +213,10 @@ const createLocationMarkerElement = (): HTMLElement => {
 
 // Create animated store marker element
 const createStoreMarkerElement = (): HTMLElement => {
+  if (typeof document === 'undefined') {
+    // Return a placeholder during SSR
+    return {} as HTMLElement
+  }
   const markerDiv = document.createElement('div')
   markerDiv.className = 'custom-marker store-marker'
   markerDiv.innerHTML = `
@@ -243,24 +251,32 @@ const getStoreMarkerOptions = (store: StoreInterface) => {
 }
 
 onMounted(async () => {
-  await localGetLocation();
-  if (initialLat.value === null || initialLng.value === null) {
-    initialLat.value = lat.value
-    initialLng.value = lng.value
+  if (process.env.CLIENT) {
+    await localGetLocation();
+    if (initialLat.value === null || initialLng.value === null) {
+      initialLat.value = lat.value
+      initialLng.value = lng.value
+    }
+    initialOrigin.value = { lat: origin.value.lat, lng: origin.value.lng }
+    // Wait for the next tick to ensure the GoogleMap component is mounted
+    await nextTick()
+
+    // Wait for Google Maps API to be fully loaded
+    await waitForGoogleMaps()
+
+    // Wait for the map to be fully initialized
+    await waitForMapReady()
   }
-  initialOrigin.value = { lat: origin.value.lat, lng: origin.value.lng }
-  // Wait for the next tick to ensure the GoogleMap component is mounted
-  await nextTick()
-
-  // Wait for Google Maps API to be fully loaded
-  await waitForGoogleMaps()
-
-  // Wait for the map to be fully initialized
-  await waitForMapReady()
-
 });
 
 const localGetLocation = () => {
+  if (process.env.SERVER) {
+    // Return default coordinates for SSR
+    lat.value = 14.609;
+    lng.value = 120.994;
+    origin.value = { lat: lat.value, lng: lng.value }
+    return Promise.resolve();
+  }
   return getLocation().then((position) => {
     lat.value = position.coords.latitude;
     lng.value = position.coords.longitude;
@@ -323,6 +339,9 @@ watch(() => directions.value, (newDirections) => {
 })
 
 const waitForGoogleMaps = () => {
+  if (process.env.SERVER) {
+    return Promise.resolve()
+  }
   return new Promise((resolve) => {
     const checkGoogleMaps = () => {
       if (window.google &&
@@ -339,6 +358,9 @@ const waitForGoogleMaps = () => {
 }
 
 const waitForMapReady = () => {
+  if (process.env.SERVER) {
+    return Promise.resolve()
+  }
   return new Promise((resolve) => {
     const checkMapReady = () => {
       // Try different ways to access the map
@@ -599,7 +621,7 @@ watch(searchString, async () => {
 </script>
 
 <style scoped lang="scss">
-.find-items-link{
+.find-items-link {
   font-weight: 600;
   color: #667eea;
   text-decoration: none;
@@ -610,6 +632,7 @@ watch(searchString, async () => {
     text-decoration: underline;
   }
 }
+
 .map-page-container {
   padding: 24px;
   max-width: 1400px;
@@ -903,6 +926,17 @@ watch(searchString, async () => {
 .google-map {
   width: 100%;
   height: 100%;
+  border-radius: 12px;
+}
+
+.map-loading-placeholder {
+  width: 100%;
+  height: 600px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: #f5f5f5;
   border-radius: 12px;
 }
 

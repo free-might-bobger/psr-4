@@ -28,7 +28,6 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted, ref, nextTick } from 'vue';
 import { useRoute } from 'vue-router';
-import { startCalleeSession } from 'src/helpers/webrtcFirebaseCall';
 import { isFirebaseConfigured } from 'src/helpers/firebaseCore';
 
 const route = useRoute();
@@ -64,14 +63,8 @@ onMounted(async () => {
     errorMsg.value = 'Could not attach video. Refresh the page.';
     return;
   }
-  try {
-    handles = await startCalleeSession(roomId, local, remote, (msg) => {
-      errorMsg.value = msg;
-    });
-  } catch (e: unknown) {
-    errorMsg.value =
-      e instanceof Error ? e.message : 'Could not start the call. Check permissions and HTTPS.';
-  }
+  // WebRTC call functionality removed - webrtcFirebaseCall.ts deleted
+  errorMsg.value = 'Call functionality has been removed.';
 });
 
 onUnmounted(() => {

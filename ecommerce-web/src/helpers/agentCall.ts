@@ -1,5 +1,4 @@
 import { pushAgentCallRequest, isFirebaseAgentNotifyConfigured } from './firebaseAgentNotify';
-import { ensureFirebaseAnonymousAuth } from './webrtcFirebaseCall';
 
 function sanitizeRoomSegment(value: string | number): string {
   return String(value).replace(/[^a-zA-Z0-9_-]/g, '-').slice(0, 40);
@@ -27,7 +26,7 @@ export type StartAgentCallResult = {
 
 /**
  * Prepares a Firebase-backed WebRTC room (no Jitsi). Customer uses the same app;
- * agents open `joinUrl` to answer. Anonymous Firebase Auth is used (no login UI).
+ * agents open `joinUrl` to answer.
  *
  * Returns immediately so the UI never waits on Firestore (addDoc can hang on bad network/rules).
  * Agent notification runs in the background.
@@ -43,7 +42,6 @@ export function startAgentCallSession(params: StartAgentCallParams): StartAgentC
   if (isFirebaseAgentNotifyConfigured()) {
     void (async () => {
       try {
-        await ensureFirebaseAnonymousAuth();
         await pushAgentCallRequest({
           roomId,
           joinUrl,

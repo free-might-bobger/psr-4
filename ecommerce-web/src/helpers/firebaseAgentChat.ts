@@ -12,7 +12,6 @@ import {
   type Unsubscribe,
 } from 'firebase/firestore';
 import { getFirebaseApp } from './firebaseCore';
-import { ensureFirebaseAnonymousAuth } from './webrtcFirebaseCall';
 
 function sanitizeRoomSegment(value: string | number): string {
   return String(value).replace(/[^a-zA-Z0-9_-]/g, '-').slice(0, 40);
@@ -55,7 +54,6 @@ export function startAgentChatSession(params: StartAgentChatParams): StartAgentC
   // Fire-and-forget so UI never blocks on slow Firestore/Auth.
   void (async () => {
     try {
-      await ensureFirebaseAnonymousAuth();
       const app = getFirebaseApp();
       if (!app) {
         return;
@@ -107,7 +105,6 @@ export async function sendChatMessage(
   if (!trimmed) {
     return;
   }
-  await ensureFirebaseAnonymousAuth();
   const app = getFirebaseApp();
   if (!app) {
     throw new Error('Firebase is not configured');

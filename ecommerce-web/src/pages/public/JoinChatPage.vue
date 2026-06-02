@@ -9,12 +9,8 @@
         <div v-if="errorMsg" class="text-negative q-mb-md">{{ errorMsg }}</div>
 
         <div class="chat-box q-pa-sm q-mb-md" ref="chatBoxRef">
-          <div
-            v-for="msg in chatMessages"
-            :key="msg.id"
-            class="chat-row q-mb-sm"
-            :class="msg.sender === 'agent' ? 'mine' : 'theirs'"
-          >
+          <div v-for="msg in chatMessages" :key="msg.id" class="chat-row q-mb-sm"
+            :class="msg.sender === 'agent' ? 'mine' : 'theirs'">
             <div class="bubble">
               <div class="text-caption text-grey-7 q-mb-xs">
                 {{ msg.sender === 'agent' ? 'You' : 'Customer' }}
@@ -24,14 +20,8 @@
           </div>
         </div>
 
-        <q-input
-          v-model="draftMessage"
-          outlined
-          autogrow
-          type="textarea"
-          placeholder="Type a message..."
-          @keyup.enter.exact.prevent="sendMessage"
-        />
+        <q-input v-model="draftMessage" outlined autogrow type="textarea" placeholder="Type a message..."
+          @keyup.enter.exact.prevent="sendMessage" />
       </q-card-section>
       <q-card-actions align="right">
         <q-btn flat color="primary" label="Send" icon="send" :loading="sending" @click="sendMessage" />
@@ -44,9 +34,6 @@
 import { nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import { isFirebaseConfigured } from 'src/helpers/firebaseCore';
-import {
-  ensureFirebaseAnonymousAuth,
-} from 'src/helpers/webrtcFirebaseCall';
 import {
   sendChatMessage,
   subscribeChatMessages,
@@ -97,7 +84,6 @@ onMounted(async () => {
     return;
   }
   try {
-    await ensureFirebaseAnonymousAuth();
     unsubChat = subscribeChatMessages(
       roomId.value,
       (messages) => {

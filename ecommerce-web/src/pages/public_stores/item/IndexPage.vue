@@ -3,7 +3,7 @@
     <div class="product-container">
       <!-- Header -->
       <div class="product-header">
-        <BreadCrumbsWrapper :bread-crumbs="[
+        <BreadCrumbsWrapper v-if="store.name && item.name" :bread-crumbs="[
           {
             name: store.name,
             path: `/public_stores/${route.params.id}`,
@@ -20,28 +20,14 @@
         <!-- Left: Image Gallery -->
         <div class="product-gallery">
           <div class="main-image-wrapper">
-            <img
-              :src="item.images?.[slide]?.path_url || ''"
-              class="main-image"
-              :alt="item.name"
-              @click="openZoomModal(item.images?.[slide]?.path_url || '')"
-            />
-            <q-btn
-              icon="zoom_in"
-              class="zoom-btn"
-              round
-              flat
-              @click="openZoomModal(item.images?.[slide]?.path_url || '')"
-            />
+            <img :src="item.images?.[slide]?.path_url || ''" class="main-image" :alt="item.name"
+              @click="openZoomModal(item.images?.[slide]?.path_url || '')" />
+            <q-btn icon="zoom_in" class="zoom-btn" round flat
+              @click="openZoomModal(item.images?.[slide]?.path_url || '')" />
           </div>
           <div class="thumbnail-list" v-if="item.images && item.images.length > 1">
-            <div
-              v-for="(image, index) in item.images"
-              :key="image.id"
-              class="thumbnail-item"
-              :class="{ active: slide === index }"
-              @click="slide = index"
-            >
+            <div v-for="(image, index) in item.images" :key="image.id" class="thumbnail-item"
+              :class="{ active: slide === index }" @click="slide = index">
               <img :src="image.path_url" :alt="item.name" />
             </div>
           </div>
@@ -55,13 +41,8 @@
           <div class="info-section">
             <div class="section-label">Select Unit</div>
             <div class="unit-selector" v-if="units.length > 0">
-              <button
-                v-for="unit in units"
-                :key="unit.id"
-                class="unit-btn"
-                :class="{ active: selectedUnit === unit.id }"
-                @click="selectedUnit = unit.id"
-              >
+              <button v-for="unit in units" :key="unit.id" class="unit-btn"
+                :class="{ active: selectedUnit === unit.id }" @click="selectedUnit = unit.id">
                 {{ unit.name }}
               </button>
             </div>
@@ -76,37 +57,15 @@
             <div class="quantity-wrapper">
               <div class="section-label">Quantity</div>
               <div class="quantity-control">
-                <q-btn
-                  icon="remove"
-                  flat
-                  dense
-                  round
-                  size="sm"
-                  @click="qty > 1 ? qty-- : null"
-                  :disable="qty <= 1"
-                />
+                <q-btn icon="remove" flat dense round size="sm" @click="qty > 1 ? qty-- : null" :disable="qty <= 1" />
                 <span class="quantity-value">{{ qty }}</span>
-                <q-btn
-                  icon="add"
-                  flat
-                  dense
-                  round
-                  size="sm"
-                  @click="qty++"
-                />
+                <q-btn icon="add" flat dense round size="sm" @click="qty++" />
               </div>
             </div>
 
             <div class="action-buttons">
-              <q-btn
-                color="primary"
-                @click="userAddCart"
-                size="lg"
-                unelevated
-                class="add-cart-btn"
-                icon="shopping_cart"
-                label="Add to Cart"
-              />
+              <q-btn color="primary" @click="userAddCart" size="lg" unelevated class="add-cart-btn" icon="shopping_cart"
+                label="Add to Cart" />
             </div>
           </div>
         </div>
@@ -122,41 +81,20 @@
         </q-card-section>
         <q-separator />
         <q-card-section class="zoom-modal-content">
-          <div
-            class="zoom-modal-container"
-            :class="{ 'is-zoomed': isZoomed, 'is-dragging': isDragging }"
-            @click="toggleZoom"
-            @mousedown.prevent="onDragStart"
-            @mousemove.prevent="onDragMove"
-            @mouseup="onDragEnd"
-            @mouseleave="onDragEnd"
-            @touchstart.passive="onTouchStart"
-            @touchmove.passive="onTouchMove"
-            @touchend="onDragEnd"
-          >
-            <img
-              v-if="zoomImageUrl"
-              :src="zoomImageUrl"
-              class="zoom-modal-image"
-              :class="{ 'is-zoomed': isZoomed }"
-              :style="zoomStyle"
-              :alt="item.name"
-              draggable="false"
-            />
+          <div class="zoom-modal-container" :class="{ 'is-zoomed': isZoomed, 'is-dragging': isDragging }"
+            @click="toggleZoom" @mousedown.prevent="onDragStart" @mousemove.prevent="onDragMove" @mouseup="onDragEnd"
+            @mouseleave="onDragEnd" @touchstart.passive="onTouchStart" @touchmove.passive="onTouchMove"
+            @touchend="onDragEnd">
+            <img v-if="zoomImageUrl" :src="zoomImageUrl" class="zoom-modal-image" :class="{ 'is-zoomed': isZoomed }"
+              :style="zoomStyle" :alt="item.name" draggable="false" />
           </div>
         </q-card-section>
       </q-card>
     </q-dialog>
 
     <!-- Agent Call Dialog -->
-    <q-dialog
-      v-model="agentCallDialogOpen"
-      maximized
-      transition-show="slide-up"
-      transition-hide="slide-down"
-      @show="onAgentCallDialogShow"
-      @hide="onAgentCallDialogHide"
-    >
+    <q-dialog v-model="agentCallDialogOpen" maximized transition-show="slide-up" transition-hide="slide-down"
+      @show="onAgentCallDialogShow" @hide="onAgentCallDialogHide">
       <q-card class="agent-call-dialog-card">
         <q-inner-loading :showing="agentCallWebRtcBusy" color="primary" label="Connecting camera and call room…" />
         <q-bar class="bg-primary text-white">
@@ -184,14 +122,8 @@
           </div>
         </q-card-section>
         <q-card-actions align="right" class="q-pa-md">
-          <q-btn
-            v-if="agentJoinUrl"
-            flat
-            color="primary"
-            label="Copy agent link"
-            icon="content_copy"
-            @click="copyAgentJoinLink"
-          />
+          <q-btn v-if="agentJoinUrl" flat color="primary" label="Copy agent link" icon="content_copy"
+            @click="copyAgentJoinLink" />
         </q-card-actions>
       </q-card>
     </q-dialog>
@@ -206,7 +138,8 @@
         </q-card-section>
 
         <q-card-section>
-          Your cart contains items from another store. Adding this item will remove the existing items from your cart. Do you want to proceed?
+          Your cart contains items from another store. Adding this item will remove the existing items from your cart.
+          Do you want to proceed?
         </q-card-section>
 
         <q-card-actions align="right">
@@ -217,6 +150,7 @@
     </q-dialog>
   </div>
 </template>
+
 <script setup lang="ts">
 import { useRoute } from 'vue-router';
 import { onMounted, ref, watch, computed, nextTick, type Ref } from 'vue';
@@ -225,9 +159,6 @@ import { getPriceRange } from 'src/boot/utilities';
 import { useUserCartStore } from 'src/stores/userCart';
 import { useQuasar } from 'quasar';
 import BreadCrumbsWrapper from 'src/components/BreadCrumbsWrapper.vue';
-import { startAgentCallSession } from 'src/helpers/agentCall';
-import { isFirebaseConfigured } from 'src/helpers/firebaseCore';
-import { startCallerSession } from 'src/helpers/webrtcFirebaseCall';
 
 interface ItemPrice {
   id: number;
@@ -269,6 +200,9 @@ const zoomScale = ref(2);
 const pan = ref({ x: 0, y: 0 });
 const dragStart = ref({ x: 0, y: 0 });
 const panStart = ref({ x: 0, y: 0 });
+
+const route = useRoute();
+
 const store = ref({
   name: '',
   logo: { path_url: '' },
@@ -277,9 +211,6 @@ const store = ref({
   },
 });
 
-const route = useRoute();
-
-const agentCallLoading = ref(false);
 const agentCallWebRtcBusy = ref(false);
 const agentCallDialogOpen = ref(false);
 const agentRoomId = ref('');
@@ -321,18 +252,8 @@ const onAgentCallDialogShow = async () => {
     }
     agentCallHangUp?.();
     agentCallHangUp = null;
-    try {
-      const handles = await startCallerSession(agentRoomId.value, local, remote, (msg) => {
-        $q.notify({ message: msg, type: 'negative', timeout: 8000 });
-      });
-      agentCallHangUp = handles.hangUp;
-    } catch (e: unknown) {
-      const msg =
-        e instanceof Error
-          ? e.message
-          : 'Could not start the call. Check camera/microphone permissions and try again.';
-      $q.notify({ message: msg, type: 'negative', timeout: 8000 });
-    }
+    // WebRTC call functionality removed - webrtcFirebaseCall.ts deleted
+    $q.notify({ message: 'Call functionality has been removed', type: 'info', timeout: 3000 });
   } finally {
     agentCallWebRtcBusy.value = false;
   }
@@ -344,42 +265,6 @@ const onAgentCallDialogHide = () => {
   agentCallHangUp = null;
   agentRoomId.value = '';
   agentJoinUrl.value = '';
-};
-
-const needToAssist = async () => {
-  if (!isFirebaseConfigured()) {
-    $q.notify({
-      message: 'Live call requires Firebase. Add VITE_FIREBASE_* keys in .env and enable Anonymous sign-in.',
-      type: 'negative',
-      timeout: 6000,
-    });
-    return;
-  }
-  agentCallLoading.value = true;
-  try {
-    const { roomId, joinUrl } = startAgentCallSession({
-      storeOptimusId: route.params.id as string,
-      itemOptimusId: route.params.item_id as string,
-      storeName: store.value.name,
-      itemName: item.value.name,
-    });
-    agentRoomId.value = roomId;
-    agentJoinUrl.value = joinUrl;
-    agentCallDialogOpen.value = true;
-    $q.notify({
-      message:
-        'Live call opened. Allow camera/microphone when prompted. Copy the agent link for your team to join.',
-      type: 'positive',
-      timeout: 5000,
-    });
-  } catch {
-    $q.notify({
-      message: 'Could not start the call. Please try again.',
-      type: 'negative',
-    });
-  } finally {
-    agentCallLoading.value = false;
-  }
 };
 
 const showStore = async () => {
@@ -411,7 +296,6 @@ const getItem = async () => {
 onMounted(() => {
   showStore();
   getItem();
-
 });
 
 const units = ref<Array<{ id: number; name: string }>>([]);
@@ -502,15 +386,15 @@ const addItemToCart = (storeId: number) => {
     id: item.value.id || 0,
     optimus_id: item.value.optimus_id,
     name: item.value.name,
-      count: qty.value,
+    count: qty.value,
     store_id: storeId,
     item_price: transformedItemPrice,
-      variations: [
-        {
-          count: qty.value,
-          unit: selectedUnit.value,
-        },
-      ],
+    variations: [
+      {
+        count: qty.value,
+        unit: selectedUnit.value,
+      },
+    ],
     primary_img: {
       path_url: item.value.images && item.value.images.length > 0
         ? item.value.images[0].path_url
@@ -698,8 +582,8 @@ const sanitizeHtml = (html: string) => {
     for (let j = attributes.length - 1; j >= 0; j--) {
       const attr = attributes[j];
       if (dangerousAttrs.some(da => attr.name.toLowerCase().startsWith(da)) ||
-          attr.name.toLowerCase().startsWith('on') ||
-          attr.name.toLowerCase() === 'href' && attr.value?.toLowerCase().startsWith('javascript:')) {
+        attr.name.toLowerCase().startsWith('on') ||
+        attr.name.toLowerCase() === 'href' && attr.value?.toLowerCase().startsWith('javascript:')) {
         element.removeAttribute(attr.name);
       }
     }
