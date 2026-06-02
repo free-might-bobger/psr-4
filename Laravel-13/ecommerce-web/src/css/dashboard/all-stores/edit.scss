@@ -1,0 +1,496 @@
+.edit-store-page {
+  padding: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+// Header Section
+.page-header-card {
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+  overflow: hidden;
+}
+
+.header-section {
+  padding: 32px;
+}
+
+.header-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  flex: 1;
+  min-width: 0;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.header-icon-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 80px;
+  height: 80px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  flex-shrink: 0;
+  border: 1px solid #e0e0e0;
+
+  .q-icon {
+    color: #1976d2;
+  }
+}
+
+.page-title {
+  font-size: 32px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 0 0 8px 0;
+  line-height: 1.2;
+}
+
+.page-subtitle {
+  font-size: 16px;
+  color: #666;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.view-items-btn {
+  border-radius: 10px;
+  font-weight: 600;
+  text-transform: none;
+  padding: 12px 24px;
+  box-shadow: 0 2px 8px rgba(25, 118, 210, 0.2);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(25, 118, 210, 0.3);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+
+  .q-icon {
+    margin-right: 8px;
+    font-size: 20px;
+  }
+}
+
+// Form Section
+.form-card {
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+}
+
+.form-card .q-card__section {
+  padding: 32px;
+}
+
+.edit-store-form {
+  width: 100%;
+}
+
+.form-section {
+  margin-bottom: 32px;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+.section-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin: 0;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.form-col {
+  width: 100%;
+}
+
+.form-input {
+  :deep(.q-field__control) {
+    border-radius: 8px;
+    transition: all 0.3s ease;
+  }
+
+  :deep(.q-field--outlined .q-field__control) {
+    border: 2px solid #e0e0e0;
+  }
+
+  :deep(.q-field--outlined:hover .q-field__control) {
+    border-color: #667eea;
+  }
+
+  :deep(.q-field--focused .q-field__control) {
+    border-color: #667eea;
+    box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1);
+  }
+}
+
+// Location Section
+.location-info {
+  margin-bottom: 16px;
+}
+
+.coordinates-display {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.coordinate-item {
+  display: flex;
+  align-items: center;
+  padding: 16px;
+  background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+  border-radius: 12px;
+  border: 1px solid #e0e0e0;
+  transition: all 0.3s ease;
+
+  &:hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+  }
+}
+
+.coordinate-label {
+  font-size: 12px;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+  font-weight: 600;
+}
+
+.coordinate-value {
+  font-size: 16px;
+  color: #1a1a1a;
+  font-weight: 600;
+  font-family: 'Courier New', monospace;
+}
+
+.map-container {
+  width: 100%;
+  height: 500px;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  border: 2px solid #e0e0e0;
+  transition: all 0.3s ease;
+
+  &:hover {
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.15);
+  }
+}
+
+.google-map {
+  width: 100%;
+  height: 100%;
+  border-radius: 12px;
+}
+
+// Custom Animated Markers
+:deep(.custom-marker) {
+  position: relative;
+  width: 48px;
+  height: 48px;
+  cursor: move;
+  transform-origin: center bottom;
+  animation: markerBounce 2s ease-in-out infinite;
+}
+
+:deep(.marker-icon) {
+  position: relative;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  transition: transform 0.3s ease;
+
+  svg {
+    width: 24px;
+    height: 24px;
+  }
+}
+
+:deep(.store-marker .marker-icon) {
+  background: linear-gradient(135deg, #34A853 0%, #2E7D32 100%);
+  border: 3px solid #FFFFFF;
+}
+
+:deep(.marker-pulse) {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  z-index: 1;
+  animation: markerPulse 2s ease-out infinite;
+}
+
+:deep(.store-marker .marker-pulse) {
+  background: rgba(52, 168, 83, 0.4);
+  border: 2px solid rgba(52, 168, 83, 0.6);
+}
+
+:deep(.custom-marker:hover .marker-icon) {
+  transform: scale(1.15);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+}
+
+@keyframes markerBounce {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes markerPulse {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
+
+  100% {
+    transform: translate(-50%, -50%) scale(2);
+    opacity: 0;
+  }
+}
+
+.info-window-content {
+  min-width: 200px;
+  padding: 8px;
+}
+
+.info-window-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #e0e0e0;
+  font-size: 14px;
+  color: #1a1a1a;
+}
+
+.info-window-body {
+  padding-top: 4px;
+}
+
+// Override default InfoWindow styles
+:deep(.gm-style .gm-style-iw-c) {
+  border-radius: 8px;
+  padding: 0;
+}
+
+:deep(.gm-style .gm-style-iw-d) {
+  overflow: hidden !important;
+}
+
+:deep(.gm-style .gm-style-iw-t::after) {
+  background: white;
+}
+
+// Action Buttons
+.form-actions {
+  display: flex;
+  gap: 16px;
+  justify-content: flex-end;
+  padding-top: 32px;
+  border-top: 2px solid #f0f0f0;
+  margin-top: 32px;
+}
+
+.submit-btn {
+  min-width: 180px;
+  height: 50px;
+  font-weight: 600;
+  font-size: 16px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+  transition: all 0.3s ease;
+  text-transform: none;
+
+  &:hover {
+    background: linear-gradient(135deg, #5568d3 0%, #6a3f8f 100%);
+    box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+    transform: translateY(-2px);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+.cancel-btn {
+  min-width: 140px;
+  height: 50px;
+  font-weight: 600;
+  border-radius: 10px;
+  text-transform: none;
+  transition: all 0.3s ease;
+
+  &:hover {
+    background-color: #f5f5f5;
+  }
+}
+
+// Responsive Design
+@media (max-width: 768px) {
+  .edit-store-page {
+    padding: 16px;
+  }
+
+  .header-section {
+    padding: 24px;
+  }
+
+  .header-content {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 20px;
+  }
+
+  .header-left {
+    flex-direction: column;
+    text-align: center;
+    gap: 16px;
+  }
+
+  .header-actions {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .view-items-btn {
+    width: 100%;
+    max-width: 300px;
+  }
+
+  .header-icon-wrapper {
+    width: 64px;
+    height: 64px;
+  }
+
+  .page-title {
+    font-size: 24px;
+  }
+
+  .form-card .q-card__section {
+    padding: 24px;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .coordinates-display {
+    grid-template-columns: 1fr;
+  }
+
+  .map-container {
+    height: 400px;
+  }
+
+  .form-actions {
+    flex-direction: column-reverse;
+    gap: 12px;
+  }
+
+  .submit-btn,
+  .cancel-btn {
+    width: 100%;
+  }
+}
+
+@media (max-width: 600px) {
+  .edit-store-page {
+    padding: 12px;
+  }
+
+  .header-section {
+    padding: 20px;
+  }
+
+  .header-left {
+    gap: 12px;
+  }
+
+  .header-icon-wrapper {
+    width: 56px;
+    height: 56px;
+  }
+
+  .page-title {
+    font-size: 20px;
+  }
+
+  .page-subtitle {
+    font-size: 14px;
+  }
+
+  .view-items-btn {
+    padding: 10px 20px;
+    font-size: 14px;
+
+    .q-icon {
+      font-size: 18px;
+      margin-right: 6px;
+    }
+  }
+
+  .form-card .q-card__section {
+    padding: 20px;
+  }
+
+  .section-title {
+    font-size: 18px;
+  }
+
+  .map-container {
+    height: 350px;
+  }
+}

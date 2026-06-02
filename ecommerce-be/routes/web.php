@@ -29,7 +29,8 @@ use App\Http\Controllers\ {
     StoreMenuAccessController,
     TransactionController,
     UserController,
-    UserValidationController
+    UserValidationController,
+    StoreUserController
 };
 
 /* Route resouce */
@@ -45,6 +46,11 @@ Route::resource('public_store_items', PublicStoreItemController::class)->only(['
 /* Route group */
 Route::group(['middleware' => 'auth:api', 'myTransactionMiddleware'], function () {
   Route::patch('my-transactions-marked-as-received/{transactionId}', [MyStoreTransactionController::class, 'markedAsReceived']);
+});
+
+Route::group(['middleware' => 'auth:api'], function () {
+  Route::resource('store-users', StoreUserController::class);
+  Route::resource('store-menu-access', StoreMenuAccessController::class);
 });
 
 Route::group(['middleware' => 'auth:api', 'itemMiddleware'], function () {
