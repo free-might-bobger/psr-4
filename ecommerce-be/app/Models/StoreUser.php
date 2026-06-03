@@ -17,6 +17,7 @@ class StoreUser extends Model implements Auditable
     protected $fillable = [
         'store_id',
         'user_id',
+        'email',
         'verification_code',
         'is_verified'
     ];

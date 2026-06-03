@@ -6,19 +6,19 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 
-class UserRegistration extends Mailable
+class StoreUserInvitation extends Mailable
 {
     use Queueable, SerializesModels;
-    public array $user;
+    public array $storeUser;
 
     /**
      * Create a new message instance.
      *
      * @return void
      */
-    public function __construct(array $user)
+    public function __construct(array $storeUser)
     {
-        $this->user = $user;
+        $this->storeUser = $storeUser;
     }
 
     /**
@@ -28,6 +28,6 @@ class UserRegistration extends Mailable
      */
     public function build()
     {
-        return $this->markdown('emails.verify');
+        return $this->markdown('emails.store-user-invitation');
     }
 }

@@ -16,4 +16,17 @@ class StoreUserController extends ApiController
         $this->updateRequest = UpdateRequest::class;
     }
 
+    public function inviteUser(){
+
+        $request = app($this->storeRequest);
+        $this->repository->inviteUser([
+            'store_id' => $request->store_id,
+            'email' => $request->email
+        ]);
+        
+        return response()->json([
+            'message' => 'User invited successfully'
+        ]);
+    }
+
 }

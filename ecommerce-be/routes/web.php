@@ -49,8 +49,10 @@ Route::group(['middleware' => 'auth:api', 'myTransactionMiddleware'], function (
 });
 
 Route::group(['middleware' => 'auth:api'], function () {
+  Route::post('invite-user', [StoreUserController::class, 'inviteUser']);
   Route::resource('store-users', StoreUserController::class);
   Route::resource('store-menu-access', StoreMenuAccessController::class);
+  Route::resource('my-stores', MyStoreController::class)->middleware(['storeAdminMiddleware', 'myStoreMiddleware']);
 });
 
 Route::group(['middleware' => 'auth:api', 'itemMiddleware'], function () {
@@ -68,7 +70,6 @@ Route::group( [ 'middleware' => 'auth:api' ], function () {
   Route::resource('all-transactions', TransactionController::class)->middleware(['superAdminMiddleware', 'allTransactionsMiddleware']);
   Route::resource('my-transactions', CustomerTransactionController::class)->middleware(['customerMiddleware', 'myTransactionsMiddleware']);
   Route::resource('my-store-transactions', MyStoreTransactionController::class)->middleware(['storeAdminMiddleware', 'myStoreMiddleware']);
-  Route::resource('my-stores', MyStoreController::class)->middleware(['storeAdminMiddleware', 'myStoreMiddleware']);
   Route::resource('users', UserController::class)->middleware('superAdminMiddleware');
   Route::resource('roles', RoleController::class)->middleware('superAdminMiddleware');
   Route::resource('store-menu-access', StoreMenuAccessController::class);
