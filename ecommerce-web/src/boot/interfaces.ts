@@ -266,5 +266,6 @@ export interface StoreUser {
   user_id: string;
   store_id: number;
   store?: StoreInterface;
+  optimus_id: number;
 }
 

@@ -10,7 +10,7 @@
                 <div class="header-actions">
                     <q-btn unelevated color="primary" icon="add" label="Invite User" :to="`${$route.path}/invite-users`"
                         class="q-mr-md" />
-                    <q-input v-model="search" placeholder="Search users..." outlined dense clearable debounce="300"
+                    <q-input v-model="search" placeholder="Search email..." outlined dense clearable debounce="300"
                         class="search-input">
                         <template v-slot:prepend>
                             <q-icon name="search" />
@@ -79,28 +79,22 @@
         <div class="mobile-only">
             <div v-if="typedResult.length === 0" class="empty-state">
                 <q-icon name="store" size="64px" color="grey-4" />
-                <div class="text-h6 q-mt-md text-grey-6">No stores found</div>
+                <div class="text-h6 q-mt-md text-grey-6">No store user found</div>
             </div>
             <div v-else class="stores-cards">
-                <q-card v-for="store in typedResult" :key="store.id" flat bordered class="store-card q-mb-md">
+                <q-card v-for="storeUser in typedResult" :key="storeUser.id" flat bordered class="store-card q-mb-md">
                     <q-card-section>
                         <div class="store-card-header">
                             <div class="store-card-title">
                                 <q-icon name="store" color="primary" size="24px" class="q-mr-sm" />
-                                <router-link :to="`${$route.path}/${store.optimus_id}`" class="store-name-link">
-                                    {{ store.name }}
+                                <router-link :to="`${$route.path}/${storeUser.optimus_id}`" class="store-name-link">
+                                    {{ storeUser.email }}
                                 </router-link>
                             </div>
                         </div>
                         <div class="store-card-actions q-mt-md">
-                            <q-btn unelevated dense color="primary" icon="list" label="Items"
-                                :to="`${$route.path}/${store.optimus_id}/items`"
-                                class="action-btn-mobile action-btn-edit-mobile" />
-                            <q-btn unelevated dense color="primary" icon="edit_note" label="Edit"
-                                :to="`${$route.path}/${store.optimus_id}`"
-                                class="action-btn-mobile action-btn-edit-mobile" />
                             <q-btn unelevated dense color="negative" icon="delete_forever" label="Delete"
-                                @click="handleDeleteStore(store)" class="action-btn-mobile action-btn-delete-mobile" />
+                                @click="handleDeleteUser(storeUser)" class="action-btn-mobile action-btn-delete-mobile" />
                         </div>
                     </q-card-section>
                 </q-card>
@@ -119,7 +113,7 @@ import { onRequest, firstPage, previousPage, nextPage, lastPage } from 'src/boot
 import { storeToRefs } from 'pinia';
 import { useCommonStore } from 'src/stores/common';
 import { onDeleteEntity } from 'src/boot/services';
-import { StoreRow } from 'src/boot/interfaces';
+import { StoreUser } from 'src/boot/interfaces';
 
 const useCommon = useCommonStore();
 const { pagination, result, entityQuery } = storeToRefs(useCommon);
