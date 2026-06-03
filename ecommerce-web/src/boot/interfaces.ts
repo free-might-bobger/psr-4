@@ -232,6 +232,7 @@ export interface StoreRow {
   name: string;
   mobile: string;
   optimus_id: number;
+  store?: StoreInterface;
 }
 
 export interface AccessRightInterface {
@@ -257,5 +258,13 @@ export interface StoreMenuAccessInterface {
 export interface ErrorValidationInterface{
   message: string
   status: boolean
+}
+
+export interface StoreUser {
+  id: number;
+  email: string;
+  user_id: string;
+  store_id: number;
+  store?: StoreInterface;
 }
 

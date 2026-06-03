@@ -64,8 +64,12 @@ const handleInvite = async () => {
 
         email.value = '';
     } catch (error) {
+        const errorMessage = error && typeof error === 'object' && 'response' in error && error.response && typeof error.response === 'object' && 'data' in error.response && error.response.data && typeof error.response.data === 'object' && 'message' in error.response.data
+            ? (error.response.data as { message: string }).message
+            : 'Failed to send invitation. Please try again.';
+
         $q.notify({
-            message: 'Failed to send invitation. Please try again.',
+            message: errorMessage,
             type: 'negative',
             position: 'top',
         });

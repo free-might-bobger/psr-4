@@ -46,17 +46,9 @@
                 <template v-slot:body-cell-actions="props">
                     <q-td :props="props">
                         <div class="action-buttons">
-                            <q-btn unelevated dense color="secondary" icon="people"
-                                :to="`${$route.path}/${props.row.optimus_id}/users`" size="md" class="q-mr-xs">
-                                <q-tooltip>User Management</q-tooltip>
-                            </q-btn>
-                            <q-btn unelevated dense color="primary" icon="edit_note"
-                                :to="`${$route.path}/${props.row.optimus_id}`" size="md" class="q-mr-xs">
-                                <q-tooltip>Edit Store</q-tooltip>
-                            </q-btn>
                             <q-btn unelevated dense color="negative" icon="delete_forever"
-                                @click="handleDeleteStore(props.row)" size="md">
-                                <q-tooltip>Delete Store</q-tooltip>
+                                @click="handleDeleteUser(props.row)" size="md">
+                                <q-tooltip>Delete User</q-tooltip>
                             </q-btn>
                         </div>
                     </q-td>
@@ -141,26 +133,35 @@ entityQuery.value = {
         orderBy: 'created_at:desc',
         page: pagination.value.page,
         limit: 10,
+        with: 'store'
     },
 };
 
-const typedResult = result as unknown as StoreRow[];
+const typedResult = result as unknown as StoreUser[];
 
 const columns = [
     {
-        name: 'name',
+        name: 'storeName',
         required: true,
         label: 'Store Name',
         align: 'left' as const,
-        field: 'name',
+        field: (row: StoreUser) => row.store?.name || 'N/A',
         sortable: true
     },
     {
-        name: 'mobile',
+        name: 'email',
         required: true,
-        label: 'Mobile',
+        label: 'Email',
         align: 'left' as const,
-        field: 'mobile',
+        field: 'email',
+        sortable: true
+    },
+    {
+        name: 'verified',
+        required: true,
+        label: 'Verified',
+        align: 'left' as const,
+        field: 'verifed',
         sortable: true
     },
     {
@@ -172,8 +173,8 @@ const columns = [
     }
 ];
 
-const handleDeleteStore = (store: StoreRow) => {
-    onDeleteEntity('stores', store.optimus_id, store.name);
+const handleDeleteUser = (user: StoreUser) => {
+    onDeleteEntity('store-users', user.optimus_id, user.email);
 };
 
 const handlePageChange = (page: number) => {

@@ -15,7 +15,7 @@
           </div>
           <h1 class="hero-title">
             Discover Local Shops<br>
-            <span class="brand-name">Near You</span>
+            <span class="brand-name" color="text-primary">Near You</span>
           </h1>
           <p class="hero-subtitle">
             Your trusted marketplace for daily essentials. Browse products from multiple shops, compare prices, and get
