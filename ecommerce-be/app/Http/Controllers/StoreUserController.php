@@ -6,6 +6,8 @@ use App\Repositories\StoreUserRepository;
 use App\Http\Requests\StoreUser\IndexRequest;
 use App\Http\Requests\StoreUser\StoreRequest;
 use App\Http\Requests\StoreUser\UpdateRequest;
+use App\Traits\Frontend\FrontendUrlTrait;
+use App\Services\StoreUserService;
 
 class StoreUserController extends ApiController
 {
@@ -27,6 +29,15 @@ class StoreUserController extends ApiController
         return response()->json([
             'message' => 'User invited successfully'
         ]);
+    }
+
+     public function acceptStoreInvitation(string $activationCode, StoreUserService $service){
+
+        $storeUser = $service->verifyActivationCode($activationCode);
+        if($storeUser){
+            return redirect(config('app.frontend_url') . '/dashboard/my-stores/' . $storeUser->store_optimus_id . '/users?success=1');
+        }
+        return redirect(config('app.frontend_url') . 'error-page?success=0');
     }
 
 }

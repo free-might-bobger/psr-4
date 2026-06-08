@@ -9,8 +9,9 @@ use Illuminate\Support\Facades\Event;
 use App\Models\Transaction;
 use App\Observers\TransactionObserver;
 use App\Models\User;
+use App\Models\StoreUser;
 use App\Observers\UserObserver;
-
+use App\Observers\StoreUserObserver;
 class EventServiceProvider extends ServiceProvider
 {
     /**
@@ -31,6 +32,7 @@ class EventServiceProvider extends ServiceProvider
     {
         Transaction::observe(TransactionObserver::class);
         User::observe(UserObserver::class);
+        StoreUser::observe(StoreUserObserver::class);
     }
 
     /**

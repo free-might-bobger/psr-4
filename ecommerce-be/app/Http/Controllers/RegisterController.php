@@ -16,8 +16,10 @@ use Laravel\Socialite\Facades\Socialite;
 use App\Models\RoleUser;
 use App\Services\RegisterService;
 use Throwable;
+use App\Traits\Frontend\FrontendUrlTrait;
 class RegisterController extends BaseController
 {
+    use FrontendUrlTrait;
     /**
      * Register api
      *
@@ -300,19 +302,9 @@ class RegisterController extends BaseController
 
     private function getFrontendLoginRedirect(array $query = []): string
     {
-        $frontendUrl = rtrim((string) env('FRONTEND_URL', ''), '/');
+        $frontEndUrl = FrontendUrlTrait::getUrl();
 
-        if ($frontendUrl === '') {
-            $request = request();
-            $host = (string) $request->getHost();
-            $scheme = (string) $request->getScheme();
-
-            // Common deployment pattern: API on api.example.com, SPA on example.com.
-            $frontendHost = preg_replace('/^api\./i', '', $host) ?: $host;
-            $frontendUrl = $scheme . '://' . $frontendHost;
-        }
-
-        return $frontendUrl . '/login?' . http_build_query($query);
+        return $frontEndUrl . '/login?' . http_build_query($query);
     }
 
      public function verifyActivationCode(string $activationCode, RegisterService $service){

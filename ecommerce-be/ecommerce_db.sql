@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: db:3306
--- Generation Time: Jun 02, 2026 at 11:42 PM
+-- Generation Time: Jun 06, 2026 at 09:58 PM
 -- Server version: 8.4.6
 -- PHP Version: 8.3.26
 
@@ -501,7 +501,10 @@ INSERT INTO `audits` (`id`, `user_type`, `user_id`, `event`, `auditable_type`, `
 (343, 'App\\Models\\User', 68, 'deleted', 'App\\Models\\ItemPrice', 1050, '{\"id\":1050,\"item_id\":666,\"unit_id\":9,\"color_id\":null,\"size_id\":null,\"qty\":4,\"delivery_charge_id\":1,\"original_price\":\"45.00\",\"selling_price\":\"90.00\",\"online_price\":\"56.00\"}', '[]', 'http://localhost:8081/item-prices', '192.168.65.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', NULL, '2026-06-01 08:28:50', '2026-06-01 08:28:50'),
 (344, 'App\\Models\\User', 68, 'created', 'App\\Models\\ItemPrice', 1051, '[]', '{\"item_id\":666,\"color_id\":null,\"size_id\":null,\"unit_id\":17,\"original_price\":4,\"selling_price\":56,\"online_price\":78.41,\"qty\":1,\"id\":1051}', 'http://localhost:8081/item-prices', '192.168.65.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', NULL, '2026-06-01 08:28:50', '2026-06-01 08:28:50'),
 (345, 'App\\Models\\User', 68, 'created', 'App\\Models\\ItemPrice', 1052, '[]', '{\"item_id\":666,\"color_id\":1,\"size_id\":2,\"unit_id\":4,\"original_price\":23,\"selling_price\":56,\"online_price\":25,\"qty\":5,\"id\":1052}', 'http://localhost:8081/item-prices', '192.168.65.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', NULL, '2026-06-01 08:28:50', '2026-06-01 08:28:50'),
-(346, 'App\\Models\\User', 68, 'created', 'App\\Models\\ItemPrice', 1053, '[]', '{\"item_id\":666,\"color_id\":null,\"size_id\":4,\"unit_id\":9,\"original_price\":45,\"selling_price\":90,\"online_price\":56,\"qty\":4,\"id\":1053}', 'http://localhost:8081/item-prices', '192.168.65.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', NULL, '2026-06-01 08:28:50', '2026-06-01 08:28:50');
+(346, 'App\\Models\\User', 68, 'created', 'App\\Models\\ItemPrice', 1053, '[]', '{\"item_id\":666,\"color_id\":null,\"size_id\":4,\"unit_id\":9,\"original_price\":45,\"selling_price\":90,\"online_price\":56,\"qty\":4,\"id\":1053}', 'http://localhost:8081/item-prices', '192.168.65.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', NULL, '2026-06-01 08:28:50', '2026-06-01 08:28:50'),
+(347, 'App\\Models\\User', 68, 'created', 'App\\Models\\StoreUser', 1, '[]', '{\"store_id\":\"458047115\",\"email\":\"momshieroce@gmail.com\",\"id\":1}', 'http://localhost:8081/invite-user', '192.168.65.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36', NULL, '2026-06-03 00:01:22', '2026-06-03 00:01:22'),
+(348, 'App\\Models\\User', 68, 'created', 'App\\Models\\StoreUser', 2, '[]', '{\"store_id\":1,\"email\":\"momshieroce@gmail.com\",\"verification_code\":\"6a1f7da345c0a\",\"is_verified\":false,\"id\":2}', 'http://localhost:8081/invite-user', '192.168.65.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36', NULL, '2026-06-03 00:04:35', '2026-06-03 00:04:35'),
+(349, 'App\\Models\\User', 68, 'created', 'App\\Models\\StoreUser', 3, '[]', '{\"store_id\":1,\"email\":\"momshieroce@gmail.com\",\"verification_code\":\"6a1f92e6b6b91\",\"is_verified\":false,\"id\":3}', 'http://localhost:8081/invite-user', '192.168.65.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36', NULL, '2026-06-03 01:35:18', '2026-06-03 01:35:18');
 
 -- --------------------------------------------------------
 
@@ -8776,11 +8779,21 @@ CREATE TABLE `store_ratings` (
 CREATE TABLE `store_users` (
   `id` int NOT NULL,
   `store_id` int NOT NULL,
-  `user_id` int NOT NULL,
-  `email` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
-  `verification_code` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
-  `is_active` tinyint(1) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  `user_id` int DEFAULT NULL,
+  `email` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `verification_code` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `is_verified` tinyint(1) DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `store_users`
+--
+
+INSERT INTO `store_users` (`id`, `store_id`, `user_id`, `email`, `verification_code`, `is_verified`, `deleted_at`, `created_at`, `updated_at`) VALUES
+(3, 1, NULL, 'momshieroce@gmail.com', '6a1f92e6b6b91', 0, NULL, '2026-06-03 01:35:18', '2026-06-03 01:35:18');
 
 -- --------------------------------------------------------
 
@@ -9334,7 +9347,7 @@ ALTER TABLE `address`
 -- AUTO_INCREMENT for table `audits`
 --
 ALTER TABLE `audits`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=347;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=350;
 
 --
 -- AUTO_INCREMENT for table `categories`
@@ -9634,7 +9647,7 @@ ALTER TABLE `store_ratings`
 -- AUTO_INCREMENT for table `store_users`
 --
 ALTER TABLE `store_users`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `transactions`

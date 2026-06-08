@@ -64,7 +64,6 @@ return [
 
     'url' => env('APP_URL', 'http://localhost'),
     'frontend_url' => env('FRONTEND_URL', 'https://mynearshops.com'),
-
     'asset_url' => env('ASSET_URL'),
 
     /*

@@ -5,6 +5,7 @@ namespace App\Mail;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Log;
 
 class StoreUserInvitation extends Mailable
 {
@@ -28,6 +29,7 @@ class StoreUserInvitation extends Mailable
      */
     public function build()
     {
-        return $this->markdown('emails.store-user-invitation');
+        return $this->markdown('emails.store-user-invitation')
+                    ->subject($this->storeUser['storeName'] . ' access invitation');
     }
 }

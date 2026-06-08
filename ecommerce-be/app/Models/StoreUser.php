@@ -4,12 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Traits\Obfuscate\OptimusRequiredToModel;
+use App\Traits\Obfuscate\OptimusId;
 use OwenIt\Auditing\Contracts\Auditable;
 
 class StoreUser extends Model implements Auditable
 {
-    use HasFactory, OptimusRequiredToModel;
+    use HasFactory, OptimusId;
     use \OwenIt\Auditing\Auditable;
 
     protected $table = 'store_users';
@@ -22,7 +22,7 @@ class StoreUser extends Model implements Auditable
         'is_verified'
     ];
 
-    protected $appends = ['optimus_id'];
+    protected $appends = ['store_optimus_id'];
 
 
     public function user(){
@@ -35,6 +35,10 @@ class StoreUser extends Model implements Auditable
 
     public function storeUserMenu(){
         return $this->hasMany(StoreUserMenu::class, 'store_user_id', 'id');
+    }
+
+    public function getStoreOptimusIdAttribute() {
+        return $this->optimus()->encode( $this->store_id );
     }
     
 }

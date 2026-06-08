@@ -46,6 +46,10 @@
                 <template v-slot:body-cell-actions="props">
                     <q-td :props="props">
                         <div class="action-buttons">
+                             <q-btn unelevated dense color="primary" icon="list"
+                                :to="`${$route.path}/access`" size="md" v-if="props.row.verified">
+                                <q-tooltip>Access Management</q-tooltip>
+                            </q-btn>
                             <q-btn unelevated dense color="negative" icon="delete_forever"
                                 @click="handleDeleteUser(props.row)" size="md">
                                 <q-tooltip>Delete User</q-tooltip>

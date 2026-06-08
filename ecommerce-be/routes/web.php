@@ -108,6 +108,7 @@ Route::post('register', [RegisterController::class, 'register']);
 Route::post('send-email-invitation', [UserController::class, 'inviteByEmail']);
 Route::post('create-new-activation-code', [MobileActivationCodeController::class, 'createNewActivationcode']);
 Route::get('verify/activation_code/{activation_code}', [RegisterController::class, 'verifyActivationCode']);
+Route::get('store-users/verification_code/{verification_code}', [StoreUserController::class, 'acceptStoreInvitation']);
 Route::get('login', [RegisterController::class, 'loginPageRedirect']);
 Route::post('login', [RegisterController::class, 'login'])->middleware('throttle:5,10');
 

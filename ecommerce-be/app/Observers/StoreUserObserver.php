@@ -3,7 +3,7 @@
 namespace App\Observers;
 use Illuminate\Support\Facades\Mail;
 use App\Models\StoreUser;
-use App\Mail\UserRegistration;
+use App\Mail\StoreUserInvitation;
 use App\Models\Store;
 class StoreUserObserver
 {
@@ -13,10 +13,10 @@ class StoreUserObserver
         $referer = env('APP_URL');
         $store = Store::find($storeUser->store_id);
         $storeUserInfo['storeName'] = $store->name;
-        $storeUserInfo['verification_code'] = $referer . '/store-users/verfication_code/' . $storeUser->verification_code;
+        $storeUserInfo['verification_code'] = $referer . '/store-users/verification_code/' . $storeUser->verification_code;
         
         Mail::to($storeUser->email)
-            ->send(new UserRegistration($storeUserInfo));
+            ->send(new StoreUserInvitation($storeUserInfo));
     }
 
 
