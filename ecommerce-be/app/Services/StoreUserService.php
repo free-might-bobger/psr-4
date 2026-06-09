@@ -9,7 +9,7 @@ class StoreUserService {
         $storeUser = StoreUser::whereVerificationCode($verificationCode)->first();
         if($storeUser){
             $storeUser->update([
-                'activation_code' => null,
+                'verification_code' => null,
                 'is_verified' => 1
             ]);
             return $storeUser;

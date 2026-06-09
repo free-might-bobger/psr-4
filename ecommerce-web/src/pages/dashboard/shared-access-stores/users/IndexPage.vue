@@ -37,24 +37,17 @@
                     </q-td>
                 </template>
 
-                <template v-slot:body-cell-email="props">
+                <template v-slot:body-cell-mobile="props">
                     <q-td :props="props">
-                        {{ props.row.email || 'N/A' }}
-                    </q-td>
-                </template>
-
-                <template v-slot:body-cell-verified="props">
-                    <q-td :props="props">
-                        <q-icon v-if="props.row.is_verified" name="check_circle" color="positive" size="20px" />
-                        <q-icon v-else name="cancel" color="grey-5" size="20px" />
+                        {{ props.row.mobile || 'N/A' }}
                     </q-td>
                 </template>
 
                 <template v-slot:body-cell-actions="props">
                     <q-td :props="props">
                         <div class="action-buttons">
-                            <q-btn unelevated dense color="primary" icon="list" :to="`${$route.path}/access`" size="md"
-                                v-if="props.row.verified">
+                             <q-btn unelevated dense color="primary" icon="list"
+                                :to="`${$route.path}/access`" size="md" v-if="props.row.verified">
                                 <q-tooltip>Access Management</q-tooltip>
                             </q-btn>
                             <q-btn unelevated dense color="negative" icon="delete_forever"
@@ -105,8 +98,7 @@
                         </div>
                         <div class="store-card-actions q-mt-md">
                             <q-btn unelevated dense color="negative" icon="delete_forever" label="Delete"
-                                @click="handleDeleteUser(storeUser)"
-                                class="action-btn-mobile action-btn-delete-mobile" />
+                                @click="handleDeleteUser(storeUser)" class="action-btn-mobile action-btn-delete-mobile" />
                         </div>
                     </q-card-section>
                 </q-card>

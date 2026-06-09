@@ -21,7 +21,8 @@
             <p class="map-header-description">
               Discover Items near you and get directions instantly. Click on product markers to view
               details.
-              <br /> Looking for shops? <router-link to="/find-shops" class="find-shops-link">FIND NEAREST SHOPS HERE</router-link>
+              <br /> Looking for shops? <router-link to="/find-shops" class="find-shops-link">FIND NEAREST SHOPS
+                HERE</router-link>
             </p>
           </div>
         </div>
@@ -30,15 +31,8 @@
             class="refresh-location-btn" size="md" />
           <q-btn color="secondary" icon="search" label="Find Nearest Items" outline @click="getNearestItems"
             class="find-stores-btn" size="md" :loading="false" :disabled="!searchString" />
-          <q-input 
-            v-model="searchString" 
-            placeholder="Search items..." 
-            outlined 
-            dense 
-            debounce="300"
-            class="search-input"
-            clearable
-          >
+          <q-input v-model="searchString" placeholder="Search items..." outlined dense debounce="1000"
+            class="search-input" clearable>
             <template v-slot:prepend>
               <q-icon name="search" />
             </template>
@@ -124,13 +118,13 @@
                         <span class="text-weight-bold">{{ item.store.name }}</span>
                       </div>
                       <div class="info-window-body">
-                         <div>{{ item.name }}</div>
+                        <div>{{ item.name }}</div>
                         <div class="store-details" v-if="item.store.distance">
                           <q-icon name="straighten" size="xs" class="q-mr-xs" />
                           <span class="text-caption">{{ item.store.distance }}KM away</span>
                         </div>
-                        <q-btn :to="`/public_stores/${item.store.optimus_id}/item/${item.optimus_id}`" color="primary" size="sm" unelevated
-                          class="q-mt-sm full-width" label="View Item" icon="arrow_forward" />
+                        <q-btn :to="`/public_stores/${item.store.optimus_id}/item/${item.optimus_id}`" color="primary"
+                          size="sm" unelevated class="q-mt-sm full-width" label="View Item" icon="arrow_forward" />
                       </div>
                     </div>
                   </InfoWindow>
@@ -605,7 +599,7 @@ watch(searchString, async () => {
 </script>
 
 <style scoped lang="scss">
-.find-shops-link{
+.find-shops-link {
   font-weight: 600;
   color: #667eea;
   text-decoration: none;
@@ -616,6 +610,7 @@ watch(searchString, async () => {
     text-decoration: underline;
   }
 }
+
 .map-page-container {
   padding: 24px;
   max-width: 1400px;
