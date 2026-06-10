@@ -30,7 +30,7 @@
             class="refresh-location-btn" size="md" />
           <q-btn color="secondary" icon="search" label="Find Nearest Shops" outline @click="getNearestStore"
             class="find-stores-btn" size="md" :loading="false" />
-          <q-input v-model="searchString" placeholder="Search shops..." outlined dense debounce="300"
+          <q-input v-model="searchString" placeholder="Search shops..." outlined dense debounce="1000"
             class="search-input" clearable>
             <template v-slot:prepend>
               <q-icon name="search" />
@@ -176,7 +176,13 @@ const showInfoWindow = ref(true);
 const isClient = computed(() => process.env.CLIENT);
 
 
-const mapRef = ref<unknown>(null)
+interface GoogleMapRef {
+  $mapObject?: google.maps.Map;
+  map?: google.maps.Map;
+  $map?: google.maps.Map;
+}
+
+const mapRef = ref<GoogleMapRef | null>(null)
 const mapSectionRef = ref<HTMLElement | null>(null)
 const directions = ref<google.maps.DirectionsResult | null>(null)
 const directionsRenderer = ref<google.maps.DirectionsRenderer | null>(null)
@@ -297,7 +303,7 @@ const getNearestStore = async () => {
   const result = await get(
     {
       message: 'Searching nearest store',
-      entity: 'public_stores',
+      entity: 'find-store',
       query: {
         orderBy: 'name:asc',
         columns: 'id,name',
@@ -310,7 +316,7 @@ const getNearestStore = async () => {
   );
 
   if (result && typeof result === 'object' && 'data' in result) {
-    nearestStores.value = (result as { data: { data: unknown[] } }).data.data;
+    nearestStores.value = (result as { data: { data: StoreInterface[] } }).data.data;
     showStoreList.value = true;
   }
 };
@@ -607,7 +613,7 @@ watch(searchString, async () => {
     );
 
     if (result && typeof result === 'object' && 'data' in result) {
-      nearestStores.value = (result as { data: { data: unknown[] } }).data.data;
+      nearestStores.value = (result as { data: { data: StoreInterface[] } }).data.data;
       showStoreList.value = true;
     }
   }

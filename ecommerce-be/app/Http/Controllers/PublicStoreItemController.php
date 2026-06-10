@@ -8,6 +8,7 @@ use App\Http\Requests\BaseIndexRequest;
 use Illuminate\Http\Request;
 use App\Http\Resources\BaseResource;
 use App\Services\PublicStoreItemService;
+
 class PublicStoreItemController extends ApiController
 {
     private PublicStoreItemService $publicStoreItemService; 
@@ -20,14 +21,6 @@ class PublicStoreItemController extends ApiController
         $this->publicStoreItemService = $publicStoreItemService;
     }
 
-    /**
-     * Show the resource
-     * @param int $id
-     * @return BaseResource
-     */
-    public function show( int $id ) : BaseResource {
-        $this->result = $this->publicStoreItemService->getPublicStoreItem( $id );
-        return $this->getResource();
-    }
+    
 
 }

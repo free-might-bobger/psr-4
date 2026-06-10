@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\BaseResource;
+use App\Http\Resources\ShowResource;
 abstract class ApiController extends Controller {
 
     protected string $model;
@@ -12,11 +13,13 @@ abstract class ApiController extends Controller {
     protected string $updateRequest;
     protected mixed $result;
     protected array $params;
+    protected string $baseResourceClass = BaseResource::class;
+    protected string $showResourceClass;
     /**
      * Index the resource
      * @return BaseResource
      */
-    public function index() : BaseResource {
+    public function index() : BaseResource{
 
         $this->params = app( $this->indexRequest )->all();
         $this->result = $this->repository->filterQuery($this->params)->getResults();
@@ -25,9 +28,9 @@ abstract class ApiController extends Controller {
 
     /**
      * Store the resource
-     * @return BaseResource
+     * @return BaseResource|ShowResource
      */
-    public function store(): BaseResource {
+    public function store(): BaseResource|ShowResource {
 
         $this->params = app( $this->storeRequest )->all();
         $this->result = $this->repository->setParameters( $this->params )->create();
@@ -37,20 +40,20 @@ abstract class ApiController extends Controller {
     /**
      * Show the resource
      * @param int $id
-     * @return BaseResource
+     * @return ShowResource
      */
-    public function show( int $id ) : BaseResource {
+    public function show( int $id ) : ShowResource {
         $this->params = app( $this->indexRequest )->all();
         $this->result = $this->repository->filterQuery($this->params)->findOrFail( $id );
-        return $this->getResource();
+        return $this->getShowResource();
     }
 
     /**
      * Edit the resource
      * @param int $id
-     * @return BaseResource
+     * @return BaseResource|ShowResource
      */
-    public function edit( int $id ) : BaseResource {
+    public function edit( int $id ) : BaseResource|ShowResource {
         $this->params = app( $this->indexRequest )->all();
         $this->result = $this->repository->filterQuery( $this->params )->where( 'id', $id )->first();
         return $this->getResource();
@@ -58,9 +61,9 @@ abstract class ApiController extends Controller {
     /**
      * Update the resource
      * @param int $id
-     * @return BaseResource
+     * @return BaseResource|ShowResource
      */
-    public function update( int $id ) : BaseResource {
+    public function update( int $id ) : BaseResource|ShowResource {
         $this->params = app( $this->updateRequest )->all();
         $result = $this->repository->where( 'id', $id );
         $this->result = tap( $result )->update( $this->params );
@@ -93,13 +96,9 @@ abstract class ApiController extends Controller {
         return false;
     }
 
-    /**
-     * Get the resource
-     * @return BaseResource
-     */
-    public function getResource(): BaseResource
-    {
-        return new BaseResource($this->result);
-    }
+  public function getResource(): BaseResource{
+    return new $this->baseResourceClass($this->result);
+  }
 
+  abstract public function showResourceClass();
 }

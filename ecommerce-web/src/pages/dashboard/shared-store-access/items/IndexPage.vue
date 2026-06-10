@@ -282,7 +282,7 @@ const search = ref('');
 onBeforeMount(async () => {
   result.value = [];
   store.value = await show({
-    entity: 'my-stores',
+    entity: 'shared-store-access',
     optimus_id: Number(route.params.id),
   });
   await requestItems();

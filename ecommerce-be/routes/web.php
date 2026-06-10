@@ -30,10 +30,12 @@ use App\Http\Controllers\ {
     TransactionController,
     UserController,
     UserValidationController,
-    StoreUserController
+    StoreUserController,
+    FindStoreController
 };
 
 /* Route resouce */
+Route::get('find-store', [FindStoreController::class, 'index']);
 Route::resource('public_stores', PublicStoreController::class);
 Route::resource('public_items', PublicItemController::class);
 Route::resource('categories', CategoryController::class);
@@ -53,6 +55,7 @@ Route::group(['middleware' => 'auth:api'], function () {
   Route::resource('store-users', StoreUserController::class);
   Route::resource('store-menu-access', StoreMenuAccessController::class);
   Route::resource('my-stores', MyStoreController::class)->middleware(['storeAdminMiddleware', 'myStoreMiddleware']);
+  Route::resource('shared-store-access', MyStoreController::class);
 });
 
 Route::group(['middleware' => 'auth:api', 'itemMiddleware'], function () {

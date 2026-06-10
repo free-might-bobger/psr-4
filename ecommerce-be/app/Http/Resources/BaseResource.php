@@ -5,11 +5,23 @@ namespace App\Http\Resources;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Http\Request;
 
 class BaseResource extends JsonResource
 {
-    public function toArray($request): array
+    protected array $fields = [];
+
+    public function __construct(Collection|LengthAwarePaginator $resource)
     {
+        parent::__construct($resource);
+    }
+
+    public function toArray(Request $request): array
+    {
+        if (!empty($this->fields)) {
+            return $this->filterByFields();
+        }
+
         if ($this->resource instanceof LengthAwarePaginator) {
             return $this->getPaginate();
         }
@@ -21,7 +33,30 @@ class BaseResource extends JsonResource
         return parent::toArray($request);
     }
 
-    private function filterCollection($request): array
+    private function filterByFields(): array
+    {
+        if ($this->resource instanceof LengthAwarePaginator) {
+            return $this->getPaginateWithFields();
+        }
+
+        if ($this->resource instanceof Collection) {
+            return $this->resource->map(fn ($item) => $item->only($this->fields))->toArray();
+        }
+
+        return $this->resource->only($this->fields);
+    }
+
+    private function getPaginateWithFields(): array
+    {
+        $items = $this->items()->map(fn ($item) => $item->only($this->fields))->toArray();
+
+        return [
+            'data' => $items,
+            'meta' => $this->getPaginationMeta(),
+        ];
+    }
+
+    private function filterCollection(Request $request): array
     {
         if (!$request->only) {
             return $this->resource->toArray();
@@ -48,7 +83,7 @@ class BaseResource extends JsonResource
         ];
     }
 
-    private function processItems($items): array
+    private function processItems(array $items): array
     {
         if (method_exists($this, 'hasStoreAdvertisement')) {
             return $this->hasStoreAdvertisement();

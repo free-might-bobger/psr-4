@@ -74,17 +74,17 @@ export default [
           ]
         },
         {
-          path: 'shared-access-stores',
+          path: 'shared-store-access',
           children: [
-            { path: '', component: () => import('src/pages/dashboard/shared-access-stores/IndexPage.vue') },
-            { path: ':id', component: () => import('src/pages/dashboard/shared-access-stores/EditPage.vue') },
-            { path: ':id/users', component: () => import('src/pages/dashboard/shared-access-stores/users/IndexPage.vue') },
-            { path: ':id/users/invite-users', component: () => import('src/pages/dashboard/shared-access-stores/users/InvitePage.vue') },
-            { path: ':id/items', component: () => import('src/pages/dashboard/shared-access-stores/items/IndexPage.vue') },
-            { path: ':id/items/:itemId', component: () => import('src/pages/dashboard/shared-access-stores/items/EditPage.vue') },
-            { path: ':id/items/:itemId/item-prices', component: () => import('src/pages/dashboard/shared-access-stores/items/ItemPrice.vue') },
-            { path: ':id/transactions', component: () => import('src/pages/dashboard/shared-access-stores/transactions/IndexPage.vue') },
-            { path: ':id/transactions/:transactionId', component: () => import('src/pages/dashboard/shared-access-store/transactions/ShowPage.vue') },
+            { path: '', component: () => import('src/pages/dashboard/shared-store-access/IndexPage.vue') },
+            { path: ':id', component: () => import('src/pages/dashboard/shared-store-access/EditPage.vue') },
+            { path: ':id/users', component: () => import('src/pages/dashboard/shared-store-access/users/IndexPage.vue') },
+            { path: ':id/users/invite-users', component: () => import('src/pages/dashboard/shared-store-access/users/InvitePage.vue') },
+            { path: ':id/items', component: () => import('src/pages/dashboard/shared-store-access/items/IndexPage.vue') },
+            { path: ':id/items/:itemId', component: () => import('src/pages/dashboard/store-access/items/EditPage.vue') },
+            { path: ':id/items/:itemId/item-prices', component: () => import('src/pages/dashboard/shared-store-access/items/ItemPrice.vue') },
+            { path: ':id/transactions', component: () => import('src/pages/dashboard/shared-store-access/transactions/IndexPage.vue') },
+            { path: ':id/transactions/:transactionId', component: () => import('src/pages/dashboard/shared-store-access/transactions/ShowPage.vue') },
           ]
         },
         {

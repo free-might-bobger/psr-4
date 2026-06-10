@@ -5,7 +5,7 @@
       <div class="header-content">
         <div class="header-title-section">
           <q-icon name="store" size="32px" color="primary" class="q-mr-sm" />
-          <h2 class="page-title">Shared Access Stores</h2>
+          <h2 class="page-title">Shared Store Access</h2>
         </div>
         <div class="header-actions">
           <q-input v-model="search" placeholder="Search stores..." outlined dense clearable debounce="300"
@@ -30,32 +30,25 @@
         <template v-slot:body-cell-name="props">
           <q-td :props="props">
             <router-link :to="`${$route.path}/${props.row.optimus_id}`" class="store-name-link">
-              {{ props.row.name }}
+              {{ props.row.store?.name}}
             </router-link>
           </q-td>
         </template>
 
         <template v-slot:body-cell-mobile="props">
           <q-td :props="props">
-            {{ props.row.mobile || 'N/A' }}
+            {{ props.row.store?.mobile || 'N/A' }}
           </q-td>
         </template>
 
         <template v-slot:body-cell-actions="props">
           <q-td :props="props">
             <div class="action-buttons">
-              <q-btn unelevated dense color="secondary" icon="people"
-                :to="`${$route.path}/${props.row.optimus_id}/users`" size="md" class="q-mr-xs">
-                <q-tooltip>User Management</q-tooltip>
+              <q-btn unelevated dense color="secondary" icon="shopping_bag"
+                :to="`${$route.path}/${props.row.store?.optimus_id}/items`" size="md" class="q-mr-xs">
+                <q-tooltip>Item Management</q-tooltip>
               </q-btn>
-              <q-btn unelevated dense color="primary" icon="edit_note" :to="`${$route.path}/${props.row.optimus_id}`"
-                size="md" class="q-mr-xs">
-                <q-tooltip>Edit Store</q-tooltip>
-              </q-btn>
-              <q-btn unelevated dense color="negative" icon="delete_forever" @click="handleDeleteStore(props.row)"
-                size="md">
-                <q-tooltip>Delete Store</q-tooltip>
-              </q-btn>
+             
             </div>
           </q-td>
         </template>
@@ -131,7 +124,7 @@ const { pagination, result, entityQuery } = storeToRefs(useCommon);
 const search = ref('');
 
 entityQuery.value = {
-  message: 'Getting store users...',
+  message: 'Getting store access...',
   entity: 'store-users',
   query: {
     orderBy: 'created_at:desc',
