@@ -3,34 +3,34 @@
 namespace App\Http\Controllers;
 
 use App\Repositories\StoreRepository;
-use App\Http\Requests\Store\StoreIndexRequest;
+use App\Http\Requests\FindStoreRequest;
 use App\Http\Resources\BaseResource;
-use App\Http\Resources\PublicStoreResource;
+use App\Http\Resources\FindStoreResource;
 
-class FindStoreController extends ApiController
+class FindStoreController
 {
-
-    public function __construct(StoreRepository $repository)
+    private $repository;
+    private $result;
+    
+    public function __construct(StoreRepository $storeRepository)
     {
-        $this->repository = $repository;
-        $this->indexRequest = StoreIndexRequest::class;
+        $this->repository = $storeRepository;
     }
-
-    public function index(): BaseResource
+    
+    public function findStore(FindStoreRequest $findStoreRequest): FindStoreResource
     {
-        $this->params = app($this->indexRequest)->all();
-        $this->result = $this->repository->setParameters($this->params)->applyFilters();
+        $this->result = $this->repository->setParameters($findStoreRequest->all())->applyFilters();
         return $this->getResource();
     }
 
-     public function getResource(): BaseResource
-    {
-        return new $this->baseResourceClass($this->result);
+    public function show(int $id): FindStoreResource {
+        $this->result = $this->repository->findOrFail($id);
+        return $this->getResource();
     }
 
-    public function showResourceClass(): PublicStoreResource
-    {
-        return new PublicStoreResource($this->result);
+    public function getResource(){
+        return new FindStoreResource($this->result);
     }
+
 
 }

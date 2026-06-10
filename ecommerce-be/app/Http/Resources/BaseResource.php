@@ -5,13 +5,14 @@ namespace App\Http\Resources;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 
 class BaseResource extends JsonResource
 {
     protected array $fields = [];
 
-    public function __construct(Collection|LengthAwarePaginator $resource)
+    public function __construct(Collection|LengthAwarePaginator|Model $resource)
     {
         parent::__construct($resource);
     }

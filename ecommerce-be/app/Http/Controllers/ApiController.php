@@ -13,13 +13,10 @@ abstract class ApiController extends Controller {
     protected string $updateRequest;
     protected mixed $result;
     protected array $params;
-    protected string $baseResourceClass = BaseResource::class;
+    protected string $baseResourceClass;
     protected string $showResourceClass;
-    /**
-     * Index the resource
-     * @return BaseResource
-     */
-    public function index() : BaseResource{
+
+    public function index() {
 
         $this->params = app( $this->indexRequest )->all();
         $this->result = $this->repository->filterQuery($this->params)->getResults();
@@ -42,10 +39,10 @@ abstract class ApiController extends Controller {
      * @param int $id
      * @return ShowResource
      */
-    public function show( int $id ) : ShowResource {
+    public function show( int $id ) {
         $this->params = app( $this->indexRequest )->all();
         $this->result = $this->repository->filterQuery($this->params)->findOrFail( $id );
-        return $this->getShowResource();
+        return $this->showResource();
     }
 
     /**
@@ -96,9 +93,7 @@ abstract class ApiController extends Controller {
         return false;
     }
 
-  public function getResource(): BaseResource{
-    return new $this->baseResourceClass($this->result);
-  }
+  abstract public function getResource();
 
-  abstract public function showResourceClass();
+  abstract public function showResource();
 }
