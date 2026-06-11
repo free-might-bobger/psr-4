@@ -26,7 +26,7 @@
           <div class="row q-col-gutter-md">
             <!-- Search Input -->
             <div class="col-12 col-md-6">
-              <q-input outlined v-model="searchString" placeholder="Search products..." debounce="800"
+              <q-input outlined v-model="searchString" placeholder="Search products..." debounce="1000"
                 class="search-input">
                 <template v-slot:prepend>
                   <q-icon name="search" />
@@ -179,11 +179,8 @@ storeId.value = route.params.id;
 const showStore = async () => {
   store.value = await show({
     message: 'Getting store...',
-    entity: 'public_stores',
+    entity: 'find-store',
     optimus_id: storeId.value,
-    query: {
-      columns: 'id,name'
-    },
   });
   getCategories();
 

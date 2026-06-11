@@ -272,9 +272,6 @@ const showStore = async () => {
     message: 'Getting item...',
     entity: 'public_stores',
     optimus_id: Number(route.params.id),
-    query: {
-      columns: 'id,name',
-    },
   });
 };
 
@@ -285,8 +282,7 @@ const getItem = async () => {
     entity: 'public_store_items',
     optimus_id: Number(route.params.item_id),
     query: {
-      with: 'itemPrice.unit,store',
-      columns: 'id,name',
+      with: 'itemPrice.unit,store'
     },
   });
   getUnits();

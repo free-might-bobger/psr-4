@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\BaseIndexRequest;
-use App\Http\Resources\BaseResource;
+use App\Http\Resources\ReceiveMethod\IndexResource;
 use App\Repositories\ReceiveMethod\ReceiveMethodRepository;
 
 class ReceiveMethodController extends ApiController
@@ -17,5 +17,13 @@ class ReceiveMethodController extends ApiController
 
     public function isPublicRoute(string $routeName): Bool {
         return true;
+    }
+
+    public function getResource(){
+        return new IndexResource($this->result);
+    }
+
+    public function showResource(){
+        return new IndexResource($this->result);
     }
 }

@@ -5,14 +5,13 @@ namespace App\Http\Controllers;
 use App\Repositories\StoreRepository;
 use App\Http\Requests\Store\StoreRequest;
 use App\Http\Requests\Store\StoreIndexRequest;
-use App\Http\Resources\BaseResource;
-use App\Http\Resources\ShowResource;
+use App\Http\Resources\PublicStore\IndexResource;
+use App\Http\Resources\PublicStore\ShowResource;
 use Illuminate\Database\Eloquent\Model;
 
 class PublicStoreController extends ApiController
 {
 
-    protected string $showResourceClass = ShowResource::class;
     
     public function __construct(StoreRepository $repository)
     {
@@ -21,7 +20,7 @@ class PublicStoreController extends ApiController
         $this->storeRequest = StoreRequest::class;
     }
 
-    public function index(): BaseResource
+    public function index(): IndexResource
     {
         $this->params = app($this->indexRequest)->all();
         $this->result = $this->repository->setParameters($this->params)->applyFilters();
@@ -30,16 +29,16 @@ class PublicStoreController extends ApiController
 
     public function show( int $id ) : ShowResource {
         $this->result = $this->repository->where( 'id', $id )->get()->first();
-        return $this->getShowResourceClass();
+        return $this->showResource();
     }
 
-    public function getResource(): BaseResource
+    public function getResource(): IndexResource
     {
-        return new ($this->result);
+        return new IndexResource($this->result);
     }
 
-    public function showResourceClass(): ShowResource {
-        return new $this->showResourceClass($this->result);
+    public function showResource(): ShowResource {
+        return new ShowResource($this->result);
     }
 
 }

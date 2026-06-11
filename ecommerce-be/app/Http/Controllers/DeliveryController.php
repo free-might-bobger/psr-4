@@ -6,7 +6,7 @@ use App\Repositories\DeliveryRepository;
 use App\Http\Requests\DeliveryRequest;
 use App\Http\Resources\BaseResource;
 
-class DeliveryController extends ApiController
+class DeliveryController
 {
 
     public function __construct(DeliveryRepository $repository){
@@ -14,11 +14,14 @@ class DeliveryController extends ApiController
         $this->indexRequest = DeliveryRequest::class;
     }
 
-     public function index(): BaseResource
+    public function index()
     {
         $this->params = app($this->indexRequest)->all();
         $this->result = $this->repository->setParameters($this->params)->applyFilters();
-        return $this->getResource();
+        return response()->json([
+            'data' => $this->result
+        ]);
     }
+
 
 }

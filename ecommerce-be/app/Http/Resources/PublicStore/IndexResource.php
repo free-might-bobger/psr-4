@@ -1,14 +1,14 @@
 <?php
 
-namespace App\Http\Resources\PublicStoreItem;
+namespace App\Http\Resources\PublicStore;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use App\Http\Resources\BaseResource;
 
 class IndexResource extends BaseResource
 {
-   public function __construct(Model|Collection|LengthAwarePaginator $resource) {
-        $this->fields = ['id', 'optimus_id', 'name', 'images', 'primary_img', 'item_price'];
+   public function __construct(Model|LengthAwarePaginator $resource) {
+        $this->fields = ['id', 'optimus_id', 'name', 'label'];
         parent::__construct($resource);
     }
     
