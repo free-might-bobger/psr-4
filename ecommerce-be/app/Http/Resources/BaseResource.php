@@ -41,15 +41,15 @@ class BaseResource extends JsonResource
         }
 
         if ($this->resource instanceof Collection) {
-            return $this->resource->map(fn ($item) => $item->only($this->fields))->toArray();
+            return $this->resource->map(fn ($item) => $this->extractFields($item))->toArray();
         }
 
-        return $this->resource->only($this->fields);
+        return $this->extractFields($this->resource);
     }
 
     private function getPaginateWithFields(): array
     {
-        $items = $this->items()->map(fn ($item) => $item->only($this->fields))->toArray();
+        $items = collect($this->items())->map(fn ($item) => $this->extractFields($item))->toArray();
 
         return [
             'data' => $items,
@@ -64,7 +64,23 @@ class BaseResource extends JsonResource
         }
 
         $fields = explode(',', $request->only);
-        return $this->resource->map(fn ($item) => $item->only($fields))->toArray();
+        $items = $this->resource instanceof Collection ? $this->resource : collect($this->resource);
+        return $items->map(fn ($item) => $item->only($fields))->toArray();
+    }
+
+    private function extractFields(Model $item): array
+    {
+        $attributes = $item->only($this->fields);
+        $loadedRelations = $item->getRelations();
+        foreach ($this->fields as $field) {
+            $camel = \Illuminate\Support\Str::camel($field);
+            if (array_key_exists($camel, $loadedRelations)) {
+                $attributes[$field] = $loadedRelations[$camel];
+            } elseif (array_key_exists($field, $loadedRelations)) {
+                $attributes[$field] = $loadedRelations[$field];
+            }
+        }
+        return $attributes;
     }
 
     public function getTo(): int
