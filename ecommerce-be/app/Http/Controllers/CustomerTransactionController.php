@@ -8,7 +8,7 @@ use App\Http\Requests\TransactionRequest;
 use App\Models\Transaction;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Resources\BaseResource;
-
+use App\Http\Resources\CustomerTransaction\IndexResource;
 
 class CustomerTransactionController extends ApiController
 {
@@ -39,14 +39,12 @@ class CustomerTransactionController extends ApiController
         return $this->getResource();
     }
 
-    public function isPublicRoute( string $routeName ): Bool {
-        return true;
-    }
 
-    public function mergeRequest(): void {
-        /**
-         * result is limited to this user_id only.
-         */
-        $this->params['user_id'] = Auth::user()->id; 
-    }
+    public function getResource(): IndexResource {
+    return new IndexResource($this->result);
+   }
+
+   public function showResource(): IndexResource {
+    return new IndexResource($this->result);
+   }
 }

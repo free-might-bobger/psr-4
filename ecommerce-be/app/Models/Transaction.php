@@ -28,6 +28,7 @@ class Transaction extends Model implements Auditable
         'lng',
         'delivery_charge',
         'contact_number',
+        'note',
         'reference_id',
         'status_id',
         'total',

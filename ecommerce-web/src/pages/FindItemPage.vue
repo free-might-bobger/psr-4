@@ -268,11 +268,10 @@ const markerDrag = (e: { latLng: google.maps.LatLng }) => {
   lng.value = e.latLng.lng();
 };
 
-const kmRadius = ref(30);
 const nearestItems = ref<Array<ItemInterface>>([]);
 
 const getNearestItems = async () => {
-
+  nearestItems.value =  []
   localGetLocation();
   const result = await get(
     {
@@ -283,7 +282,6 @@ const getNearestItems = async () => {
         orderBy: 'name:asc',
         latitude: lat.value,
         longitude: lng.value,
-        radius: kmRadius.value,
         type: 'collection',
         with: 'store' // Include store details in the response
       },

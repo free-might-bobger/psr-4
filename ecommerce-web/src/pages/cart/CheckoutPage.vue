@@ -30,27 +30,13 @@
               </q-chip>
             </div>
             <div class="search-location-wrapper">
-              <q-input
-                ref="searchInputRef"
-                v-model="searchLocation"
-                outlined
-                dense
-                placeholder="Search for a location ..."
-                class="location-search-input"
-              >
+              <q-input ref="searchInputRef" v-model="searchLocation" outlined dense
+                placeholder="Search for a location ..." class="location-search-input">
                 <template v-slot:prepend>
                   <q-icon name="search" />
                 </template>
                 <template v-slot:append>
-                  <q-btn
-                    v-if="searchLocation"
-                    icon="close"
-                    flat
-                    round
-                    dense
-                    size="sm"
-                    @click="clearSearch"
-                  />
+                  <q-btn v-if="searchLocation" icon="close" flat round dense size="sm" @click="clearSearch" />
                 </template>
               </q-input>
             </div>
@@ -129,6 +115,13 @@
                   <q-icon name="phone" color="grey-7" />
                 </template>
               </q-input>
+              <q-input v-model="note" type="textarea" outlined label="Order Note (Optional)"
+                placeholder="Add any special instructions for your order..." class="q-mb-md" dense
+                input-style="min-height: 4.5em; height: 4.5em;">
+                <template v-slot:prepend>
+                  <q-icon name="notes" color="grey-7" />
+                </template>
+              </q-input>
               <q-btn type="submit" class="complete-order-btn full-width" label="Complete Order" color="primary"
                 unelevated size="lg" icon="check_circle" />
             </q-form>
@@ -174,6 +167,7 @@ const {
 const router = useRouter();
 const useCommon = useCommonStore();
 const { lat, lng, mobile } = storeToRefs(useCommon);
+const note = ref('');
 const showInfoWindow = ref(true);
 const mapRef = ref<HTMLElement | null>(null);
 const currentZoom = ref(15);
@@ -476,6 +470,7 @@ const processCustomerOrder = async () => {
         lat: lat.value,
         lng: lng.value,
         receivers_mobile: mobile.value,
+        note: note.value,
       },
     },
     false

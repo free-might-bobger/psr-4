@@ -8,6 +8,7 @@ use App\Http\Requests\StoreUser\StoreRequest;
 use App\Http\Requests\StoreUser\UpdateRequest;
 use App\Traits\Frontend\FrontendUrlTrait;
 use App\Services\StoreUserService;
+use App\Http\Resources\StoreUser\IndexResource;
 
 class StoreUserController extends ApiController
 {
@@ -39,5 +40,13 @@ class StoreUserController extends ApiController
         }
         return redirect(config('app.frontend_url') . 'error-page?success=0');
     }
+
+    public function getResource(): IndexResource {
+    return new IndexResource($this->result);
+   }
+
+   public function showResource(): IndexResource {
+    return new IndexResource($this->result);
+   }
 
 }

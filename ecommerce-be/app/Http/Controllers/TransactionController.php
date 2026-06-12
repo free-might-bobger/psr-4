@@ -7,6 +7,7 @@ use App\Http\Requests\TransactionRequest;
 use App\Models\Transaction;
 use App\Http\Requests\BaseIndexRequest;
 use App\Http\Requests\Transaction\UpdateRequest;
+use App\Http\Resources\CustomerTransaction\IndexResource;
 
 class TransactionController extends ApiController {
 
@@ -19,9 +20,13 @@ class TransactionController extends ApiController {
         $this->updateRequest    = UpdateRequest::class;
     }
 
-    public function isPublicRoute( string $routeName ): Bool {
-        return true;
-    }
+   public function getResource(): IndexResource {
+    return new IndexResource($this->result);
+   }
+
+   public function showResource(): IndexResource {
+    return new IndexResource($this->result);
+   }
 
     
 }

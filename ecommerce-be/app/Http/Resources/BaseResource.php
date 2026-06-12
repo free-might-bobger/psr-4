@@ -70,16 +70,50 @@ class BaseResource extends JsonResource
 
     private function extractFields(Model $item): array
     {
-        $attributes = $item->only($this->fields);
+        $attributes = [];
         $loadedRelations = $item->getRelations();
+
         foreach ($this->fields as $field) {
-            $camel = \Illuminate\Support\Str::camel($field);
-            if (array_key_exists($camel, $loadedRelations)) {
-                $attributes[$field] = $loadedRelations[$camel];
-            } elseif (array_key_exists($field, $loadedRelations)) {
-                $attributes[$field] = $loadedRelations[$field];
+            // Handle dot notation (e.g., "store.id" => store: {id: ...})
+            if (str_contains($field, '.')) {
+                [$relation, $nestedField] = explode('.', $field, 2);
+                $camelRelation = \Illuminate\Support\Str::camel($relation);
+
+                // Get relation data from loaded relations
+                if (array_key_exists($camelRelation, $loadedRelations)) {
+                    $relationData = $loadedRelations[$camelRelation];
+                } elseif (array_key_exists($relation, $loadedRelations)) {
+                    $relationData = $loadedRelations[$relation];
+                } else {
+                    continue;
+                }
+
+                // Build nested structure
+                if (!isset($attributes[$relation])) {
+                    $attributes[$relation] = [];
+                }
+
+                // Handle collection relations (hasMany) vs single model (hasOne/belongsTo)
+                if ($relationData instanceof Collection) {
+                    $attributes[$relation] = $relationData->map(
+                        fn ($r) => $r->only(explode('.', $nestedField))
+                    )->toArray();
+                } elseif ($relationData instanceof Model) {
+                    $attributes[$relation][$nestedField] = $relationData->{$nestedField} ?? null;
+                }
+            } else {
+                // Plain attribute field
+                $camel = \Illuminate\Support\Str::camel($field);
+                if (array_key_exists($camel, $loadedRelations)) {
+                    $attributes[$field] = $loadedRelations[$camel];
+                } elseif (array_key_exists($field, $loadedRelations)) {
+                    $attributes[$field] = $loadedRelations[$field];
+                } else {
+                    $attributes[$field] = $item->{$field} ?? null;
+                }
             }
         }
+
         return $attributes;
     }
 

@@ -10,7 +10,7 @@ use Illuminate\Support\Arr;
 use App\Repositories\Support\SearchFieldSupport;
 use Illuminate\Support\Facades\File;
 use App\Models\Image;
-
+use App\Constants\Config;
 class ItemRepository extends BaseRepository
 {
     use RoleTrait, SearchFieldSupport;
@@ -70,7 +70,7 @@ class ItemRepository extends BaseRepository
         
         $this->collection = $this->model->get()
         ->filter(function ($item) {
-            return $item->store && $item->store->distance <= 30;
+            return $item->store && $item->store->distance <= Config::MAX_DISTANCE;
         })
         ->sortBy(function ($item) {
             return $item->store->distance ?? PHP_INT_MAX;
