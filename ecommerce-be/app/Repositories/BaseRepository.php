@@ -4,7 +4,7 @@ namespace App\Repositories;
 
 use Illuminate\Database\Eloquent\Builder;
 use App\Repositories\Support\SearchFieldSupport;
-use App\Traits\Obfuscate\OptimusRequiredToModel;
+use App\Traits\Obfuscate\OptimusId;
 use Illuminate\Support\Arr;
 use App\Traits\Support\BaseSupportRepository;
 use App\Models\Image;
@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
 class BaseRepository implements BaseInterface
 {
-    use RoleTrait, SearchFieldSupport, OptimusRequiredToModel, BaseSupportRepository;
+    use RoleTrait, SearchFieldSupport, OptimusId, BaseSupportRepository;
 
     protected Model|Builder|null $model;
     protected array $params;

@@ -5,11 +5,11 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
-use App\Traits\Obfuscate\OptimusRequiredToModel;
+use App\Traits\Obfuscate\OptimusId;
 
 class StoreMenuAccessMiddleware
 {
-    use OptimusRequiredToModel;
+    use OptimusId;
     /**
      * Handle an incoming request.
      *

@@ -4,12 +4,12 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
-use App\Traits\Obfuscate\OptimusRequiredToModel;
+use App\Traits\Obfuscate\OptimusId;
 use App\Model\User;
 
 class UserFormRequest extends FormRequest
 {
-    use OptimusRequiredToModel;
+    use OptimusId;
     /**
      * Determine if the user is authorized to make this request.
      *

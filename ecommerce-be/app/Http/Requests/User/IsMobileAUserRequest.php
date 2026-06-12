@@ -2,14 +2,14 @@
 
 namespace App\Http\Requests\User;
 
-use App\Traits\Obfuscate\OptimusRequiredToModel;
+use App\Traits\Obfuscate\OptimusId;
 use Illuminate\Foundation\Http\FormRequest;
 use App\Rules\RequestCountRule;
 use Illuminate\Validation\Rule;
 use Illuminate\Database\Query\Builder;
 class IsMobileAUserRequest extends FormRequest
 {
-    use OptimusRequiredToModel;
+    use OptimusId;
     /**
      * Determine if the user is authorized to make this request.
      *

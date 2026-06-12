@@ -5,12 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use App\Traits\Obfuscate\OptimusRequiredToModel;
+use App\Traits\Obfuscate\OptimusId;
 use Carbon\Carbon;
 
 class Franchisee extends Model
 {
-    use HasFactory, SoftDeletes, OptimusRequiredToModel;
+    use HasFactory, SoftDeletes, OptimusId;
 
     protected $table = 'franchisees';
     protected $fillable = [

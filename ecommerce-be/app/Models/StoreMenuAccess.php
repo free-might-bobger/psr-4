@@ -6,11 +6,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use OwenIt\Auditing\Contracts\Auditable;
-use App\Traits\Obfuscate\OptimusRequiredToModel;
+use App\Traits\Obfuscate\OptimusId;
 
 class StoreMenuAccess extends Model implements Auditable
  {
-    use HasFactory, SoftDeletes, OptimusRequiredToModel;
+    use HasFactory, SoftDeletes, OptimusId;
     use \OwenIt\Auditing\Auditable;
 
     protected $table = 'store_menu_access';

@@ -4,13 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Traits\Obfuscate\OptimusRequiredToModel;
+use App\Traits\Obfuscate\OptimusId;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use OwenIt\Auditing\Contracts\Auditable;
 
 class Order extends Model implements Auditable
 {
-    use HasFactory, OptimusRequiredToModel, SoftDeletes;
+    use HasFactory, OptimusId, SoftDeletes;
     use \OwenIt\Auditing\Auditable;
 
     protected $table = 'orders';
@@ -31,7 +31,7 @@ class Order extends Model implements Auditable
 
     protected $appends = ['optimus_item','subtotal', 'format_subtotal', 'format_price', 'optimus_id'];
 
-    public function getOptimusRequiredToModeltoreAttribute(){
+    public function getOptimusStoreAttribute(){
         return $this->optimus()->encode($this->store_id);
     }
 

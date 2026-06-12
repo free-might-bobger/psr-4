@@ -9,12 +9,12 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\StoreMenuAccess;
 use App\Traits\RoleTrait;
 use App\Enum\HttpAccessRight;
-use App\Traits\Obfuscate\OptimusRequiredToModel;
+use App\Traits\Obfuscate\OptimusId;
 use App\Enum\StoreMenu;
 
 
 class ItemMiddleware {
-    use RoleTrait, OptimusRequiredToModel;
+    use RoleTrait, OptimusId;
     /**
     * Handle an incoming request.
     *

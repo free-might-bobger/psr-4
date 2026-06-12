@@ -1,10 +1,10 @@
 <?php 
 
 namespace App\Repositories\Support;
-use App\Traits\Obfuscate\OptimusRequiredToModel;
+use App\Traits\Obfuscate\OptimusId;
 
 trait SearchFieldSupport {
-    use OptimusRequiredToModel;
+    use OptimusId;
     
     public function id(int $id): void {
         $this->model = $this->model->where('id', $this->optimus()->decode($id));

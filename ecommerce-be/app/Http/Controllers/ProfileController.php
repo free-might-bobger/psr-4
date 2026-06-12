@@ -17,15 +17,4 @@ class ProfileController extends ApiController
         $this->updateRequest    = ProfileRequest::class;
     }
 
-    public function isPublicRoute( string $routeName ): Bool {
-        return true;
-    }
-
-    public function mergeRequest(): void {
-        /**
-         * result is limited to this user_id only.
-         */
-        $this->params['user_id'] = \Auth::User()->id; 
-    }
-
 }

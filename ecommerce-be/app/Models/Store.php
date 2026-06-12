@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Traits\Slug;
-use App\Traits\Obfuscate\OptimusRequiredToModel;
+use App\Traits\Obfuscate\OptimusId;
 use OwenIt\Auditing\Contracts\Auditable;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Builder;
@@ -14,7 +14,7 @@ use App\Traits\Google\Maps;
 
 class Store extends Model implements Auditable
 {
-    use HasFactory, Slug, OptimusRequiredToModel, SoftDeletes, Maps;
+    use HasFactory, Slug, OptimusId, SoftDeletes, Maps;
     use \OwenIt\Auditing\Auditable;
 
     protected $table = 'stores';

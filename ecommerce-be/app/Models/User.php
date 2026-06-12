@@ -8,12 +8,12 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Passport\HasApiTokens;
-use App\Traits\Obfuscate\OptimusRequiredToModel;
+use App\Traits\Obfuscate\OptimusId;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable, OptimusRequiredToModel, SoftDeletes;
+    use HasApiTokens, HasFactory, Notifiable, OptimusId, SoftDeletes;
 
     /**
      * The attributes that are mass assignable.

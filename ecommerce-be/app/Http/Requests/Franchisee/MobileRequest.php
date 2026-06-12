@@ -4,10 +4,10 @@ namespace App\Http\Requests\Franchisee;
 
 use App\Traits\Requests\RequestValidation;
 use App\Http\Requests\BaseRequest;
-use App\Traits\Obfuscate\OptimusRequiredToModel;
+use App\Traits\Obfuscate\OptimusId;
 class MobileRequest extends BaseRequest
 {
-    use RequestValidation, OptimusRequiredToModel;
+    use RequestValidation, OptimusId;
 
     public function rules()
     {

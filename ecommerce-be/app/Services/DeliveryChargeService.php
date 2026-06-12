@@ -2,14 +2,14 @@
 
 namespace App\Services;
 use App\Models\Store;
-use App\Traits\Obfuscate\OptimusRequiredToModel;
+use App\Traits\Obfuscate\OptimusId;
 use App\Traits\Google\Maps;
 use App\Http\Requests\BaseIndexRequest;
 use Illuminate\Support\Arr;
 
 class DeliveryChargeService {
 
-    use OptimusRequiredToModel;
+    use OptimusId;
 
     public function calculateTotalDeliveryCharge(float $baseAmount, string $storeIds): float {
         $totalDeliveryCharge = 0;

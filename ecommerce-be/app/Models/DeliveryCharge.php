@@ -5,12 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Services\DeliveryChargeService;
-use App\Traits\Obfuscate\OptimusRequiredToModel;
+use App\Traits\Obfuscate\OptimusId;
 use Config;
 
 class DeliveryCharge extends Model
  {
-    use HasFactory, OptimusRequiredToModel;
+    use HasFactory, OptimusId;
 
     protected $table = 'delivery_charges';
     protected $fillable = [

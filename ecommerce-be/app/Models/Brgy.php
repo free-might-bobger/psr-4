@@ -4,11 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Traits\Obfuscate\OptimusRequiredToModel;
+use App\Traits\Obfuscate\OptimusId;
 use App\Traits\Models\LabelValue;
 class Brgy extends Model
 {
-    use HasFactory, OptimusRequiredToModel, LabelValue;
+    use HasFactory, OptimusId, LabelValue;
 
     protected $table = 'refbrgy';
     protected $appends = ['optimus_id', 'label', 'value'];

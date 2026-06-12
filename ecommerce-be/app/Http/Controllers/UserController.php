@@ -5,14 +5,14 @@ namespace App\Http\Controllers;
 use App\Repositories\User\UserRepository;
 use App\Http\Requests\BaseIndexRequest;
 use App\Models\User;
-use App\Traits\Obfuscate\OptimusRequiredToModel;
+use App\Traits\Obfuscate\OptimusId;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Hash;
 
 class UserController extends ApiController
 {
-    use OptimusRequiredToModel;
+    use OptimusId;
     public function __construct(UserRepository $repository) {
         $this->model =  User::class;
         $this->repository = $repository;

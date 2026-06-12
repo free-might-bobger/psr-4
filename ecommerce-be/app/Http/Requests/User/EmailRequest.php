@@ -3,10 +3,10 @@
 namespace App\Http\Requests\User;
 
 use Illuminate\Foundation\Http\FormRequest;
-use App\Traits\Obfuscate\OptimusRequiredToModel;
+use App\Traits\Obfuscate\OptimusId;
 class EmailRequest extends FormRequest
 {
-    use OptimusRequiredToModel;
+    use OptimusId;
     /**
      * Determine if the user is authorized to make this request.
      *

@@ -6,12 +6,12 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Repositories\DataAccessObjectContract;
-use App\Traits\Obfuscate\OptimusRequiredToModel;
+use App\Traits\Obfuscate\OptimusId;
 use Carbon\Carbon;
 
 class Invoice extends Model
 {
-    use HasFactory, SoftDeletes, OptimusRequiredToModel;
+    use HasFactory, SoftDeletes, OptimusId;
     
     protected $table = 'invoices';
     protected $fillable = [

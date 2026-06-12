@@ -6,11 +6,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Traits\Slug;
 use App\Traits\Models\CreatedAttribute;
-use App\Traits\Obfuscate\OptimusRequiredToModel;
+use App\Traits\Obfuscate\OptimusId;
 
 class Role extends Model
 {
-    use HasFactory, Slug, CreatedAttribute, OptimusRequiredToModel;
+    use HasFactory, Slug, CreatedAttribute, OptimusId;
 
     protected $table = 'roles';
     protected $fillable = ['name'];

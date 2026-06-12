@@ -3,11 +3,11 @@
 namespace App\Services;
 
 use App\Models\Item;
-use App\Traits\Obfuscate\OptimusRequiredToModel;
+use App\Traits\Obfuscate\OptimusId;
 
 class PublicStoreItemService {
 
-    use OptimusRequiredToModel;
+    use OptimusId;
 
     public function getPublicStoreItem(int $id) : Item
     {

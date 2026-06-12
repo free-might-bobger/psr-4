@@ -4,12 +4,12 @@ namespace App\Http\Requests\Invoice;
 
 use App\Traits\Requests\RequestValidation;
 use App\Http\Requests\BaseRequest;
-use App\Traits\Obfuscate\OptimusRequiredToModel;
+use App\Traits\Obfuscate\OptimusId;
 use App\Repositories\StoreUserRepository;
 
 class IndexRequest extends BaseRequest
 {
-    use RequestValidation, OptimusRequiredToModel;
+    use RequestValidation, OptimusId;
 
      /**
      * Get the validation rules that apply to the request.

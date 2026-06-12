@@ -4,13 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Traits\Obfuscate\OptimusRequiredToModel;
+use App\Traits\Obfuscate\OptimusId;
 use App\Models\SellingPrice;
 use OwenIt\Auditing\Contracts\Auditable;
 
 class ItemPrice extends Model implements Auditable
 {
-    use HasFactory, OptimusRequiredToModel;
+    use HasFactory, OptimusId;
     use \OwenIt\Auditing\Auditable;
     /**
      * price = base_price
