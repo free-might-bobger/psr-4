@@ -23,9 +23,7 @@ class ProfileRequest extends BaseRequest
     {
         return [
             'name'      => 'sometimes',
-            'mobile'    => 'sometimes',
-            'latitude'  => 'sometimes',
-            'longitude' => 'sometimes'
+            'mobile'    => 'sometimes'
         ];
     }
 }

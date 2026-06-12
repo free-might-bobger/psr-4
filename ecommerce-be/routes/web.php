@@ -80,10 +80,8 @@ Route::group( [ 'middleware' => 'auth:api' ], function () {
   Route::resource('statuses', StatusController::class);
   /* Route get */
   Route::get('profile', [ProfileController::class, 'show']);
+  Route::post('profile-update', [ProfileController::class, 'profileUpdate']);
   Route::delete('role-user', [RoleUserController::class, 'destroyByPair'])->middleware('superAdminMiddleware');
-  Route::patch('profile/ {
-  id}
-  ', [ProfileController::class, 'update'])->middleware('superAdminMiddleware');
   Route::post('role-user', [RoleUserController::class, 'store'])->middleware('superAdminMiddleware');
   Route::post('logout', [RegisterController::class, 'logout']);
 

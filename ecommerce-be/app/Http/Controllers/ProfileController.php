@@ -6,15 +6,23 @@ use App\Http\Requests\ProfileRequest;
 use App\Repositories\ProfileRepository;
 use App\Http\Requests\BaseIndexRequest;
 use App\Models\User;
+use App\Http\Resources\Profile\IndexResource;
 
-class ProfileController extends ApiController
+class ProfileController
 {
     public function __construct( ProfileRepository $repository ) {
-        $this->model            = User::class;
         $this->repository       = $repository;
-        $this->indexRequest     = BaseIndexRequest::class;
         $this->storeRequest     = ProfileRequest::class;
-        $this->updateRequest    = ProfileRequest::class;
+    }
+
+    public function profileUpdate(){
+        $request = app($this->storeRequest);
+        $this->result = $this->repository->profileUpdate([
+            'name' => $request->name,
+            'mobile' => $request->mobile,
+        ]);
+
+        return new IndexResource($this->result);
     }
 
 }

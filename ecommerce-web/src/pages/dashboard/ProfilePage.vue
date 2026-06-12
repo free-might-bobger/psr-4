@@ -72,7 +72,7 @@
 import { ref } from 'vue';
 import { useUserStore } from 'src/stores/user';
 import { storeToRefs } from 'pinia';
-import { update } from 'src/boot/axios-call';
+import { create } from 'src/boot/axios-call';
 import { useRoute } from 'vue-router';
 import { useQuasar } from 'quasar';
 import { isValidMobileNumber } from 'src/boot/validators';
@@ -89,14 +89,13 @@ const onSubmit = async () => {
   myForm.value?.validate().then(async (success: any) => {
     if (success) {
       try {
-      await update({
-          entity: 'profile',
-          optimus_id: profile.value.optimus_id,
+      await create({
+          entity: 'profile-update',
           data: {
             name: profile.value.name,
             mobile: profile.value.mobile
           }
-        });
+        }, false);
         $q.notify({
           message: 'Profile updated successfully!',
           type: 'positive',
