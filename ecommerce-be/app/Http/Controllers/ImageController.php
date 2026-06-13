@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Repositories\ImageRepository;
 use App\Models\Image;
-class ImageController extends ApiController
+class ImageController
 {
     public function __construct(ImageRepository $repository)
     {

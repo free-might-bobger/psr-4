@@ -2,14 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Resources\BaseResource;
+use App\Http\Resources\SharedItemAccess\IndexResource;
 use App\Repositories\ItemRepository;
 use App\Http\Requests\Item\StoreRequest;
 use App\Http\Requests\BaseIndexRequest;
 use Illuminate\Http\Request;
-use App\Http\Resources\Item\IndexResource;
-use App\Http\Resources\Item\ShowResource;
-class ItemController extends ApiController
+
+class SharedItemAccessController extends ApiController
 {
 
     public function __construct(ItemRepository $repository)
@@ -20,17 +19,13 @@ class ItemController extends ApiController
         $this->updateRequest = Request::class;
     }
 
-    protected function itemUpdate(int $id) : BaseResource {
-        $params = app( $this->storeRequest )->all();
-        $this->result = $this->repository->itemUpdateWithImage( $id, $params );
-        return $this->getResource();
-    }
-
-    public function getResource(){
+    public function getResource(): IndexResource{
         return new IndexResource($this->result);
     }
 
-    public function showResource(){
-        return new ShowResource($this->result);
+    public function showResource(): IndexResource {
+        return new IndexResource($this->result);
     }
+
+    
 }

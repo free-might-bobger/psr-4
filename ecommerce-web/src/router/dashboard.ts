@@ -81,7 +81,7 @@ export default [
             { path: ':id/users', component: () => import('src/pages/dashboard/shared-store-access/users/IndexPage.vue') },
             { path: ':id/users/invite-users', component: () => import('src/pages/dashboard/shared-store-access/users/InvitePage.vue') },
             { path: ':id/items', component: () => import('src/pages/dashboard/shared-store-access/items/IndexPage.vue') },
-            { path: ':id/items/:itemId', component: () => import('src/pages/dashboard/store-access/items/EditPage.vue') },
+            { path: ':id/items/:itemId', component: () => import('src/pages/dashboard/shared-store-access/items/EditPage.vue') },
             { path: ':id/items/:itemId/item-prices', component: () => import('src/pages/dashboard/shared-store-access/items/ItemPrice.vue') },
             { path: ':id/transactions', component: () => import('src/pages/dashboard/shared-store-access/transactions/IndexPage.vue') },
             { path: ':id/transactions/:transactionId', component: () => import('src/pages/dashboard/shared-store-access/transactions/ShowPage.vue') },

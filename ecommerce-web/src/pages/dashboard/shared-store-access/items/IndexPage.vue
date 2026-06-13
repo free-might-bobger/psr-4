@@ -4,15 +4,7 @@
     <div class="page-header q-mb-md">
       <div class="header-content">
         <div class="header-left">
-          <q-btn
-            flat
-            round
-            dense
-            color="grey-8"
-            icon="arrow_back"
-            @click="router.back()"
-            class="back-btn"
-          >
+          <q-btn flat round dense color="grey-8" icon="arrow_back" @click="router.back()" class="back-btn">
             <q-tooltip>Back to Store</q-tooltip>
           </q-btn>
           <div class="header-title-section">
@@ -24,41 +16,20 @@
           </div>
         </div>
         <div class="header-actions">
-          <q-input
-            v-model="search"
-            placeholder="Search items..."
-            outlined
-            dense
-            clearable
-            debounce="300"
-            class="search-input"
-          >
+          <q-input v-model="search" placeholder="Search items..." outlined dense clearable debounce="1000"
+            class="search-input">
             <template v-slot:prepend>
               <q-icon name="search" />
             </template>
           </q-input>
-          <q-select
-            outlined
-            v-model="selectedCategory"
-            :options="categories"
-            label="Category"
-            hide-bottom-space
-            use-input
-            dense
-            clearable
-            class="category-select"
-            @update:model-value="handleCategoryChange"
-          >
+          <q-select outlined v-model="selectedCategory" :options="categories" label="Category" hide-bottom-space
+            use-input dense clearable class="category-select" @update:model-value="handleCategoryChange">
             <template v-slot:prepend>
               <q-icon name="category" />
             </template>
             <template v-slot:append>
-              <q-icon
-                v-if="selectedCategory"
-                name="close"
-                @click.stop.prevent="handleCategoryChange('')"
-                class="cursor-pointer"
-              />
+              <q-icon v-if="selectedCategory" name="close" @click.stop.prevent="handleCategoryChange('')"
+                class="cursor-pointer" />
             </template>
           </q-select>
         </div>
@@ -72,17 +43,8 @@
         <div class="text-h5 q-mt-md text-grey-6">No items found</div>
         <div class="text-body2 text-grey-5 q-mt-sm">Try adjusting your search criteria</div>
       </div>
-      <q-table
-        v-else
-        flat
-        bordered
-        :rows="typedResult"
-        :columns="columns"
-        row-key="optimus_id"
-        class="items-table"
-        :rows-per-page-options="[0]"
-        hide-pagination
-      >
+      <q-table v-else flat bordered :rows="typedResult" :columns="columns" row-key="optimus_id" class="items-table"
+        :rows-per-page-options="[0]" hide-pagination>
         <template v-slot:body-cell-name="props">
           <q-td :props="props">
             <router-link :to="`${$route.path}/${props.row.optimus_id}`" class="item-name-link">
@@ -94,36 +56,18 @@
         <template v-slot:body-cell-actions="props">
           <q-td :props="props">
             <div class="action-buttons">
-              <q-btn
-                unelevated
-                dense
-                color="secondary"
-                icon="attach_money"
+              <q-btn unelevated dense color="secondary" icon="attach_money"
                 :to="`${$route.path}/${props.row.optimus_id}/item-prices?filters=store_id:${store.optimus_id}`"
-                size="md"
-                class="q-mr-xs"
-              >
+                size="md" class="q-mr-xs">
                 <q-tooltip>Item Prices</q-tooltip>
               </q-btn>
-              <q-btn
-                unelevated
-                dense
-                color="primary"
-                icon="edit_note"
-                :to="`${$route.path}/${props.row.optimus_id}?filters=store_id:${store.optimus_id}`"
-                size="md"
-                class="q-mr-xs"
-              >
+              <q-btn unelevated dense color="primary" icon="edit_note"
+                :to="`${$route.path}/${props.row.optimus_id}?filters=store_id:${store.optimus_id}`" size="md"
+                class="q-mr-xs">
                 <q-tooltip>Edit Item</q-tooltip>
               </q-btn>
-              <q-btn
-                unelevated
-                dense
-                color="negative"
-                icon="delete_forever"
-                @click="handleDeleteItem(props.row)"
-                size="md"
-              >
+              <q-btn unelevated dense color="negative" icon="delete_forever" @click="handleDeleteItem(props.row)"
+                size="md">
                 <q-tooltip>Delete Item</q-tooltip>
               </q-btn>
             </div>
@@ -136,45 +80,15 @@
               Showing {{ pagination.from }} - {{ pagination.to }} of {{ pagination.rowsNumber }} items
             </div>
             <div class="pagination-controls">
-              <q-btn
-                v-if="pagination.lastPage > 2"
-                flat
-                round
-                dense
-                icon="first_page"
-                color="grey-8"
-                :disable="pagination.page === 1"
-                @click="goToFirstPage"
-              />
-              <q-btn
-                flat
-                round
-                dense
-                icon="chevron_left"
-                color="grey-8"
-                :disable="pagination.page === 1"
-                @click="goToPreviousPage"
-              />
+              <q-btn v-if="pagination.lastPage > 2" flat round dense icon="first_page" color="grey-8"
+                :disable="pagination.page === 1" @click="goToFirstPage" />
+              <q-btn flat round dense icon="chevron_left" color="grey-8" :disable="pagination.page === 1"
+                @click="goToPreviousPage" />
               <span class="page-number">{{ pagination.page }} / {{ pagination.lastPage }}</span>
-              <q-btn
-                flat
-                round
-                dense
-                icon="chevron_right"
-                color="grey-8"
-                :disable="pagination.page === pagination.lastPage"
-                @click="goToNextPage"
-              />
-              <q-btn
-                v-if="pagination.lastPage > 2"
-                flat
-                round
-                dense
-                icon="last_page"
-                color="grey-8"
-                :disable="pagination.page === pagination.lastPage"
-                @click="goToLastPage"
-              />
+              <q-btn flat round dense icon="chevron_right" color="grey-8"
+                :disable="pagination.page === pagination.lastPage" @click="goToNextPage" />
+              <q-btn v-if="pagination.lastPage > 2" flat round dense icon="last_page" color="grey-8"
+                :disable="pagination.page === pagination.lastPage" @click="goToLastPage" />
             </div>
           </div>
         </template>
@@ -188,68 +102,33 @@
         <div class="text-h6 q-mt-md text-grey-6">No items found</div>
       </div>
       <div v-else class="items-cards">
-        <q-card
-          v-for="item in typedResult"
-          :key="item.optimus_id"
-          flat
-          bordered
-          class="item-card q-mb-md"
-        >
+        <q-card v-for="item in typedResult" :key="item.optimus_id" flat bordered class="item-card q-mb-md">
           <q-card-section>
             <div class="item-card-header">
               <div class="item-card-title">
                 <q-icon name="inventory_2" color="primary" size="24px" class="q-mr-sm" />
-                <router-link
-                  :to="`${$route.path}/${item.optimus_id}`"
-                  class="item-name-link"
-                >
+                <router-link :to="`${$route.path}/${item.optimus_id}`" class="item-name-link">
                   {{ item.name }}
                 </router-link>
               </div>
             </div>
             <div class="item-card-actions q-mt-md">
-              <q-btn
-                unelevated
-                dense
-                color="primary"
-                icon="attach_money"
-                label="Prices"
+              <q-btn unelevated dense color="primary" icon="attach_money" label="Prices"
                 :to="`${$route.path}/${item.optimus_id}/item-prices?filters=store_id:${store.optimus_id}`"
-                class="action-btn-mobile action-btn-prices-mobile"
-              />
-              <q-btn
-                unelevated
-                dense
-                color="primary"
-                icon="edit_note"
-                label="Edit"
+                class="action-btn-mobile action-btn-prices-mobile" />
+              <q-btn unelevated dense color="primary" icon="edit_note" label="Edit"
                 :to="`${$route.path}/${item.optimus_id}?filters=store_id:${store.optimus_id}`"
-                class="action-btn-mobile action-btn-edit-mobile"
-              />
-              <q-btn
-                unelevated
-                dense
-                color="negative"
-                icon="delete_forever"
-                label="Delete"
-                @click="handleDeleteItem(item)"
-                class="action-btn-mobile action-btn-delete-mobile"
-              />
+                class="action-btn-mobile action-btn-edit-mobile" />
+              <q-btn unelevated dense color="negative" icon="delete_forever" label="Delete"
+                @click="handleDeleteItem(item)" class="action-btn-mobile action-btn-delete-mobile" />
             </div>
           </q-card-section>
         </q-card>
       </div>
       <!-- Mobile Pagination -->
       <div v-if="typedResult.length > 0" class="mobile-pagination q-mt-md">
-        <q-pagination
-          v-model="pagination.page"
-          :max="pagination.lastPage"
-          :max-pages="5"
-          direction-links
-          boundary-links
-          color="primary"
-          @update:model-value="handlePageChange"
-        />
+        <q-pagination v-model="pagination.page" :max="pagination.lastPage" :max-pages="5" direction-links boundary-links
+          color="primary" @update:model-value="handlePageChange" />
       </div>
     </div>
   </div>
@@ -259,10 +138,11 @@
 import { useItemStore } from 'src/stores/item';
 import { ref, onBeforeMount, watch, onMounted } from 'vue';
 import { show, get, onRequest, firstPage, previousPage, nextPage, lastPage } from 'src/boot/axios-call';
-import { useRoute, useRouter  } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { storeToRefs } from 'pinia';
 import { useCommonStore } from 'src/stores/common';
 import { onDeleteEntity } from 'boot/services';
+import type { StoreInterface, CategoryInterface, ResultInterface } from 'src/boot/interfaces';
 
 const useCommon = useCommonStore();
 const { pagination, result, entityQuery } = storeToRefs(useCommon);
@@ -270,10 +150,9 @@ const useItem = useItemStore();
 const { searchString, selectedCategory } = storeToRefs(useItem);
 const route = useRoute();
 const router = useRouter();
-const store = ref<any>({
+const store = ref<Partial<StoreInterface>>({
   optimus_id: '',
   name: '',
-  desc: '',
   latitude: 0,
   longitude: 0,
 });
@@ -293,9 +172,9 @@ onMounted(() => {
   entityQuery.value.query.page = 1;
 });
 
-const categories = ref<any[]>([]);
+const categories = ref<CategoryInterface[]>([]);
 const getCategories = async () => {
-  const cat: any = await get(
+  const cat = await get<ResultInterface>(
     {
       entity: 'categories',
       query: {
@@ -318,8 +197,9 @@ const requestItems = async () => {
   }
 
   if (selectedCategory.value) {
-    const categoryId = typeof selectedCategory.value === 'object' && 'id' in selectedCategory.value
-      ? (selectedCategory.value as any).id
+    const categoryValue = selectedCategory.value as unknown as CategoryInterface;
+    const categoryId = typeof categoryValue === 'object' && 'id' in categoryValue
+      ? categoryValue.id
       : selectedCategory.value;
     if (categoryId) {
       filters += ',category_id:' + categoryId;
@@ -328,7 +208,7 @@ const requestItems = async () => {
 
   entityQuery.value = {
     message: 'Getting items...',
-    entity: 'items',
+    entity: 'shared-item-access',
     query: {
       filters: filters,
       page: pagination.value.page,
@@ -392,8 +272,8 @@ const goToNextPage = () => {
 const goToLastPage = () => {
   lastPage(entityQuery.value, pagination.value);
 };
-const handleCategoryChange = (value: any) => {
-  selectedCategory.value = value;
+const handleCategoryChange = (value: CategoryInterface | string | null) => {
+  selectedCategory.value = value as string;
   requestItems();
 };
 </script>

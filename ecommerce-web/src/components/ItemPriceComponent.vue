@@ -293,7 +293,7 @@ const createItemPrice = async () => {
           item_prices: itemPrices,
         },
       },
-      true
+      false
     );
     Notify.create({
       position: 'bottom',
