@@ -76,21 +76,8 @@ abstract class ApiController extends Controller {
         $this->result = $this->repository->where( 'id', $id )->delete();
     }
 
-    /**
-     * Check if the route is public
-     * @param string $routeName
-     * @return Bool
-     */
-    public function isPublicRoute(string $routeName): Bool
-    {
-        $publicRoute = [
-            'index', 'view'
-        ];
-        if (in_array($routeName, $publicRoute)) {
-            return true;
-        }
-
-        return false;
+    public function restore($id): void {
+        $this->result = $this->repository->where('id', $id)->restore();
     }
 
   abstract public function getResource();

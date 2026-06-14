@@ -33,6 +33,9 @@ class StoreRepository extends BaseRepository implements BaseInterface
         if(isset($this->params['show_mobile'])){
             $this->showMobile();
         }
+         if(isset($this->params['deleted'])){
+            $this->includeDeleted();
+        }
         $this->filterQuery($this->params);
         return $this->model->get();
     }
@@ -47,4 +50,5 @@ class StoreRepository extends BaseRepository implements BaseInterface
         $this->model = $this->model->makeVisible(['mobile']);
         return $this;
     }
+    
 }

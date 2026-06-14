@@ -3,7 +3,7 @@
 namespace App\Repositories\Support;
 use App\Traits\Obfuscate\OptimusId;
 
-trait SearchFieldSupport {
+trait ColumnValueCriteria {
     use OptimusId;
     
     public function id(int $id): void {
@@ -81,6 +81,12 @@ trait SearchFieldSupport {
      */
     public function reference_id(string $value): void {
         $this->model = $this->model->where('reference_id', 'LIKE', '%'. $value . '%');
+    }
+
+    public function deleted(int|null $value):void{
+        if($value){
+            $this->model = $this->model->withTrashed();
+        }
     }
 
 }

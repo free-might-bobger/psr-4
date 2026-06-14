@@ -8,7 +8,7 @@
           <h2 class="page-title">Shared Store Access</h2>
         </div>
         <div class="header-actions">
-          <q-input v-model="search" placeholder="Search stores..." outlined dense clearable debounce="300"
+          <q-input v-model="search" placeholder="Search stores..." outlined dense clearable debounce="1000"
             class="search-input">
             <template v-slot:prepend>
               <q-icon name="search" />
@@ -30,7 +30,7 @@
         <template v-slot:body-cell-name="props">
           <q-td :props="props">
             <router-link :to="`${$route.path}/${props.row.optimus_id}`" class="store-name-link">
-              {{ props.row.store?.name}}
+              {{ props.row.store?.name }}
             </router-link>
           </q-td>
         </template>
@@ -48,7 +48,7 @@
                 :to="`${$route.path}/${props.row.store?.optimus_id}/items`" size="md" class="q-mr-xs">
                 <q-tooltip>Item Management</q-tooltip>
               </q-btn>
-             
+
             </div>
           </q-td>
         </template>

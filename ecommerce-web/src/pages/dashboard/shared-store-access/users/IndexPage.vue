@@ -10,7 +10,7 @@
                 <div class="header-actions">
                     <q-btn unelevated color="primary" icon="add" label="Invite User" :to="`${$route.path}/invite-users`"
                         class="q-mr-md" />
-                    <q-input v-model="search" placeholder="Search email..." outlined dense clearable debounce="300"
+                    <q-input v-model="search" placeholder="Search email..." outlined dense clearable debounce="1000"
                         class="search-input">
                         <template v-slot:prepend>
                             <q-icon name="search" />
@@ -46,8 +46,8 @@
                 <template v-slot:body-cell-actions="props">
                     <q-td :props="props">
                         <div class="action-buttons">
-                             <q-btn unelevated dense color="primary" icon="list"
-                                :to="`${$route.path}/access`" size="md" v-if="props.row.verified">
+                            <q-btn unelevated dense color="primary" icon="list" :to="`${$route.path}/access`" size="md"
+                                v-if="props.row.verified">
                                 <q-tooltip>Access Management</q-tooltip>
                             </q-btn>
                             <q-btn unelevated dense color="negative" icon="delete_forever"
@@ -98,7 +98,8 @@
                         </div>
                         <div class="store-card-actions q-mt-md">
                             <q-btn unelevated dense color="negative" icon="delete_forever" label="Delete"
-                                @click="handleDeleteUser(storeUser)" class="action-btn-mobile action-btn-delete-mobile" />
+                                @click="handleDeleteUser(storeUser)"
+                                class="action-btn-mobile action-btn-delete-mobile" />
                         </div>
                     </q-card-section>
                 </q-card>

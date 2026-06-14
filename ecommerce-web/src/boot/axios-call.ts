@@ -6,7 +6,7 @@ import { storeToRefs } from 'pinia';
 import { queryString, removeEmptyValue } from './common';
 import { useCommonStore } from 'src/stores/common';
 import { AxiosResponse } from 'axios';
-import { GetParams, CreateData, LoginInterface, ShowInterface, DeleteInterface, UpdateInterface} from 'boot/interfaces';
+import { GetParams, CreateData, LoginInterface, ShowInterface, DeleteInterface, UpdateInterface, RestoreInterface} from 'boot/interfaces';
 
 function userRefs() {
   const useUser = useUserStore();
@@ -341,6 +341,30 @@ export async function deleteEntity(params: DeleteInterface) {
         position: 'bottom',
         type: 'positive',
         message: 'Successfully deleted.',
+      });
+      return true;
+    })
+    .catch((err) => {
+      Loading.hide();
+      if (err.response.status == 403) {
+        Notify.create({
+          position: 'bottom',
+          type: 'negative',
+          message: err.response.data.message,
+        });
+      }
+    });
+}
+
+export async function restore(params: RestoreInterface) {
+  Loading.show();
+  return await axios
+    .post(`/${params.entity}/${params.optimus_id}/restore`)
+    .then(() => {
+      Notify.create({
+        position: 'bottom',
+        type: 'positive',
+        message: 'Successfully restored.',
       });
       return true;
     })

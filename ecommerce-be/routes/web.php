@@ -44,7 +44,7 @@ Route::resource('public_items', PublicItemController::class);
 Route::resource('categories', CategoryController::class);
 Route::resource('interconnected_cities', InterConnectedCityController::class);
 Route::resource('receive_methods', ReceiveMethodController::class)->only(['index']);
-Route::resource('all_stores', StoreController::class);
+
 Route::resource('delivery_charges', DeliveryChargeController::class)->only(['index']);
 Route::resource('public_store_items', PublicStoreItemController::class)->only(['index', 'show']);
 
@@ -73,6 +73,8 @@ Route::group(['middleware' => 'auth:api', 'itemMiddleware'], function () {
 
 Route::group( [ 'middleware' => 'auth:api' ], function () {
   /* Route resouce */
+  Route::resource('all_stores', StoreController::class);
+  Route::post('/all_stores/{id}/restore', [StoreController::class, 'restore']);
   Route::resource('deliveries', DeliveryController::class)->middleware('deliveryMiddleware');
   Route::resource('all-transactions', TransactionController::class)->middleware(['superAdminMiddleware', 'allTransactionsMiddleware']);
   Route::resource('my-transactions', CustomerTransactionController::class)->middleware(['customerMiddleware', 'myTransactionsMiddleware']);

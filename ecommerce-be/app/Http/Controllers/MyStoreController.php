@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\Store\StoreRequest;
 use App\Repositories\MyStoreRepository;
 use App\Http\Requests\BaseIndexRequest;
-use App\Http\Resources\BaseResource;
+use App\Http\Resources\MyStore\IndexResource;
 use App\Models\Store;
 class MyStoreController extends ApiController
 {
@@ -17,4 +17,11 @@ class MyStoreController extends ApiController
         $this->updateRequest    = BaseIndexRequest::class;
     }
     
+    public function getResource(){
+        return new IndexResource($this->result);
+    }
+
+    public function showResource(){
+        return new IndexResource($this->result);
+    }
 }

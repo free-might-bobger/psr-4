@@ -20,6 +20,7 @@ export interface GetQuery {
   whereHas?: string
   listingApi?: string,
   show_mobile?: number
+  deleted?: number
 }
 export interface GetParams {
   message?: string
@@ -165,6 +166,12 @@ export interface DeleteInterface {
   query?: GetQuery
 }
 
+export interface RestoreInterface {
+  label: string
+  entity: string
+  optimus_id: number
+}
+
 export interface UpdateInterface {
   message?: string
   entity: string
@@ -233,6 +240,7 @@ export interface StoreRow {
   mobile: string;
   optimus_id: number;
   store?: StoreInterface;
+  deleted_at?: string | null;
 }
 
 export interface AccessRightInterface {

@@ -8,7 +8,7 @@
           <h2 class="page-title">My Transactions</h2>
         </div>
         <div class="header-actions">
-          <q-input v-model="search" placeholder="Search transactions..." outlined dense clearable debounce="300"
+          <q-input v-model="search" placeholder="Search transactions..." outlined dense clearable debounce="1000"
             class="search-input">
             <template v-slot:prepend>
               <q-icon name="search" />

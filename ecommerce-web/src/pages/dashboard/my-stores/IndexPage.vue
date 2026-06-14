@@ -8,15 +8,8 @@
           <h2 class="page-title">My Stores</h2>
         </div>
         <div class="header-actions">
-          <q-input
-            v-model="search"
-            placeholder="Search stores..."
-            outlined
-            dense
-            clearable
-            debounce="300"
-            class="search-input"
-          >
+          <q-input v-model="search" placeholder="Search stores..." outlined dense clearable debounce="1000"
+            class="search-input">
             <template v-slot:prepend>
               <q-icon name="search" />
             </template>
@@ -32,16 +25,8 @@
         <div class="text-h5 q-mt-md text-grey-6">No stores found</div>
         <div class="text-body2 text-grey-5 q-mt-sm">Try adjusting your search criteria</div>
       </div>
-      <q-table
-        v-else
-        flat
-        bordered
-        :rows="typedResult"
-        :columns="columns"
-        row-key="id"
-        :pagination="{ rowsPerPage: 0 }"
-        class="stores-table"
-      >
+      <q-table v-else flat bordered :rows="typedResult" :columns="columns" row-key="id" :pagination="{ rowsPerPage: 0 }"
+        class="stores-table">
         <template v-slot:body-cell-name="props">
           <q-td :props="props">
             <router-link :to="`${$route.path}/${props.row.optimus_id}`" class="store-name-link">
@@ -59,36 +44,16 @@
         <template v-slot:body-cell-actions="props">
           <q-td :props="props">
             <div class="action-buttons">
-              <q-btn
-                unelevated
-                dense
-                color="secondary"
-                icon="people"
-                :to="`${$route.path}/${props.row.optimus_id}/users`"
-                size="md"
-                class="q-mr-xs"
-              >
+              <q-btn unelevated dense color="secondary" icon="people"
+                :to="`${$route.path}/${props.row.optimus_id}/users`" size="md" class="q-mr-xs">
                 <q-tooltip>User Management</q-tooltip>
               </q-btn>
-              <q-btn
-                unelevated
-                dense
-                color="primary"
-                icon="edit_note"
-                :to="`${$route.path}/${props.row.optimus_id}`"
-                size="md"
-                class="q-mr-xs"
-              >
+              <q-btn unelevated dense color="primary" icon="edit_note" :to="`${$route.path}/${props.row.optimus_id}`"
+                size="md" class="q-mr-xs">
                 <q-tooltip>Edit Store</q-tooltip>
               </q-btn>
-              <q-btn
-                unelevated
-                dense
-                color="negative"
-                icon="delete_forever"
-                @click="handleDeleteStore(props.row)"
-                size="md"
-              >
+              <q-btn unelevated dense color="negative" icon="delete_forever" @click="handleDeleteStore(props.row)"
+                size="md">
                 <q-tooltip>Delete Store</q-tooltip>
               </q-btn>
             </div>
@@ -101,45 +66,15 @@
               Showing {{ pagination.from }} - {{ pagination.to }} of {{ pagination.rowsNumber }} stores
             </div>
             <div class="pagination-controls">
-              <q-btn
-                v-if="pagination.lastPage > 2"
-                flat
-                round
-                dense
-                icon="first_page"
-                color="grey-8"
-                :disable="pagination.page === 1"
-                @click="goToFirstPage"
-              />
-              <q-btn
-                flat
-                round
-                dense
-                icon="chevron_left"
-                color="grey-8"
-                :disable="pagination.page === 1"
-                @click="goToPreviousPage"
-              />
+              <q-btn v-if="pagination.lastPage > 2" flat round dense icon="first_page" color="grey-8"
+                :disable="pagination.page === 1" @click="goToFirstPage" />
+              <q-btn flat round dense icon="chevron_left" color="grey-8" :disable="pagination.page === 1"
+                @click="goToPreviousPage" />
               <span class="page-number">{{ pagination.page }} / {{ pagination.lastPage }}</span>
-              <q-btn
-                flat
-                round
-                dense
-                icon="chevron_right"
-                color="grey-8"
-                :disable="pagination.page === pagination.lastPage"
-                @click="goToNextPage"
-              />
-              <q-btn
-                v-if="pagination.lastPage > 2"
-                flat
-                round
-                dense
-                icon="last_page"
-                color="grey-8"
-                :disable="pagination.page === pagination.lastPage"
-                @click="goToLastPage"
-              />
+              <q-btn flat round dense icon="chevron_right" color="grey-8"
+                :disable="pagination.page === pagination.lastPage" @click="goToNextPage" />
+              <q-btn v-if="pagination.lastPage > 2" flat round dense icon="last_page" color="grey-8"
+                :disable="pagination.page === pagination.lastPage" @click="goToLastPage" />
             </div>
           </div>
         </template>
@@ -153,68 +88,31 @@
         <div class="text-h6 q-mt-md text-grey-6">No stores found</div>
       </div>
       <div v-else class="stores-cards">
-        <q-card
-          v-for="store in typedResult"
-          :key="store.id"
-          flat
-          bordered
-          class="store-card q-mb-md"
-        >
+        <q-card v-for="store in typedResult" :key="store.id" flat bordered class="store-card q-mb-md">
           <q-card-section>
             <div class="store-card-header">
               <div class="store-card-title">
                 <q-icon name="store" color="primary" size="24px" class="q-mr-sm" />
-                <router-link
-                  :to="`${$route.path}/${store.optimus_id}`"
-                  class="store-name-link"
-                >
+                <router-link :to="`${$route.path}/${store.optimus_id}`" class="store-name-link">
                   {{ store.name }}
                 </router-link>
               </div>
             </div>
             <div class="store-card-actions q-mt-md">
-              <q-btn
-                unelevated
-                dense
-                color="primary"
-                icon="list"
-                label="Items"
-                :to="`${$route.path}/${store.optimus_id}/items`"
-                class="action-btn-mobile action-btn-edit-mobile"
-              />
-              <q-btn
-                unelevated
-                dense
-                color="primary"
-                icon="edit_note"
-                label="Edit"
-                :to="`${$route.path}/${store.optimus_id}`"
-                class="action-btn-mobile action-btn-edit-mobile"
-              />
-              <q-btn
-                unelevated
-                dense
-                color="negative"
-                icon="delete_forever"
-                label="Delete"
-                @click="handleDeleteStore(store)"
-                class="action-btn-mobile action-btn-delete-mobile"
-              />
+              <q-btn unelevated dense color="primary" icon="list" label="Items"
+                :to="`${$route.path}/${store.optimus_id}/items`" class="action-btn-mobile action-btn-edit-mobile" />
+              <q-btn unelevated dense color="primary" icon="edit_note" label="Edit"
+                :to="`${$route.path}/${store.optimus_id}`" class="action-btn-mobile action-btn-edit-mobile" />
+              <q-btn unelevated dense color="negative" icon="delete_forever" label="Delete"
+                @click="handleDeleteStore(store)" class="action-btn-mobile action-btn-delete-mobile" />
             </div>
           </q-card-section>
         </q-card>
       </div>
       <!-- Mobile Pagination -->
       <div v-if="typedResult.length > 0" class="mobile-pagination q-mt-md">
-        <q-pagination
-          v-model="pagination.page"
-          :max="pagination.lastPage"
-          :max-pages="5"
-          direction-links
-          boundary-links
-          color="primary"
-          @update:model-value="handlePageChange"
-        />
+        <q-pagination v-model="pagination.page" :max="pagination.lastPage" :max-pages="5" direction-links boundary-links
+          color="primary" @update:model-value="handlePageChange" />
       </div>
     </div>
   </div>

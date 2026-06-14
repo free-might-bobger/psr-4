@@ -3,7 +3,7 @@
 namespace App\Repositories;
 
 use Illuminate\Database\Eloquent\Builder;
-use App\Repositories\Support\SearchFieldSupport;
+use App\Repositories\Support\ColumnValueCriteria;
 use App\Traits\Obfuscate\OptimusId;
 use Illuminate\Support\Arr;
 use App\Traits\Support\BaseSupportRepository;
@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
 class BaseRepository implements BaseInterface
 {
-    use RoleTrait, SearchFieldSupport, OptimusId, BaseSupportRepository;
+    use RoleTrait, ColumnValueCriteria, OptimusId, BaseSupportRepository;
 
     protected Model|Builder|null $model;
     protected array $params;
@@ -112,6 +112,7 @@ class BaseRepository implements BaseInterface
         }
         $this->with();
         $this->orderBy(Arr::get($parameters, 'orderBy', 'created_at:desc'));
+        $this->deleted(Arr::get($parameters, 'deleted', null));
         return $this;
     }
 
@@ -160,40 +161,6 @@ class BaseRepository implements BaseInterface
     }
 
 
-    /***
-     * NOT YET REWRITTEN BELOW
-      NOT YET REWRITTEN BELOW
-      NOT YET REWRITTEN BELOW
-     */
-
-    /**
-     * Filters query parameters by invoking methods named after each key in the parameter array.
-     * 
-     * This function iterates through `$this->params`, where each key-value pair represents 
-     * a specific query constraint. If a method exists within this class that matches a key, 
-     * it dynamically calls that method, passing the corresponding value as an argument.
-     * 
-     * Example:
-     * Given `$this->params = ['user_id' => 27]`, this function will call `$this->user_id(27)`, 
-     * assuming a `user_id` method exists in the class.
-     * Please check App/Support/FieldSupport for all global filter
-     * if you need specific filter you can create in your OwnRepository
-     * public function key($value)
-     *
-     * @return $this
-     */
-    // public function filterQuery(array $request): self
-    // {
-    //     foreach ($request as $key => $param) {
-    //         if(method_exists($this, $key)){
-    //             call_user_func([$this, $key], $param);
-    //         }
-    //     }
-
-    //     return $this->getResults();
-    // }
-
-    //orderBy=name:asc
     /**
      * Order the resource
      * @param string $param
@@ -415,45 +382,19 @@ class BaseRepository implements BaseInterface
         return $this->model->delete();
     }
 
-    // public function upload()
-    // {
-
-    //     if (isset($_FILES["images"])) {
-
-
-    //         foreach ($_FILES["images"]['name'] as $key => $value) {
-
-    //             $this->name = $_FILES["images"]['name'][$key];
-    //             $this->fileName = time() . '-' . $this->name;
-    //             $fileTmp = $_FILES["images"]['tmp_name'][$key];
-    //             $this->size = $_FILES["images"]['size'][$key];
-    //             $uploadfile = file_get_contents($fileTmp);
-
-    //             File::put(public_path() . '/images/uploads/' . $this->fileName, $uploadfile);
-
-    //             if ($this->request->isPrimary && $this->model->image) {
-    //                 foreach ($this->model->images as $image) {
-    //                     $image->update([
-    //                         'is_primary' => 0
-    //                     ]);
-    //                 }
-
-    //                 if ($this->name == $this->request->primaryName) {
-    //                     $this->imageUploadIsPrimary(true);
-    //                 } else {
-    //                     $this->imageUploadIsPrimary(false);
-    //                 }
-    //             } else {
-    //                 if ($key == 0) {
-    //                     $this->imageUploadIsPrimary(true);
-    //                 } else {
-    //                     $this->imageUploadIsPrimary(false);
-    //                 }
-    //             }
-    //         }
-    //     }
-    // }
-
+    /**
+     * Delete records matching multiple where conditions
+     * @param array $conditions Associative array of column => value pairs
+     * @return int Number of deleted rows
+     */
+    public function deleteWhere(array $conditions): int
+    {
+        $query = $this->model;
+        foreach ($conditions as $column => $value) {
+            $query = $query->where($column, $value);
+        }
+        return $query->delete();
+    }
 
 
     public function all()

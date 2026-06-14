@@ -10,7 +10,7 @@
                 <div class="header-actions">
                     <q-btn unelevated color="primary" icon="add" label="Invite User" :to="`${$route.path}/invite-users`"
                         class="q-mr-md" />
-                    <q-input v-model="search" placeholder="Search email..." outlined dense clearable debounce="300"
+                    <q-input v-model="search" placeholder="Search email..." outlined dense clearable debounce="1000"
                         class="search-input">
                         <template v-slot:prepend>
                             <q-icon name="search" />

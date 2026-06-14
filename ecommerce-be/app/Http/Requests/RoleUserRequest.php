@@ -25,8 +25,8 @@ class RoleUserRequest extends FormRequest
     {
         
         return [
-            'user_id' => 'required',
-            'role_id' => 'required'
+            'user_id' => 'required|integer',
+            'role_id' => 'required|integer'
         ];
     }
 }
