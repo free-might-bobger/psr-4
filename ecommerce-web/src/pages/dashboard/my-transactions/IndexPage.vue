@@ -8,15 +8,8 @@
           <h2 class="page-title">My Transactions</h2>
         </div>
         <div class="header-actions">
-          <q-input
-            v-model="search"
-            placeholder="Search transactions..."
-            outlined
-            dense
-            clearable
-            debounce="300"
-            class="search-input"
-          >
+          <q-input v-model="search" placeholder="Search transactions..." outlined dense clearable debounce="300"
+            class="search-input">
             <template v-slot:prepend>
               <q-icon name="search" />
             </template>
@@ -32,23 +25,11 @@
         <div class="text-h5 q-mt-md text-grey-6">No transactions found</div>
         <div class="text-body2 text-grey-5 q-mt-sm">Your transaction history will appear here</div>
       </div>
-      <q-table
-        v-else
-        flat
-        bordered
-        :rows="typedResult"
-        :columns="columns"
-        row-key="optimus_id"
-        class="transactions-table"
-        :rows-per-page-options="[0]"
-        hide-pagination
-      >
+      <q-table v-else flat bordered :rows="typedResult" :columns="columns" row-key="optimus_id"
+        class="transactions-table" :rows-per-page-options="[0]" hide-pagination>
         <template v-slot:body-cell-reference="props">
           <q-td :props="props">
-            <router-link
-              :to="`${$route.path}/${props.row.optimus_id}`"
-              class="transaction-reference-link"
-            >
+            <router-link :to="`${$route.path}/${props.row.optimus_id}`" class="transaction-reference-link">
               <div class="transaction-reference-id">{{ props.row.reference_id }}</div>
               <div class="transaction-date">
                 <q-icon name="calendar_today" size="xs" class="q-mr-xs" />
@@ -60,11 +41,8 @@
 
         <template v-slot:body-cell-status="props">
           <q-td :props="props">
-            <q-badge
-              :color="getStatusColor(props.row.status?.label)"
-              :label="props.row.status?.label || 'Pending'"
-              class="status-badge"
-            />
+            <q-badge :color="getStatusColor(props.row.status?.label)" :label="props.row.status?.label || 'Pending'"
+              class="status-badge" />
           </q-td>
         </template>
 
@@ -91,38 +69,16 @@
         <template v-slot:body-cell-actions="props">
           <q-td :props="props">
             <div class="action-buttons">
-              <q-btn
-                v-if="props.row.status?.name !== TRANSACTION_STATUS.COMPLETED"
-                unelevated
-                dense
-                color="secondary"
-                icon="inventory_2"
-                @click="markedAsReceived(props.row.optimus_id)"
-                size="md"
-                class="q-mr-xs"
-              >
+              <q-btn v-if="props.row.status?.name !== TRANSACTION_STATUS.COMPLETED" unelevated dense color="secondary"
+                icon="inventory_2" @click="markedAsReceived(props.row.optimus_id)" size="md" class="q-mr-xs">
                 <q-tooltip>Mark as received</q-tooltip>
               </q-btn>
-              <q-btn
-                unelevated
-                dense
-                color="primary"
-                icon="info"
-                :to="`${$route.path}/${props.row.optimus_id}`"
-                size="md"
-                class="q-mr-xs"
-              >
+              <q-btn unelevated dense color="primary" icon="info" :to="`${$route.path}/${props.row.optimus_id}`"
+                size="md" class="q-mr-xs">
                 <q-tooltip>View details</q-tooltip>
               </q-btn>
-              <q-btn
-                v-if="props.row.status"
-                unelevated
-                dense
-                color="negative"
-                icon="currency_exchange"
-                :to="`${$route.path}/${props.row.optimus_id}`"
-                size="md"
-              >
+              <q-btn v-if="props.row.status" unelevated dense color="negative" icon="currency_exchange"
+                :to="`${$route.path}/${props.row.optimus_id}`" size="md">
                 <q-tooltip>Request refund</q-tooltip>
               </q-btn>
             </div>
@@ -135,45 +91,15 @@
               Showing {{ pagination.from }} - {{ pagination.to }} of {{ pagination.rowsNumber }} transactions
             </div>
             <div class="pagination-controls">
-              <q-btn
-                v-if="pagination.lastPage > 2"
-                flat
-                round
-                dense
-                icon="first_page"
-                color="grey-8"
-                :disable="pagination.page === 1"
-                @click="goToFirstPage"
-              />
-              <q-btn
-                flat
-                round
-                dense
-                icon="chevron_left"
-                color="grey-8"
-                :disable="pagination.page === 1"
-                @click="goToPreviousPage"
-              />
+              <q-btn v-if="pagination.lastPage > 2" flat round dense icon="first_page" color="grey-8"
+                :disable="pagination.page === 1" @click="goToFirstPage" />
+              <q-btn flat round dense icon="chevron_left" color="grey-8" :disable="pagination.page === 1"
+                @click="goToPreviousPage" />
               <span class="page-number">{{ pagination.page }} / {{ pagination.lastPage }}</span>
-              <q-btn
-                flat
-                round
-                dense
-                icon="chevron_right"
-                color="grey-8"
-                :disable="pagination.page === pagination.lastPage"
-                @click="goToNextPage"
-              />
-              <q-btn
-                v-if="pagination.lastPage > 2"
-                flat
-                round
-                dense
-                icon="last_page"
-                color="grey-8"
-                :disable="pagination.page === pagination.lastPage"
-                @click="goToLastPage"
-              />
+              <q-btn flat round dense icon="chevron_right" color="grey-8"
+                :disable="pagination.page === pagination.lastPage" @click="goToNextPage" />
+              <q-btn v-if="pagination.lastPage > 2" flat round dense icon="last_page" color="grey-8"
+                :disable="pagination.page === pagination.lastPage" @click="goToLastPage" />
             </div>
           </div>
         </template>
@@ -188,24 +114,16 @@
         <div class="text-body2 text-grey-5 q-mt-sm">Your transaction history will appear here</div>
       </div>
       <div v-else class="stores-cards">
-        <q-card
-          v-for="transaction in typedResult"
-          :key="transaction.optimus_id"
-          flat
-          bordered
-          class="store-card q-mb-md"
-        >
+        <q-card v-for="transaction in typedResult" :key="transaction.optimus_id" flat bordered
+          class="store-card q-mb-md">
           <q-card-section>
             <div class="store-card-header transaction-store-card-header">
               <div class="store-card-title">
                 <div class="transaction-reference-id">#{{ transaction.reference_id }}</div>
               </div>
               <div class="transaction-header-badge">
-                <q-badge
-                  :color="getStatusColor(transaction.status?.label)"
-                  :label="transaction.status?.label || 'Pending'"
-                  class="status-badge"
-                />
+                <q-badge :color="getStatusColor(transaction.status?.label)"
+                  :label="transaction.status?.label || 'Pending'" class="status-badge" />
               </div>
             </div>
             <div class="store-card-info">
@@ -226,49 +144,29 @@
               </div>
             </div>
             <div class="store-card-actions q-mt-md">
-              <q-btn
-                unelevated
-                dense
-                color="negative"
-                icon="check_circle"
-                label="Received"
-                :to="`${$route.path}/${transaction.optimus_id}`"
-                class="action-btn-mobile action-btn-delete-mobile"
-              />
-              <q-btn
-                unelevated
-                dense
-                color="primary"
-                icon="visibility"
-                label="View"
-                :to="`${$route.path}/${transaction.optimus_id}`"
-                class="action-btn-mobile action-btn-edit-mobile"
-              />
+              <q-btn unelevated dense color="negative" icon="check_circle" label="Received"
+                :to="`${$route.path}/${transaction.optimus_id}`" class="action-btn-mobile action-btn-delete-mobile" />
+              <q-btn unelevated dense color="primary" icon="visibility" label="View"
+                :to="`${$route.path}/${transaction.optimus_id}`" class="action-btn-mobile action-btn-edit-mobile" />
             </div>
           </q-card-section>
         </q-card>
       </div>
       <div v-if="typedResult.length > 0" class="mobile-pagination q-mt-md">
-        <q-pagination
-          v-model="pagination.page"
-          :max="pagination.lastPage"
-          :max-pages="5"
-          direction-links
-          boundary-links
-          color="primary"
-          @update:model-value="handlePageChange"
-        />
+        <q-pagination v-model="pagination.page" :max="pagination.lastPage" :max-pages="5" direction-links boundary-links
+          color="primary" @update:model-value="handlePageChange" />
       </div>
     </div>
   </div>
 </template>
 <script setup lang="ts">
-import { onRequest, firstPage, previousPage, nextPage, lastPage, update} from 'boot/axios-call';
+import { onRequest, firstPage, previousPage, nextPage, lastPage, update } from 'boot/axios-call';
 import { useCommonStore } from 'src/stores/common';
 import { onMounted, ref, watch } from 'vue';
 import { storeToRefs } from 'pinia';
 import { CustomerTransactionRow } from 'src/boot/interfaces';
-import { TRANSACTION_STATUS } from 'src/boot/constant'
+import { TRANSACTION_STATUS } from 'src/boot/constant';
+import { Notify } from 'quasar';
 
 const search = ref('');
 const useCommon = useCommonStore();
@@ -382,15 +280,17 @@ const formatDate = (dateString: string | undefined): string => {
 };
 
 const markedAsReceived = async (transactionId: string) => {
-   await update(
-      {
-        entity: 'my-transactions-marked-as-received',
-        data: {},
-        optimus_id: transactionId,
-      },
-      true,
-      true
-    );
+  await update(
+    {
+      entity: 'my-transactions-marked-as-received',
+      data: {},
+      optimus_id: transactionId,
+    },
+    true,
+    true
+  );
+
+  onRequest(entityQuery.value, true);
 };
 </script>
 

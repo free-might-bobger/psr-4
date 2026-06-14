@@ -13,11 +13,5 @@ class MyStoreTransactionRepository extends BaseRepository implements BaseInterfa
         $this->cacheKey = 'MyStoreTransactions-get';
     }
 
-    public function markedAsReceived(int $transactionId)
-    {
-        $transaction = $this->findOrFail($transactionId);
-        $transaction->status_id = 5; // Assuming 5 is the ID for "Received" status
-        $transaction->save();
-        return $transaction;
-    }
+    
 }

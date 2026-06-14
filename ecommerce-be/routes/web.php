@@ -14,7 +14,7 @@ use App\Http\Controllers\ {
     ListingApiController,
     MobileActivationCodeController,
     MyStoreController,
-    MyStoreTransactionController,
+    MyTransactionController,
     PaymentMethodController,
     ProfileController,
     PublicItemController,
@@ -50,7 +50,7 @@ Route::resource('public_store_items', PublicStoreItemController::class)->only(['
 
 /* Route group */
 Route::group(['middleware' => 'auth:api', 'myTransactionMiddleware'], function () {
-  Route::patch('my-transactions-marked-as-received/{transactionId}', [MyStoreTransactionController::class, 'markedAsReceived']);
+  Route::patch('my-transactions-marked-as-received/{transactionId}', [MyTransactionController::class, 'markedAsReceived']);
 });
 
 Route::group(['middleware' => 'auth:api'], function () {

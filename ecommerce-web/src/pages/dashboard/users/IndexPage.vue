@@ -250,7 +250,7 @@ const columns = [
     required: true,
     label: 'User Name',
     align: 'left' as const,
-    field: (row: any) => row.name || row.label || 'N/A',
+    field: (row: UserRow) => row.name || row.label || 'N/A',
     sortable: true
   },
   {
