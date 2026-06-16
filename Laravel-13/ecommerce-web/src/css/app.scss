@@ -1,0 +1,221 @@
+// Importing Google Fonts
+@import url('https://fonts.googleapis.com/css?family=Poppins:100,100i,200,200i,300,300i,400,400i,500,500i,600,600i,700,700i,800,800i,900,900i');
+@import url('https://fonts.googleapis.com/css?family=Raleway:100,100i,200,200i,300,300i,400,400i,500,500i,600,600i,700,700i,800,800i,900,900i');
+
+body {
+  font-family: 'Poppins', sans-serif;
+  color: #616161;
+}
+
+// MAIN STORE
+
+.main-store-wrapper {
+  margin-top: 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 5px;
+}
+
+.main-store-generic-box {
+
+  padding: 15px;
+  height: 420px;
+  flex-grow: 1;
+  border-radius: 8px;
+  overflow: hidden;
+  text-decoration: none;
+  color: inherit;
+  background-color: #ffffff;
+  transition: all 0.3s ease;
+  display: block;
+
+  &:hover {
+    border: 1px solid #c0c0c0;
+    transform: translateY(-5px);
+    transition: all 0.5s ease;
+    cursor: pointer;
+  }
+
+  &:visited,
+  &:link,
+  &:active {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  &.main-store-generic-box-large {
+    max-width: 390px;
+  }
+}
+
+.main-store-item-image {
+  width: 100%;
+  height: 70%;
+  object-fit: cover;
+  object-position: 45% 25%;
+  margin: 0 auto;
+  display: block;
+}
+
+.main-store-item-wrapper {
+  padding: 10px 0;
+}
+
+.main-store-item-desc {
+  margin-top: 5px;
+  text-align: center;
+  color: #333;
+}
+
+.main-store-item-name {
+  font-weight: 600;
+  font-size: 16px;
+  color: #212529;
+  margin-bottom: 8px;
+  line-height: 1.4;
+  height: 80px;
+  overflow: hidden;
+}
+
+.main-store-item-price {
+  font-size: 18px;
+  font-weight: 700;
+  color: #108a00;
+}
+
+/**
+Location: /
+***/
+.store-wrapper {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  width: 100%;
+  margin: 0 auto;
+  margin-top: 5px;
+}
+
+.store-desc {
+  width: 220px;
+  display: inline-block;
+  margin-left: 9px;
+  color: #616161;
+}
+
+/*******
+Location: /public_stores/{id}
+***/
+
+.item-wrapper {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  width: 100%;
+  margin: 0 auto;
+  margin-top: 5px;
+}
+
+.item-desc {
+  width: 220px;
+  display: inline-block;
+  margin-left: 9px;
+  color: #616161;
+}
+
+
+.item-box {
+  padding: 5px;
+  width: 100%;
+  border: 1px solid #d3d3d3;
+  flex-grow: 1;
+  border-radius: 5px;
+  text-decoration: none;
+}
+
+
+.item-flex-container {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.detailed-item-wrapper {
+  display: flex;
+  align-items: top;
+  height: 100%;
+}
+
+.item-item-desc {
+  display: inline-block;
+  margin-left: 9px;
+  color: #616161;
+}
+
+.itemMargin {
+  margin-left: 5px;
+}
+
+a { text-decoration: none; }
+
+.grey-box, .store {
+  border: 1px solid #d3d3d3;
+  padding: 10px;
+  border-radius: 5px;
+  margin-top: 5px;
+}
+
+
+/**
+Location: /cart
+**/
+
+.cart-image-wrapper {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  width: 100%;
+}
+
+.cart-image-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cart-wrapper {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  width: 100%;
+  justify-content: right;
+}
+
+.cart-item-desc{
+  width: 220px;
+}
+.dark-grey{
+    color: #616161;
+}
+
+
+/** UPDATED 11-17-2024
+**/
+.table-header-title, .main-title{
+  font-size: 20px
+}
+
+.router-link{
+  color: #108a00;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/**
+Location: /public_stores/{id}/item/{item_id}
+**/
+.breadcrumbs-container {
+  height: 40px;
+  border: 1px solid #c2c2c2;
+  border-radius: 5px;
+  padding: 8px;
+  overflow: hidden;
+}
