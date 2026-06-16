@@ -2,12 +2,10 @@ import axios from 'axios';
 import { useUserStore } from 'stores/user';
 import { storeToRefs } from 'pinia';
 
-const useUser = useUserStore();
-const { profile } = storeToRefs(useUser);
 const checkDevProduction = (): string => {
-  const live = 'https://shaischool.net/api/';
-  const test = 'http://127.0.0.1:8080/api/';
-  if (window.location.href.includes('shaischool')) {
+  const live = 'https://api.mynearshops.com/';
+  const test = 'http://localhost:8081/';
+  if (window.location.href.includes('mynearshops')) {
     return live;
   }
   return test;
@@ -21,9 +19,10 @@ const intercept = (isIntercept: boolean) => {
   }
   axios.interceptors.request.use(
     (request) => {
-      if (profile.value.token) {
-        request.headers['Authorization'] = `Bearer ${profile.value.token}`;
-      }
+      // IMPORTANT: do not access Pinia stores at module top-level.
+      // In production builds, boot module import order can cause Pinia to be unavailable early.
+      const { profile } = storeToRefs(useUserStore());
+      if (profile.value?.token) request.headers['Authorization'] = `Bearer ${profile.value.token}`;
       return request;
     },
     (error) => {

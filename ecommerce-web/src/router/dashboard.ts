@@ -4,7 +4,7 @@ export default [
     {
       path: '/dashboard',
       meta: {
-        needAuth: true
+        requiresAuth: true
       },
       component: () => import('layouts/DashboardLayout.vue'),
       children: [

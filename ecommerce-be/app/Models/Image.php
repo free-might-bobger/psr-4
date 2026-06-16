@@ -35,7 +35,7 @@ class Image extends Model
             '::1',
         );
         if (!in_array($_SERVER['REMOTE_ADDR'], $whitelist)) {
-            return url($this->path);
+            return url('public/'.$this->path);
         } else {
             return url($this->path);
         }
@@ -50,7 +50,7 @@ class Image extends Model
             '::1',
         );
         if (!in_array($_SERVER['REMOTE_ADDR'], $whitelist)) {
-            return url($this->path);
+            return url('public/'.$this->path);
         } else {
             return url($this->path);
         }

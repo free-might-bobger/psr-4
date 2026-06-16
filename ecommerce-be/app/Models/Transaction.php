@@ -28,7 +28,8 @@ class Transaction extends Model implements Auditable
         'reference_id',
         'status_id',
         'total',
-        'grand_total'
+        'grand_total',
+        'receivers_mobile',
     ];
 
     protected $appends = ['optimus_id'];

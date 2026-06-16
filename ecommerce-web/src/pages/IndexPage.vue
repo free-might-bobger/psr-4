@@ -5,20 +5,21 @@
       <div class="hero-content">
         <div class="hero-text">
           <h1 class="hero-title">
-            Welcome to <span class="brand-name">Biliscart</span>
+            Welcome to <span class="brand-name">My Near Shops</span>
           </h1>
           <p class="hero-subtitle">
-            Your trusted marketplace for daily essentials. Discover multiple stores, compare prices, and shop with
+            Your trusted marketplace for daily essentials. Discover multiple shops, compare prices, and shop with
             confidence.
           </p>
           <div class="hero-actions">
-            <q-btn to="/find-store" color="primary" size="lg" unelevated class="hero-btn" icon="explore"
-              label="Find Stores Near Me" />
-            <q-btn to="/cart" color="secondary" size="lg" outline class="hero-btn hero-btn--outline"
-              icon="shopping_cart" label="View Cart" />
+            <q-btn to="/find-shops" color="primary" size="lg" unelevated class="hero-btn" icon="store"
+              label="Find Shops Near Me" />
+            <q-btn to="/find-items" color="secondary" size="lg" unelevated class="hero-btn" icon="shopping_bag"
+              label="Find Items Near Me" outline />
+            
           </div>
         </div>
-        <div class="hero-image">
+        <div class="hero-image">  
           <BiliscartLogo :size="200" />
         </div>
       </div>
@@ -27,16 +28,16 @@
     <!-- Features Section -->
     <section class="features-section">
       <div class="features-container">
-        <h2 class="section-title">Why Choose Biliscart?</h2>
+        <h2 class="section-title">Why Choose My Near Shops?</h2>
         <div class="features-grid">
           <q-card flat bordered class="feature-card">
             <q-card-section>
               <div class="feature-icon">
                 <q-icon name="store" size="48px" color="primary" />
               </div>
-              <h3 class="feature-title">Multiple Stores</h3>
+              <h3 class="feature-title">Multiple Shops</h3>
               <p class="feature-description">
-                Browse products from various stores all in one place. Compare prices and find the best deals.
+                Browse products from various shops all in one place. Compare prices and find the best deals.
               </p>
             </q-card-section>
           </q-card>
@@ -87,11 +88,11 @@
           <div class="cta-text">
             <h2 class="cta-title">Ready to Start Shopping?</h2>
             <p class="cta-description">
-              Find stores near you and discover amazing products at great prices.
+              Find shops near you and discover amazing products at great prices.
             </p>
           </div>
-          <q-btn to="/find-store" color="primary" size="lg" unelevated class="cta-button" icon="explore"
-            label="Find Stores Now" />
+          <q-btn to="/find-store" color="primary" size="lg" unelevated class="cta-button" icon="store"
+            label="Find Shops Now" />
         </q-card-section>
       </q-card>
     </section>
@@ -100,6 +101,22 @@
 
 <script setup lang="ts">
 import BiliscartLogo from 'src/components/BiliscartLogo.vue';
+import { useQuasar } from 'quasar';
+
+const $q = useQuasar();
+const urlParams = new URLSearchParams(window.location.search);
+const success = urlParams.get('success')?.trim();
+
+if (success === 'true') {
+  $q.notify({
+    type: 'positive',
+    message: 'Account activated successfully',
+    position: 'top',
+    timeout: 0,
+    closeBtn: 'OK'
+  });
+}
+
 </script>
 
 <style scoped lang="scss">

@@ -108,7 +108,7 @@ class BaseRepository implements BaseInterface
      */
     public function getResults(): LengthAwarePaginator|Collection
     {
-        $limit = Arr::get($this->params, 'limit', 10);
+        $limit = Arr::get($this->params, 'limit', 12);
         $type  = Arr::get($this->params, 'type', false);
         
         if ($type) {
@@ -132,14 +132,17 @@ class BaseRepository implements BaseInterface
      * Where the resource
      * @param string $field
      * @param int $optimusId
-     * @return Model
+     * @return Builder
      */
-    public function where(string $field, int $optimusId): Model
+    public function where(string $field, int $optimusId): Builder
     {
         $this->model = $this->model->where($field, $this->optimus()->decode($optimusId));
         $this->params = app(BaseIndexRequest::class)->all();
-        $this->with();
-        return $this->model->first();
+        if(Arr::get($this->params, 'with')){
+            $this->with();
+
+        }
+        return $this->model;
     }
 
 

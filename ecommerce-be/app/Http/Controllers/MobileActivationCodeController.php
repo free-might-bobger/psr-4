@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Service\MobileActivationCodeService;
+use App\Services\MobileActivationCodeService;
 
 class MobileActivationCodeController extends Controller
 {

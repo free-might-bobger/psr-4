@@ -18,4 +18,9 @@ class MyStoreTransactionController extends ApiController {
 
     }
 
+    public function markedAsReceived($transactionId) {
+        $updatedTransaction = $this->repository->markedAsReceived($transactionId);
+        return $this->successResponse($updatedTransaction, 'Transaction marked as received successfully');
+    }
+
 }

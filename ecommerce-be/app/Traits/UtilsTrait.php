@@ -29,6 +29,7 @@ trait UtilsTrait
         return preg_split( $pattern, $value, 0, PREG_SPLIT_NO_EMPTY );
     }
 
+
     /**
      * Check if the user is a super admin.
      *

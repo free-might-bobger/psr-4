@@ -29,7 +29,7 @@ class PublicStoreController extends ApiController
    
 
     public function show( int $id ) : BaseResource {
-        $this->result = $this->repository->where( 'id', (int) $id )->first();
+        $this->result = $this->repository->where( 'id', $id )->get()->first();
         return $this->getResource();
     }
 

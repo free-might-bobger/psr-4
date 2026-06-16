@@ -13,5 +13,11 @@ class MyStoreTransactionRepository extends BaseRepository implements BaseInterfa
         $this->cacheKey = 'MyStoreTransactions-get';
     }
 
+    public function markedAsReceived($transactionId) {
+        $transaction = $this->model::findOrFail($this->optimus()->decode($transaction));
+        $transaction->status_id = 5; // Assuming 5 is the ID for "Received" status
+        $transaction->save();
+        return $transaction;
+
 
 }

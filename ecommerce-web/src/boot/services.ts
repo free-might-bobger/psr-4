@@ -3,14 +3,12 @@ import { onRequest, deleteEntity } from 'boot/axios-call';
 import { storeToRefs } from 'pinia';
 import { useCommonStore } from 'src/stores/common';
 
-const useCommon = useCommonStore();
-const { entityQuery } = storeToRefs(useCommon);
-
 export const onDeleteEntity = (
   entity: string,
   optimusId: number,
   label: string
 ) => {
+  const { entityQuery } = storeToRefs(useCommonStore());
   Notify.create({
     message: `Delete ${label}?`,
     type: 'negative',

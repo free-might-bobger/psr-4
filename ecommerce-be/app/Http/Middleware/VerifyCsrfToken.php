@@ -12,6 +12,11 @@ class VerifyCsrfToken extends Middleware
      * @var array<int, string>
      */
     protected $except = [
-        //
+        'register',
+        'login',
+        /*
+        API uses token-based authentication (Bearer tokens), you might want to exclude API routes from CSRF verification entirely. 
+        */
+        '*'
     ];
 }

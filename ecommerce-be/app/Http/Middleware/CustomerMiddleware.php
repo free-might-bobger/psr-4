@@ -6,9 +6,9 @@ use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
-use App\Traits\UtilsTrait;
+use App\Traits\Role\AccessChecker;
 class CustomerMiddleware {
-    use UtilsTrait;
+    use AccessChecker;
     /**
     * Handle an incoming request.
     *

@@ -5,13 +5,13 @@
       <q-card-section class="map-header-section">
         <div class="map-header-main">
           <div class="map-header-icon-wrapper">
-            <q-icon name="explore" size="40px" color="primary" />
+            <q-icon name="store" size="40px" color="primary" />
           </div>
           <div class="map-header-text">
             <div class="map-header-title-wrapper">
               <div class="map-header-title-with-icon">
-                <q-icon name="explore" size="md" color="primary" class="map-header-inline-icon" />
-                <h1 class="map-header-title">Find Nearby Stores</h1>
+                <q-icon name="store" size="md" color="primary" class="map-header-inline-icon" />
+                <h1 class="map-header-title">Find Nearby Shops</h1>
               </div>
               <q-chip color="primary" text-color="white" size="sm" class="map-header-badge">
                 <q-icon name="store" size="xs" class="q-mr-xs" />
@@ -20,18 +20,18 @@
             </div>
             <p class="map-header-description">
               Discover stores near you and get directions instantly. Click on store markers to view
-              details.
+              details. <br /> Looking for items? <router-link to="/find-items" class="find-items-link">FIND NEAREST ITEMS HERE</router-link>
             </p>
           </div>
         </div>
         <div class="map-header-actions">
           <q-btn color="primary" icon="my_location" label="Refresh Location" unelevated @click="localGetLocation"
             class="refresh-location-btn" size="md" />
-          <q-btn color="secondary" icon="search" label="Find Nearest Stores" outline @click="getNearestStore"
+           <q-btn color="secondary" icon="search" label="Find Nearest Shops" outline @click="getNearestStore"
             class="find-stores-btn" size="md" :loading="false" />
           <q-input 
             v-model="searchString" 
-            placeholder="Search stores..." 
+            placeholder="Search shops..." 
             outlined 
             dense 
             debounce="300"
@@ -55,7 +55,7 @@
             <div class="store-list-title" @click="getNearestStore">
               <q-icon name="store" color="primary" size="md" class="q-mr-sm" />
               <div>
-                <div class="text-h6 text-weight-bold">Nearby Stores</div>
+                <div class="text-h6 text-weight-bold">Nearby Shops</div>
                 <div class="text-caption text-grey-6">Click to search for stores</div>
               </div>
             </div>
@@ -65,7 +65,7 @@
             <div v-if="nearestStores.length === 0" class="empty-store-list">
               <q-icon name="store" size="48px" color="grey-4" />
               <div class="text-body2 text-grey-6 q-mt-md">No stores found yet</div>
-              <div class="text-caption text-grey-5 q-mt-xs">Click "Nearby Stores" above to search</div>
+              <div class="text-caption text-grey-5 q-mt-xs">Click "Nearby Shops" above to search</div>
             </div>
             <div v-else class="store-list-items">
               <div v-for="store in nearestStores" :key="store.id" class="store-list-item"
@@ -148,8 +148,8 @@
           <div>
             <div class="text-subtitle2 text-weight-bold q-mb-xs">How to use the map</div>
             <ul class="instructions-list">
-              <li>Click on "Nearby Stores" in the map to find stores in your area</li>
-              <li>Click on any green store marker to view store details and get directions</li>
+              <li>Click on "Nearby Shops" in the map to find shops in your area</li>
+              <li>Click on any green shop marker to view shop details and get directions</li>
               <li>Drag the map to explore different areas</li>
               <li>Use the refresh button to update your current location</li>
             </ul>
@@ -199,7 +199,7 @@ const createLocationMarkerElement = (): HTMLElement => {
   markerDiv.innerHTML = `
         <div class="marker-pulse"></div>
         <div class="marker-icon">
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" fill="#FFFFFF"/>
             </svg>
         </div>
@@ -214,7 +214,7 @@ const createStoreMarkerElement = (): HTMLElement => {
   markerDiv.innerHTML = `
         <div class="marker-pulse"></div>
         <div class="marker-icon">
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M20 4H4c-1.11 0-1.99.89-1.99 2L2 18c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z" fill="#FFFFFF"/>
             </svg>
         </div>
@@ -599,6 +599,17 @@ watch(searchString, async () => {
 </script>
 
 <style scoped lang="scss">
+.find-items-link{
+  font-weight: 600;
+  color: #667eea;
+  text-decoration: none;
+  transition: all 0.2s ease;
+
+  &:hover {
+    color: #5568d3;
+    text-decoration: underline;
+  }
+}
 .map-page-container {
   padding: 24px;
   max-width: 1400px;
@@ -687,7 +698,6 @@ watch(searchString, async () => {
   color: #666;
   line-height: 1.6;
   margin: 0;
-  max-width: 600px;
 }
 
 .map-header-actions {
@@ -899,8 +909,8 @@ watch(searchString, async () => {
 // Custom Animated Markers
 :deep(.custom-marker) {
   position: relative;
-  width: 48px;
-  height: 48px;
+  width: 25px;
+  height: 25px;
   cursor: pointer;
   transform-origin: center bottom;
   animation: markerBounce 2s ease-in-out infinite;
@@ -908,8 +918,8 @@ watch(searchString, async () => {
 
 :deep(.marker-icon) {
   position: relative;
-  width: 48px;
-  height: 48px;
+  width: 25px;
+  height: 25px;
   border-radius: 50%;
   display: flex;
   align-items: center;

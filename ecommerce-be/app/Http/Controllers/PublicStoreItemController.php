@@ -7,7 +7,7 @@ use App\Repositories\PublicStoreItemRepository;
 use App\Http\Requests\BaseIndexRequest;
 use Illuminate\Http\Request;
 use App\Http\Resources\BaseResource;
-use App\Service\PublicStoreItemService;
+use App\Services\PublicStoreItemService;
 class PublicStoreItemController extends ApiController
 {
     private $publicStoreItemService; 

@@ -146,7 +146,8 @@ export interface CustomerOrder {
 }
 
 export interface LoginInterface {
-  mobile: string
+  mobile?: string
+  email?: string
   password: string
 }
 
@@ -170,6 +171,13 @@ export interface UpdateInterface {
   optimus_id: number|string|string[]
   data: object
   query?: GetQuery
+}
+
+export interface ItemInterface {
+  id: number
+  name: string
+  optimus_id: number,
+  store: StoreInterface
 }
 
 export interface StoreInterface {

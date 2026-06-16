@@ -7,7 +7,6 @@ use App\Http\Requests\TransactionRequest;
 use App\Models\Transaction;
 use App\Http\Requests\BaseIndexRequest;
 use App\Http\Requests\Transaction\UpdateRequest;
-use App\Http\Resources\BaseResource;
 
 class TransactionController extends ApiController {
 
@@ -24,20 +23,5 @@ class TransactionController extends ApiController {
         return true;
     }
 
-    public function store(): BaseResource {
-        
-        $request = app($this->storeRequest);
-        $this->result = $this->repository
-            ->createTransaction( 
-                $request->store_id,
-                $request->items, 
-                $request->deliveryCharge, 
-                $request->selectedReceiveMethod, $request->selectedPaymenthMethod, 
-                $request->lat, 
-                $request->lng,
-                $request->total
-             );
-
-        return $this->getResource();
-    }
+    
 }

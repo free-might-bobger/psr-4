@@ -8,7 +8,7 @@
             <BiliscartLogo :size="48" />
           </div>
           <div class="logo-text">
-            <span class="logo-brand-name">Biliscart</span>
+            <span class="logo-brand-name">My Near Shops</span>
             <span class="logo-tagline">Your Trusted Shop</span>
           </div>
         </router-link>

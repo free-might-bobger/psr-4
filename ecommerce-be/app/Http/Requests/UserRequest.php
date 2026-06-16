@@ -25,8 +25,9 @@ class UserRequest extends FormRequest
     {
         
         return [
-            'mobile' => 'required',
-            'password' => 'required'
+            'email' => 'required_without:mobile|nullable|email',
+            'mobile' => 'required_without:email|nullable|string',
+            'password' => 'required',
         ];
     }
 }

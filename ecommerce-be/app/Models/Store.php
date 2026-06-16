@@ -81,12 +81,24 @@ class Store extends Model implements Auditable
         ->orderBy('distance', 'asc');
     }
 
-    public function getDistanceAttribute():String{
-       $request = app()->make('request');
-       if( $request->latitude && $request->longitude){
-        return Maps::calculateDistance($this->latitude, $this->longitude, $request->latitude, $request->longitude);
-       }
-       return '';
+    public function getDistanceAttribute(): float
+    {
+
+        $request = request();
+
+        if ($request->latitude && $request->longitude) {
+
+            $distance = Maps::calculateDistance(
+                $this->latitude,
+                $this->longitude,
+                $request->latitude,
+                $request->longitude
+            );
+
+            return (float) str_replace(',', '', $distance);
+        }
+        //default earth distance in km
+        return 13716.96;
     }
 
 }

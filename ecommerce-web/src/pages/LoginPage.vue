@@ -31,71 +31,124 @@
 
           <!-- Login Form -->
           <q-card-section class="login-form-section">
-            <q-form @submit.prevent="onSubmit" class="login-form" ref="myForm">
-              <!-- Mobile Number Input -->
-              <div class="form-group q-mb-md">
-                <label class="form-label">
-                  <q-icon name="phone_android" size="sm" class="q-mr-xs" />
-                  Mobile Number
-                </label>
-                <q-input v-model="loginInfo.mobile" class="full-width q-mb-md" outlined label="Enter mobile number"
-                  placeholder="9XX XXX XXXX" :rules="[
-                    async (val) =>
-                      isValidMobileNumber(val) ||
-                      'Please enter a valid mobile number.',
-                  ]" hide-bottom-space prefix="+63">
-                  <template v-slot:prepend>
-                    <q-icon name="phone" />
-                  </template>
-                </q-input>
-                <div class="form-helper-text q-mt-xs">
-                  We'll send a verification code to this number
+            <div class="social-login-content">
+              <div class="social-login-copy q-mb-md">
+                <div class="text-subtitle1 text-weight-medium q-mb-sm">
+                  Sign in with email
+                </div>
+                <div class="form-helper-text">
+                  Use the email and password for your account.
                 </div>
               </div>
 
-              <!-- Get Passcode Button -->
-              <q-btn label="Get Verification Code" color="primary" outline class="full-width q-mb-lg"
-                @click="getPassCode" icon="verified_user" size="md" :disable="!isValidMobileNumber(loginInfo.mobile)" />
+              <q-form class="q-gutter-y-md" @submit.prevent="loginWithEmail">
+                <q-input
+                  v-model="email"
+                  outlined
+                  dense
+                  type="email"
+                  label="Email"
+                  class="login-input"
+                  :rules="[
+                    (val) => !!val?.trim() || 'Email is required',
+                    (val) => /.+@.+\..+/.test(val) || 'Enter a valid email',
+                  ]"
+                  lazy-rules
+                  autocomplete="email"
+                >
+                  <template #prepend>
+                    <q-icon name="email" />
+                  </template>
+                </q-input>
 
-              <!-- Passcode Input -->
-              <div class="form-group q-mb-md">
-                <label class="form-label">
-                  <q-icon name="vpn_key" size="sm" class="q-mr-xs" />
-                  Verification Code
-                </label>
-                <q-input :type="showPassword ? 'text' : 'password'" v-model="loginInfo.password" outlined
-                  label="Enter verification code" placeholder="Enter the code sent to your mobile" :rules="[
-                    (val) => (val && val.length > 0) || 'Verification code is required.'
-                  ]" hide-bottom-space class="login-input" mask="######">
-                  <template v-slot:prepend>
+                <q-input
+                  v-model="password"
+                  outlined
+                  dense
+                  :type="showPassword ? 'text' : 'password'"
+                  label="Password"
+                  class="login-input"
+                  :rules="[(val) => !!val || 'Password is required']"
+                  lazy-rules
+                  autocomplete="current-password"
+                >
+                  <template #prepend>
                     <q-icon name="lock" />
                   </template>
-                  <template v-slot:append>
-                    <q-icon :name="showPassword ? 'visibility' : 'visibility_off'" class="cursor-pointer"
-                      @click="showPassword = !showPassword" />
+                  <template #append>
+                    <q-btn
+                      flat
+                      round
+                      dense
+                      :icon="showPassword ? 'visibility_off' : 'visibility'"
+                      tabindex="-1"
+                      @click="showPassword = !showPassword"
+                    />
                   </template>
                 </q-input>
-                <div class="form-helper-text q-mt-xs">
-                  Enter the 6-digit code sent to your mobile number
+
+                <q-btn
+                  type="submit"
+                  label="Sign in"
+                  color="primary"
+                  class="login-submit-btn full-width"
+                  unelevated
+                  size="lg"
+                  :loading="isEmailSubmitting"
+                />
+              </q-form>
+
+              <div class="or-separator q-my-lg">
+                <q-separator />
+                <span class="or-separator-label text-caption text-grey-6">or</span>
+                <q-separator />
+              </div>
+
+              <div class="social-login-copy q-mb-md">
+                <div class="text-subtitle1 text-weight-medium q-mb-sm">
+                  Continue with Google Account
+                </div>
+                <div class="form-helper-text">
+                  Use your google account to sign in quickly and continue shopping.
                 </div>
               </div>
 
-              <!-- Submit Button -->
-              <q-btn label="Sign In" type="submit" color="primary" class="login-submit-btn full-width" unelevated
-                size="lg" icon="login" :loading="isSubmitting" />
+              <q-btn
+                label="Continue with Google"
+                color="primary"
+                class="login-submit-btn google-login-btn full-width q-mt-sm"
+                unelevated
+                size="lg"
+                :loading="isGoogleRedirecting"
+                :disable="isEmailSubmitting"
+                @click="loginWithGoogle"
+              />
 
-              <!-- Trust Indicators -->
+              <q-btn
+                label="Continue with Facebook"
+                color="primary"
+                class="login-submit-btn facebook-login-btn full-width"
+                unelevated
+                size="lg"
+                :loading="isFacebookRedirecting"
+                :disable="isEmailSubmitting"
+                @click="loginWithFacebook"
+                :disabled=true
+              />
+
+              
+
               <div class="trust-section q-mt-lg">
                 <div class="trust-item">
                   <q-icon name="lock" size="xs" color="positive" />
-                  <span class="text-caption">Secure Login</span>
+                  <span class="text-caption">Secure sign-in</span>
                 </div>
                 <div class="trust-item">
                   <q-icon name="verified" size="xs" color="positive" />
-                  <span class="text-caption">Verified Account</span>
+                  <span class="text-caption">Fast account access</span>
                 </div>
               </div>
-            </q-form>
+            </div>
           </q-card-section>
 
           <!-- Footer -->
@@ -115,88 +168,170 @@
 
 <script lang="ts" setup>
 import BreadCrumbsWrapper from 'src/components/BreadCrumbsWrapper.vue';
-import { ref } from 'vue';
-import { login, create } from 'src/boot/axios-call';
-import type { QForm } from 'quasar';
-import { LoginInterface } from 'boot/interfaces';
+import { onMounted, ref } from 'vue';
+import { axios } from 'src/boot/axios';
 import { useQuasar } from 'quasar';
-import { isValidMobileNumber } from 'src/boot/validators';
-import { useRouter } from 'vue-router';
+import { useRouter, useRoute } from 'vue-router';
+import { useUserStore } from 'src/stores/user';
+import type { ProfileState } from 'boot/interfaces';
 
 const router = useRouter();
+const route = useRoute();
 const $q = useQuasar();
-const loginInfo = ref<LoginInterface>({
-  mobile: '',
-  password: '',
-});
-const myForm = ref<QForm | null>(null);
-const showPassword = ref(false);
-const isSubmitting = ref(false);
+const userStore = useUserStore();
 
-const onSubmit = async () => {
-  myForm.value?.validate().then(async (success: any) => {
-    if (success) {
-      isSubmitting.value = true;
-      try {
-        const result = await login({
-          mobile: loginInfo.value.mobile,
-          password: loginInfo.value.password,
-        });
-        if (result) {
-          $q.notify({
-            message: 'Login successful! Welcome back.',
-            type: 'positive',
-            position: 'top',
-            icon: 'check_circle'
-          });
-          router.push('/');
-        }
-      } catch (error) {
-        $q.notify({
-          message: 'Invalid credentials. Please try again.',
-          type: 'negative',
-          position: 'top',
-          icon: 'error'
-        });
-      } finally {
-        isSubmitting.value = false;
-      }
-    }
+const email = ref('');
+const password = ref('');
+const showPassword = ref(false);
+const isEmailSubmitting = ref(false);
+const isFacebookRedirecting = ref(false);
+const isGoogleRedirecting = ref(false);
+
+const redirectTo = route.redirectedFrom?.fullPath;
+const getFacebookLoginUrl = () => {
+  return new URL('auth/facebook', axios.defaults.baseURL).toString();
+};
+
+const getGoogleLoginUrl = () => {
+  return new URL('auth/google', axios.defaults.baseURL).toString();
+};
+
+const getQueryValue = (value: unknown): string => {
+  if (Array.isArray(value)) {
+    return value[0] ?? '';
+  }
+
+  return typeof value === 'string' ? value : '';
+};
+
+const getUserMenuFromQuery = (): ProfileState['userMenu'] => {
+  const userMenu = getQueryValue(route.query.userMenu);
+
+  if (!userMenu) {
+    return [];
+  }
+
+  try {
+    return JSON.parse(userMenu) as ProfileState['userMenu'];
+  } catch (error) {
+    return [];
+  }
+};
+
+const applyAuthPayload = (profile: ProfileState, successMessage: string) => {
+  userStore.setProfile(profile);
+  userStore.setUser(profile);
+  $q.notify({
+    message: successMessage,
+    type: 'positive',
+    position: 'top',
+    icon: 'check_circle',
   });
 };
 
-const getPassCode = async () => {
-  if (!isValidMobileNumber(loginInfo.value.mobile)) {
-    $q.notify({
-      message: 'Please enter a valid mobile number.',
-      type: 'negative',
-      position: 'top'
+const finishFacebookLoginFromQuery = async (token: string) => {
+  const socialProfile: ProfileState = {
+    token,
+    name: getQueryValue(route.query.name) || null,
+    mobile: getQueryValue(route.query.mobile),
+    optimus_id: Number(getQueryValue(route.query.optimus_id) || 0),
+    userMenu: getUserMenuFromQuery(),
+  };
+
+  applyAuthPayload(socialProfile, 'Facebook login successful! Welcome back.');
+  await router.replace(redirectTo || '/');
+};
+
+const finishGoogleLoginFromQuery = async (token: string) => {
+  const socialProfile: ProfileState = {
+    token,
+    name: getQueryValue(route.query.name) || null,
+    mobile: getQueryValue(route.query.mobile),
+    optimus_id: Number(getQueryValue(route.query.optimus_id) || 0),
+    userMenu: getUserMenuFromQuery(),
+  };
+
+  applyAuthPayload(socialProfile, 'Google login successful! Welcome back.');
+  await router.replace(redirectTo || '/');
+};
+
+const loginWithEmail = async () => {
+  isEmailSubmitting.value = true;
+  try {
+    const res = await axios.post('login', {
+      email: email.value.trim(),
+      password: password.value,
     });
+    if (res.data?.success && res.data.data?.token) {
+      const data = res.data.data as ProfileState;
+      const profile: ProfileState = {
+        token: data.token,
+        name: data.name ?? null,
+        mobile: data.mobile ?? '',
+        optimus_id: Number(data.optimus_id ?? 0),
+        userMenu: Array.isArray(data.userMenu) ? data.userMenu : (typeof data.userMenu === 'string' ? JSON.parse(data.userMenu) : []),
+      };
+      applyAuthPayload(profile, 'Signed in successfully. Welcome back.');
+      await router.replace(redirectTo || '/');
+    }
+  } catch (err: unknown) {
+    const ax = err as { response?: { data?: { message?: string } } };
+    $q.notify({
+      message: ax.response?.data?.message ?? 'Sign in failed. Please try again.',
+      type: 'negative',
+      position: 'top',
+      icon: 'error',
+    });
+  } finally {
+    isEmailSubmitting.value = false;
+  }
+};
+
+const loginWithFacebook = () => {
+  isFacebookRedirecting.value = true;
+  window.location.href = getFacebookLoginUrl();
+};
+
+const loginWithGoogle = () => {
+  isGoogleRedirecting.value = true;
+  window.location.href = getGoogleLoginUrl();
+};
+
+onMounted(async () => {
+  const token = getQueryValue(route.query.token);
+  const error = getQueryValue(route.query.error);
+  const provider = getQueryValue(route.query.provider);
+
+  if (error) {
+    $q.notify({
+      message: error === 'facebook_email_required'
+        ? 'Facebook did not return an email address for this account.'
+        : error === 'google_email_required'
+        ? 'Google did not return an email address for this account.'
+        : 'Social login failed. Please try again.',
+      type: 'negative',
+      position: 'top',
+      icon: 'error'
+    });
+  }
+
+  if (!token) {
+    isFacebookRedirecting.value = false;
+    isGoogleRedirecting.value = false;
     return;
   }
 
   try {
-   await create(
-      {
-        entity: 'create-new-activation-code',
-        data: {
-          mobile: loginInfo.value.mobile,
-        },
-      },
-      true,
-      'Sending verification code to your mobile number...',
-      'Verification code sent! Please check your mobile.'
-    );
-
-  } catch (error) {
-    $q.notify({
-      message: 'Failed to send verification code. Please try again.',
-      type: 'negative',
-      position: 'bottom',
-      icon: 'error'
-    });
+    if (provider === 'google') {
+      await finishGoogleLoginFromQuery(token);
+    } else {
+      await finishFacebookLoginFromQuery(token);
+    }
+  } finally {
+    isFacebookRedirecting.value = false;
+    isGoogleRedirecting.value = false;
   }
-};
+});
 </script>
 
 <style scoped lang="scss">
@@ -276,6 +411,12 @@ const getPassCode = async () => {
   }
 }
 
+.social-login-content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
 .form-label {
   display: flex;
   align-items: center;
@@ -323,6 +464,27 @@ const getPassCode = async () => {
     transform: translateY(-2px);
     box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
   }
+}
+
+.facebook-login-btn {
+  background: #1877f2 !important;
+}
+
+.google-login-btn {
+  background: #4285f4 !important;
+}
+
+.or-separator {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 12px;
+  position: relative;
+}
+
+.or-separator-label {
+  text-transform: lowercase;
+  letter-spacing: 0.08em;
 }
 
 .trust-section {

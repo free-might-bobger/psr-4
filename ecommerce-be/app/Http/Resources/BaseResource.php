@@ -8,56 +8,71 @@ use Illuminate\Database\Eloquent\Collection;
 
 class BaseResource extends JsonResource
 {
-    public function toArray($request)
+    public function toArray($request): array
     {
-        $request = app()->make('request');
-        
-        if($this->resource instanceof LengthAwarePaginator){
+        if ($this->resource instanceof LengthAwarePaginator) {
             return $this->getPaginate();
         }
-        if($this->resource instanceof Collection){
-            if($request->only){
-                $explode = explode(',', $request->only);
-                return $this->resource->map( fn($v) => $v->only($explode) );
-            }
-           
+
+        if ($this->resource instanceof Collection) {
+            return $this->filterCollection($request);
         }
+
         return parent::toArray($request);
-        
     }
 
-    public function getTo(){
+    private function filterCollection($request): array
+    {
+        if (!$request->only) {
+            return $this->resource->toArray();
+        }
+
+        $fields = explode(',', $request->only);
+        return $this->resource->map(fn ($item) => $item->only($fields))->toArray();
+    }
+
+    public function getTo(): int
+    {
         $to = $this->perPage() * $this->currentPage();
-        if ( $to >= $this->total() ){
-            return $this->total();
-        }
-        return $to;
+        return $to >= $this->total() ? $this->total() : $to;
     }
 
-    public function getPaginate(){
-
-        
+    public function getPaginate(): array
+    {
         $items = $this->items();
-
-        if(method_exists($this, 'hasStoreAdvertisement')){
-            $items =  $this->hasStoreAdvertisement();
-        }
-
-        if(method_exists($this, 'makeVisibleFields')){
-            $items =  $this->makeVisibleFields();
-        }
-        
+        $items = $this->processItems($items);
 
         return [
             'data' => $items,
-            'meta' => [
-                'per_page'      => $this->perPage(),
-                'current_page'  => $this->currentPage(),
-                'total'         => $this->total(),
-                'last_page'     => $this->lastPage(),
-                'to'            => $this->getTo(),
-                'from'          => ( $this->perPage() * $this->currentPage() ) - $this->perPage() + 1
-            ]
+            'meta' => $this->getPaginationMeta(),
+        ];
+    }
+
+    private function processItems($items): array
+    {
+        if (method_exists($this, 'hasStoreAdvertisement')) {
+            return $this->hasStoreAdvertisement();
+        }
+
+        if (method_exists($this, 'makeVisibleFields')) {
+            return $this->makeVisibleFields();
+        }
+
+        return $items;
+    }
+
+    private function getPaginationMeta(): array
+    {
+        $perPage = $this->perPage();
+        $currentPage = $this->currentPage();
+
+        return [
+            'per_page' => $perPage,
+            'current_page' => $currentPage,
+            'total' => $this->total(),
+            'last_page' => $this->lastPage(),
+            'to' => $this->getTo(),
+            'from' => ($perPage * $currentPage) - $perPage + 1,
         ];
     }
 

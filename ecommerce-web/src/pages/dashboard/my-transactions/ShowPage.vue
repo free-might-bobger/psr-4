@@ -81,9 +81,9 @@
                     <q-icon name="phone" color="primary" />
                   </q-item-section>
                   <q-item-section>
-                    <q-item-label class="info-label">Contact Number</q-item-label>
+                    <q-item-label class="info-label">Receiver's Mobile Number</q-item-label>
                     <q-item-label caption class="info-value">
-                      {{ localResult.contact_number || 'N/A' }}
+                      {{ localResult.receivers_mobile || 'N/A' }}
                     </q-item-label>
                   </q-item-section>
                 </q-item>
@@ -269,7 +269,7 @@ interface TransactionDetail {
   receive_method_id: number;
   lat: number | null;
   lng: number | null;
-  contact_number: string;
+  receivers_mobile: string;
   delivery_charge: string;
   total: number;
   grand_total: number;
@@ -291,7 +291,7 @@ const localResult = ref<TransactionDetail>({
   receive_method_id: 0,
   lat: null,
   lng: null,
-  contact_number: '',
+  receivers_mobile: '',
   delivery_charge: '0.00',
   total: 0,
   grand_total: 0,

@@ -109,9 +109,9 @@
                     unelevated
                     dense
                     round
-                    color="negative"
+                    color="secondary"
                     icon="check_circle"
-                    :to="`${$route.path}/${transaction.optimus_id}`"
+                    @click="markedAsReceived(transaction.optimus_id)"
                      class="action-btn-grid action-btn-delete"
                   >
                     <q-tooltip>Mark as received</q-tooltip>
@@ -126,6 +126,18 @@
                       class="action-btn-grid action-btn-edit"
                   >
                     <q-tooltip>View details</q-tooltip>
+                  </q-btn>
+                  <q-btn
+                    v-if="transaction.status"
+                    unelevated
+                    dense
+                    round
+                    color="negative"
+                    icon="undo"
+                    :to="`${$route.path}/${transaction.optimus_id}`"
+                     class="action-btn-grid action-btn-delete"
+                  >
+                    <q-tooltip>Request refund</q-tooltip>
                   </q-btn>
                 </div>
               </div>
@@ -266,7 +278,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { onRequest, firstPage, previousPage, nextPage, lastPage } from 'boot/axios-call';
+import { onRequest, firstPage, previousPage, nextPage, lastPage, update} from 'boot/axios-call';
 import { useCommonStore } from 'src/stores/common';
 import { onMounted, ref, watch } from 'vue';
 import { storeToRefs } from 'pinia';
@@ -348,6 +360,18 @@ const formatDate = (dateString: string | undefined): string => {
     day: 'numeric',
     year: 'numeric'
   });
+};
+
+const markedAsReceived = async (transactionId: string) => {
+   const updated = await update(
+      {
+        entity: 'my-transactions-marked-as-received',
+        data: {},
+        optimus_id: transactionId,
+      },
+      true,
+      true
+    );
 };
 </script>
 

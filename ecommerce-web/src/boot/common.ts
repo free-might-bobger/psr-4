@@ -1,8 +1,6 @@
 import { useUserStore } from 'src/stores/user';
 import { storeToRefs } from 'pinia';
 
-const { menuIds, profile } = storeToRefs(useUserStore());
-
 export const queryString = (query: object) => {
   const newQuery = removeEmptyValue(query);
   if (newQuery) {
@@ -59,11 +57,9 @@ export const menuAllChildren = (menu: MenuAllChildren) => {
 };
 
 export const hasAccessToMenu = (menuId: number): boolean => {
+  const { menuIds } = storeToRefs(useUserStore());
   const accessMenus = menuIds.value.indexOf(menuId);
-  if (accessMenus) {
-    return true;
-  }
-  return false;
+  return accessMenus !== -1;
 };
 
 export async function urltoFile(
@@ -77,6 +73,7 @@ export async function urltoFile(
 }
 
 export function getPrimaryImageUrl(): string {
+  const { profile } = storeToRefs(useUserStore());
   if (profile.value.images.length > 0) {
     const image = profile.value.images.find((v) => v.is_primary === 1);
     if (image) {

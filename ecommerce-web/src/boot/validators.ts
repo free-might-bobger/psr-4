@@ -2,6 +2,9 @@ import { isEmailUnique } from './axios-call';
 import { ErrorValidationInterface } from './interfaces';
 
 export const isValidMobileNumber = (mobile: string): boolean => {
+  if (!mobile) {
+    return false;
+  }
   const mobileNumberPattern = /^\d{10}$/;
   return mobileNumberPattern.test(mobile);
 }

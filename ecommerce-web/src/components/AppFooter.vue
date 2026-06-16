@@ -9,7 +9,7 @@
                             <BiliscartLogo :size="40" />
                         </div>
                         <div class="footer-brand-text">
-                            <div class="footer-brand-name">Biliscart</div>
+                            <div class="footer-brand-name">My Near Shops</div>
                             <div class="footer-brand-tagline">Your Trusted Online Shop</div>
                         </div>
                     </div>
@@ -38,7 +38,7 @@
                     </div>
                     <div class="footer-contact-item">
                         <q-icon name="email" size="sm" class="q-mr-sm" />
-                        <span>support@biliscart.com</span>
+                        <span>support@mynearshops.com</span>
                     </div>
                     <div class="footer-contact-item">
                         <q-icon name="location_on" size="sm" class="q-mr-sm" />
@@ -52,7 +52,7 @@
             <div class="footer-bottom">
                 <div class="footer-copyright">
                     <q-icon name="copyright" size="sm" class="q-mr-xs" />
-                    <span>2024 Biliscart. All rights reserved.</span>
+                    <span>2024 My Near Shops. All rights reserved.</span>
                 </div>
                 <div class="footer-social">
                     <q-btn flat round icon="facebook" size="sm" class="social-btn" />

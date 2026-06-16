@@ -8,12 +8,19 @@ import { useCommonStore } from 'src/stores/common';
 import { AxiosResponse } from 'axios';
 import { GetParams, CreateData, LoginInterface, ShowInterface, DeleteInterface, UpdateInterface} from 'boot/interfaces';
 import { ERROR_CODE } from './constant';
-const useCommon = useCommonStore();
-const useUser = useUserStore()
-const { profile, user } = storeToRefs(useUser);
+
+function userRefs() {
+  const useUser = useUserStore();
+  return { useUser, ...storeToRefs(useUser) };
+}
+
+function commonStore() {
+  return useCommonStore();
+}
 
 
 export const login = async (attributes: LoginInterface): Promise<void | boolean> => {
+  const { profile, user } = userRefs();
   Loading.show();
   return await axios
     .post('login', attributes)
@@ -37,7 +44,7 @@ export const login = async (attributes: LoginInterface): Promise<void | boolean>
 export const register = async (params: object): Promise<void | boolean> => {
   Loading.show();
   return await axios
-    .post('user-register', params)
+    .post('register', params)
     .then(() => {
       Loading.hide();
 
@@ -45,21 +52,27 @@ export const register = async (params: object): Promise<void | boolean> => {
         timeout: 5000,
         position: 'bottom',
         type: 'positive',
-        message: 'Please check your email for confirmation.',
+        message: 'Account created successfully.',
       });
       return true;
     })
     .catch((err) => {
       Loading.hide();
+      const data = err.response?.data;
+      const fromValidation =
+        data?.data && typeof data.data === 'object'
+          ? errorToString(data.data as { errors: object[] })
+          : undefined;
       Notify.create({
         position: 'bottom',
         type: 'negative',
-        message: errorToString(err.response.data.errors),
+        message: fromValidation ?? data?.message ?? 'Registration failed.',
       });
     });
 };
 
 export const logout = async (): Promise<object | void> => {
+  const { useUser } = userRefs();
   Loading.show();
   return await axios
     .post('/logout')
@@ -263,7 +276,7 @@ export async function onRequest(
   params: GetParams,
   showLoader?: boolean
 ): Promise<void> {
-  await useCommon.setResultPagination(params, showLoader);
+  await commonStore().setResultPagination(params, showLoader);
 }
 
 export const nextPage = (entityQuery: GetParams) => {

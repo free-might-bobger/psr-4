@@ -5,21 +5,20 @@ namespace App\Mail;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Contracts\Queue\ShouldQueue;
 
 class UserRegistration extends Mailable
 {
     use Queueable, SerializesModels;
-    public $array;
+    public $user;
 
     /**
      * Create a new message instance.
      *
      * @return void
      */
-    public function __construct($array)
+    public function __construct(array $user)
     {
-        $this->array = $array;
+        $this->user = $user;
     }
 
     /**

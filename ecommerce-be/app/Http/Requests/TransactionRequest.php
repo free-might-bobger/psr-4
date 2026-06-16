@@ -27,10 +27,10 @@ class TransactionRequest extends BaseRequest
             'deliveryCharge'            => 'required',
             'selectedReceiveMethod'     => 'required',
             'selectedPaymenthMethod'    => 'required',
+            'receivers_mobile'          => 'required',
             'lat'                       => 'required',
             'lng'                       => 'required',
-            'total'                     => 'required',
-            'status_id'                 => 'required'
+            'total'                     => 'required'
 
         ];
     }
