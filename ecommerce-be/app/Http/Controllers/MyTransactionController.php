@@ -20,6 +20,7 @@ class MyTransactionController extends ApiController {
         $this->repository = $repository;
         $this->transactionService = $transactionService;
         $this->indexRequest = BaseIndexRequest::class;
+        $this->showRequest = BaseIndexRequest::class;
         $this->updateRequest    = UpdateRequest::class;
 
     }

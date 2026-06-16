@@ -18,6 +18,7 @@ class RoleUserController extends ApiController
         $this->model =  RoleUser::class;
         $this->repository = $repository;
         $this->indexRequest = BaseIndexRequest::class;
+        $this->showRequest = BaseIndexRequest::class;
         $this->storeRequest    = RoleUserRequest::class;
         $this->updateRequest    = RoleUserRequest::class;
         $this->service = $service;

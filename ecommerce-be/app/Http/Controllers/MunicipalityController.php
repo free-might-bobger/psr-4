@@ -13,6 +13,7 @@ class MunicipalityController extends ApiController
         $this->model =  Municipality::class;
         $this->repository = $repository;
         $this->indexRequest = BaseIndexRequest::class;
+        $this->showRequest = BaseIndexRequest::class;
     }
 
     public function isPublicRoute(string $routeName): Bool {

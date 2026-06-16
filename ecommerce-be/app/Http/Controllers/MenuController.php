@@ -12,6 +12,7 @@ class MenuController extends ApiController
         $this->model =  Menu::class;
         $this->repository = $repository;
         $this->indexRequest = BaseIndexRequest::class;
+        $this->showRequest = BaseIndexRequest::class;
     }
 
 

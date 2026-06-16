@@ -13,6 +13,7 @@ class ReceiveMethodController extends ApiController
 
         $this->repository = $repository;
         $this->indexRequest = BaseIndexRequest::class;
+        $this->showRequest = BaseIndexRequest::class;
     }
 
     public function isPublicRoute(string $routeName): Bool {

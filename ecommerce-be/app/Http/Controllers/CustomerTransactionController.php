@@ -17,6 +17,7 @@ class CustomerTransactionController extends ApiController
         $this->model            =  Transaction::class;
         $this->repository       = $repository;
         $this->indexRequest     = BaseIndexRequest::class;
+        $this->showRequest      = BaseIndexRequest::class;
         $this->storeRequest     = TransactionRequest::class;
         $this->updateRequest    = BaseIndexRequest::class;
     }

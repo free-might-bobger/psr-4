@@ -9,12 +9,14 @@ use App\Http\Requests\StoreUser\UpdateRequest;
 use App\Traits\Frontend\FrontendUrlTrait;
 use App\Services\StoreUserService;
 use App\Http\Resources\StoreUser\IndexResource;
+use App\Http\Requests\BaseIndexRequest;
 
 class StoreUserController extends ApiController
 {
     public function __construct(StoreUserRepository $repository){
         $this->repository = $repository;
         $this->indexRequest = IndexRequest::class;
+        $this->showRequest = BaseIndexRequest::class;
         $this->storeRequest = StoreRequest::class;
         $this->updateRequest = UpdateRequest::class;
     }

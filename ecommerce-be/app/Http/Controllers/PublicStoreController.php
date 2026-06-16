@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Repositories\StoreRepository;
 use App\Http\Requests\Store\StoreRequest;
 use App\Http\Requests\Store\StoreIndexRequest;
+use App\Http\Requests\BaseIndexRequest;
 use App\Http\Resources\PublicStore\IndexResource;
 use App\Http\Resources\PublicStore\ShowResource;
 use Illuminate\Database\Eloquent\Model;
@@ -17,6 +18,7 @@ class PublicStoreController extends ApiController
     {
         $this->repository = $repository;
         $this->indexRequest = StoreIndexRequest::class;
+        $this->showRequest = BaseIndexRequest::class;
         $this->storeRequest = StoreRequest::class;
     }
 

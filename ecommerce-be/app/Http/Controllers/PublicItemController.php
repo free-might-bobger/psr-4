@@ -4,7 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\PublicItemResource;
 use App\Repositories\ItemRepository;
-use App\Http\Requests\PublicItem\IndexRequest; 
+use App\Http\Requests\PublicItem\IndexRequest;
+use App\Http\Requests\BaseIndexRequest; 
 use Illuminate\Support\Arr;
 use App\Http\Resources\PublicItem\IndexResource;
 
@@ -14,6 +15,7 @@ class PublicItemController extends ApiController
     {
         $this->repository = $repository;
         $this->indexRequest = IndexRequest::class;
+        $this->showRequest = BaseIndexRequest::class;
     }
 
     public function index(): IndexResource

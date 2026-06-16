@@ -13,6 +13,7 @@ class SharedStoreAccessController extends ApiController
     public function __construct( SharedStoreAccessRepository $repository ) {
         $this->repository       = $repository;
         $this->indexRequest     = BaseIndexRequest::class;
+        $this->showRequest     = BaseIndexRequest::class;
     }
 
     public function getResource(): IndexResource {

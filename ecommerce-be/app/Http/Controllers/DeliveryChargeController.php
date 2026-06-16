@@ -15,6 +15,7 @@ class DeliveryChargeController extends ApiController
 
         $this->repository = $repository;
         $this->indexRequest = BaseIndexRequest::class;
+        $this->showRequest = BaseIndexRequest::class;
     }
 
     public function getResource(){

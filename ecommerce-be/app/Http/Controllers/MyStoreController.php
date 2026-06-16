@@ -14,6 +14,7 @@ class MyStoreController extends ApiController
         $this->model            = Store::class;
         $this->repository       = $repository;
         $this->indexRequest     = BaseIndexRequest::class;
+        $this->showRequest      = BaseIndexRequest::class;
         $this->storeRequest     = StoreRequest::class;
         $this->updateRequest    = PatchRequest::class;
     }
