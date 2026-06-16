@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class FindStoreResource extends BaseResource
 {
    public function __construct(Collection|Model $resource) {
-        $this->fields = ['id', 'label', 'name', 'latitude', 'longitude', 'optimus_id'];
+        $this->fields = ['id', 'label', 'name', 'latitude', 'longitude', 'optimus_id', 'distance'];
         parent::__construct($resource);
     }
     

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\Store\StoreRequest;
+use App\Http\Requests\Store\PatchRequest;
 use App\Repositories\MyStoreRepository;
 use App\Http\Requests\BaseIndexRequest;
 use App\Http\Resources\MyStore\IndexResource;
@@ -14,7 +15,7 @@ class MyStoreController extends ApiController
         $this->repository       = $repository;
         $this->indexRequest     = BaseIndexRequest::class;
         $this->storeRequest     = StoreRequest::class;
-        $this->updateRequest    = BaseIndexRequest::class;
+        $this->updateRequest    = PatchRequest::class;
     }
     
     public function getResource(){

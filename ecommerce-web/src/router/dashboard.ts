@@ -18,7 +18,6 @@ export default [
           path: 'users',
           children: [
             { path: '', component: () => import('src/pages/dashboard/users/IndexPage.vue') },
-            { path: 'create', component: () => import('src/pages/dashboard/users/CreatePage.vue') },
             { path: ':id', component: () => import('src/pages/dashboard/users/EditPage.vue') },
           ]
         },

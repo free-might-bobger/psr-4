@@ -18,8 +18,9 @@ class UserController extends ApiController
         $this->model =  User::class;
         $this->repository = $repository;
         $this->indexRequest = BaseIndexRequest::class;
-        $this->storeRequest    = BaseIndexRequest::class;
-        $this->updateRequest    = BaseIndexRequest::class;
+        $this->storeRequest = BaseIndexRequest::class;
+        $this->updateRequest = BaseIndexRequest::class;
+        $this->showRequest = BaseIndexRequest::class;
         $this->userService = $userService;
     }
 
