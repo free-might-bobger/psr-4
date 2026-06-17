@@ -7,13 +7,13 @@ use App\Repositories\BaseRepository;
 use App\Traits\RoleTrait;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Arr;
-use App\Repositories\Support\SearchFieldSupport;
+use App\Repositories\Support\ColumnValueCriteria;
 use Illuminate\Support\Facades\File;
 use App\Models\Image;
 use App\Constants\Config;
 class ItemRepository extends BaseRepository
 {
-    use RoleTrait, SearchFieldSupport;
+    use RoleTrait, ColumnValueCriteria;
 
     protected Collection $collection;
 

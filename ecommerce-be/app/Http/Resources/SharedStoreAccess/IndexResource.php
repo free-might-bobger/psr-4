@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 class IndexResource extends BaseResource
 {
    public function __construct(Model|LengthAwarePaginator $resource) {
-        $this->fields = ['id', 'label', 'name', 'optimus_id'];
+        $this->fields = ['id', 'label', 'name', 'optimus_id', 'email'];
         parent::__construct($resource);
     }
     
