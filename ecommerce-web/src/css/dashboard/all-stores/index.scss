@@ -276,129 +276,6 @@
 }
 
 // Mobile Styles
-.stores-cards {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.store-card {
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  transition: all 0.3s ease;
-  border: 1px solid #e0e0e0;
-  position: relative;
-  overflow: hidden;
-
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 4px;
-    height: 100%;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    opacity: 0;
-    transition: opacity 0.3s ease;
-  }
-
-  &:hover {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
-    transform: translateY(-2px);
-    border-color: #1976d2;
-
-    &::before {
-      opacity: 1;
-    }
-  }
-}
-
-.store-card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.store-card-title {
-  display: flex;
-  align-items: center;
-  flex: 1;
-}
-
-.store-name-link {
-  color: #1a1a1a;
-  text-decoration: none;
-  font-size: 18px;
-  font-weight: 600;
-  transition: color 0.2s ease;
-
-  &:hover {
-    color: #1976d2;
-  }
-}
-
-.store-card-info {
-  display: flex;
-  align-items: center;
-  padding: 8px 0;
-}
-
-.store-card-actions {
-  display: flex;
-  gap: 8px;
-  padding-top: 12px;
-  border-top: 1px solid #f0f0f0;
-}
-
-.action-btn-mobile {
-  flex: 1;
-  border-radius: 10px;
-  font-weight: 600;
-  text-transform: none;
-  padding: 10px 16px;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  }
-
-  &:active {
-    transform: translateY(0);
-  }
-}
-
-.action-btn-edit-mobile {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-
-  .q-icon {
-    margin-right: 6px;
-    font-size: 18px;
-  }
-
-  &:hover {
-    background: linear-gradient(135deg, #5568d3 0%, #6a3f8f 100%);
-    box-shadow: 0 4px 16px rgba(102, 126, 234, 0.4);
-  }
-}
-
-.action-btn-delete-mobile {
-  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-  color: white;
-
-  .q-icon {
-    margin-right: 6px;
-    font-size: 18px;
-  }
-
-  &:hover {
-    background: linear-gradient(135deg, #e082ea 0%, #e4465b 100%);
-    box-shadow: 0 4px 16px rgba(245, 87, 108, 0.4);
-  }
-}
-
 .empty-state {
   display: flex;
   flex-direction: column;
@@ -408,10 +285,226 @@
   text-align: center;
 }
 
+.empty-state-icon {
+  background: linear-gradient(135deg, #f0f4ff 0%, #e8edff 100%);
+  border-radius: 24px;
+  padding: 24px;
+  box-shadow: 0 4px 16px rgba(102, 126, 234, 0.15);
+}
+
+.stores-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.store-card {
+  border-radius: 16px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid #e8eaf6;
+  position: relative;
+  overflow: hidden;
+  background: white;
+
+  &:hover {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    transform: translateY(-2px);
+    border-color: #c5cae9;
+  }
+}
+
+.store-card-accent {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+}
+
+.store-card-section {
+  padding: 20px;
+}
+
+.store-card-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.store-card-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.store-card-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.store-name-link {
+  color: #1a1a1a;
+  text-decoration: none;
+  font-size: 18px;
+  font-weight: 700;
+  transition: all 0.2s ease;
+  display: block;
+  line-height: 1.3;
+  word-break: break-word;
+
+  &:hover {
+    color: #667eea;
+  }
+}
+
+.store-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  background: #e8f5e9;
+  color: #2e7d32;
+
+  .q-icon {
+    font-size: 14px;
+  }
+
+  &.deleted {
+    background: #ffebee;
+    color: #c62828;
+  }
+}
+
+.store-card-info {
+  background: linear-gradient(135deg, #f8f9ff 0%, #f5f7ff 100%);
+  border-radius: 12px;
+  padding: 12px 16px;
+  margin-bottom: 16px;
+}
+
+.info-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.info-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #667eea;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+}
+
+.info-text {
+  font-size: 15px;
+  font-weight: 500;
+  color: #374151;
+}
+
+.store-card-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.action-btn {
+  border-radius: 10px;
+  font-weight: 600;
+  text-transform: none;
+  padding: 10px 16px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+  .q-icon {
+    margin-right: 6px;
+    font-size: 18px;
+  }
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+.action-btn-edit {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+
+  &:hover {
+    background: linear-gradient(135deg, #5568d3 0%, #6a3f8f 100%);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+  }
+}
+
+.action-btn-delete {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  color: white;
+
+  &:hover {
+    background: linear-gradient(135deg, #e082ea 0%, #e4465b 100%);
+    box-shadow: 0 6px 20px rgba(245, 87, 108, 0.4);
+  }
+}
+
+.action-btn-restore {
+  background: linear-gradient(135deg, #4caf50 0%, #388e3c 100%);
+  color: white;
+
+  &:hover {
+    background: linear-gradient(135deg, #43a047 0%, #2e7d32 100%);
+    box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+  }
+}
+
 .mobile-pagination {
   display: flex;
-  justify-content: center;
-  padding: 16px;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 20px 16px;
+  background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  margin-top: 16px;
+}
+
+.pagination-wrapper {
+  :deep(.q-pagination) {
+    .q-btn {
+      border-radius: 8px;
+      margin: 0 2px;
+    }
+  }
+}
+
+.pagination-stats {
+  font-size: 13px;
+  color: #666;
+  font-weight: 500;
 }
 
 // Responsive Design
@@ -708,91 +801,40 @@
     padding: 0 20px;
   }
 
-  // Mobile card view improvements
-  .stores-cards {
-    gap: 16px;
+  // Mobile card view - uses base styles
+  .store-card-section {
+    padding: 18px;
   }
 
-  .store-card {
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    border: 1px solid #e0e0e0;
-    overflow: hidden;
-    transition: all 0.3s ease;
-
-    &:hover {
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
-      transform: translateY(-2px);
-    }
-  }
-
-  .store-card-header {
-    margin-bottom: 12px;
-  }
-
-  .store-card-title {
-    .q-icon {
-      font-size: 28px;
-    }
-  }
-
-  .store-name-link {
-    font-size: 18px;
-    font-weight: 600;
-  }
-
-  .store-card-info {
-    background: #f8f9fa;
-    padding: 12px 16px;
-    border-radius: 8px;
-    margin: 12px 0;
-    display: flex;
-    align-items: center;
-
-    .q-icon {
-      font-size: 18px;
-      margin-right: 8px;
-    }
-
-    span {
-      font-size: 15px;
-      font-weight: 500;
-      color: #333;
-    }
-  }
-
-  .store-card-actions {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-    padding-top: 16px;
-    border-top: 2px solid #f0f0f0;
-    margin-top: 16px;
-  }
-
-  .action-btn-mobile {
-    padding: 12px 16px;
-    font-size: 14px;
-    font-weight: 600;
-    height: 48px;
+  .store-card-icon {
+    width: 44px;
+    height: 44px;
 
     .q-icon {
       font-size: 20px;
     }
   }
 
-  .empty-state {
-    padding: 60px 20px;
-    border-radius: 12px;
-    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+  .store-name-link {
+    font-size: 17px;
+  }
+
+  .store-card-info {
+    padding: 10px 14px;
+  }
+
+  .action-btn {
+    padding: 10px 14px;
+    font-size: 13px;
+    height: 44px;
+
+    .q-icon {
+      font-size: 18px;
+    }
   }
 
   .mobile-pagination {
-    padding: 20px 16px;
-    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
-    border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-    margin-top: 16px;
+    padding: 16px;
   }
 }
 
@@ -893,54 +935,68 @@
     padding: 0 12px;
   }
 
-  // Mobile card improvements
-  .store-card {
-    border-radius: 10px;
-    margin-bottom: 12px;
+  // Mobile card - small screen adjustments
+  .store-card-section {
+    padding: 16px;
   }
 
-  .store-card-title {
+  .store-card-icon {
+    width: 40px;
+    height: 40px;
+
     .q-icon {
-      font-size: 24px;
+      font-size: 18px;
     }
   }
 
+  .store-card-header {
+    gap: 12px;
+  }
+
   .store-name-link {
-    font-size: 17px;
+    font-size: 16px;
+  }
+
+  .store-status-badge {
+    font-size: 11px;
+    padding: 3px 8px;
   }
 
   .store-card-info {
     padding: 10px 12px;
-    margin: 10px 0;
+    margin-bottom: 12px;
+  }
+
+  .info-icon {
+    width: 28px;
+    height: 28px;
 
     .q-icon {
-      font-size: 16px;
-    }
-
-    span {
       font-size: 14px;
     }
   }
 
-  .store-card-actions {
-    gap: 10px;
-    padding-top: 12px;
-    margin-top: 12px;
+  .info-text {
+    font-size: 14px;
   }
 
-  .action-btn-mobile {
-    font-size: 13px;
-    padding: 10px 12px;
-    height: 44px;
+  .store-card-actions {
+    gap: 10px;
+  }
+
+  .action-btn {
+    padding: 8px 12px;
+    font-size: 12px;
+    height: 40px;
 
     .q-icon {
-      font-size: 18px;
+      font-size: 16px;
       margin-right: 4px;
     }
   }
 
-  .empty-state {
-    padding: 50px 16px;
+  .empty-state-icon {
+    padding: 20px;
 
     .q-icon {
       font-size: 56px !important;
@@ -949,6 +1005,7 @@
 
   .mobile-pagination {
     padding: 16px 12px;
+    gap: 10px;
 
     :deep(.q-pagination) {
       .q-btn {

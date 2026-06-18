@@ -65,6 +65,7 @@ interface UserMenu {
   name: string 
   icon: string 
   path: string
+  all_children: Array<UserMenu>
 }
 
 export interface ProfileState {

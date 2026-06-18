@@ -89,37 +89,62 @@
     <!-- Mobile Card View -->
     <div class="mobile-only">
       <div v-if="typedResult.length === 0" class="empty-state">
-        <q-icon name="store" size="64px" color="grey-4" />
-        <div class="text-h6 q-mt-md text-grey-6">No stores found</div>
+        <div class="empty-state-icon">
+          <q-icon name="store_mall_directory" size="72px" color="primary" />
+        </div>
+        <div class="text-h6 q-mt-lg text-grey-7">No stores found</div>
+        <div class="text-body2 q-mt-sm text-grey-5">Try adjusting your search</div>
       </div>
       <div v-else class="stores-cards">
-        <q-card v-for="store in typedResult" :key="store.id" flat bordered class="store-card q-mb-md">
-          <q-card-section>
+        <q-card v-for="store in typedResult" :key="store.id" flat class="store-card">
+          <div class="store-card-accent"></div>
+          <q-card-section class="store-card-section">
             <div class="store-card-header">
-              <div class="store-card-title">
-                <q-icon name="store" color="primary" size="24px" class="q-mr-sm" />
+              <div class="store-card-icon">
+                <q-icon name="store" color="white" size="22px" />
+              </div>
+              <div class="store-card-content">
                 <router-link :to="`/dashboard/all-stores/${store.optimus_id}`" class="store-name-link">
                   {{ store.name }}
                 </router-link>
+                <div class="store-status-badge" :class="{ 'deleted': store.deleted_at }">
+                  <q-icon :name="store.deleted_at ? 'archive' : 'check_circle'" size="12px" />
+                  {{ store.deleted_at ? 'Archived' : 'Active' }}
+                </div>
               </div>
             </div>
-            <div v-if="store.mobile" class="store-card-info q-mt-sm">
-              <q-icon name="phone" size="16px" color="grey-6" class="q-mr-xs" />
-              <span class="text-body2 text-grey-7">{{ store.mobile }}</span>
+            <div v-if="store.mobile" class="store-card-info">
+              <div class="info-item">
+                <div class="info-icon">
+                  <q-icon name="phone" size="16px" />
+                </div>
+                <span class="info-text">{{ store.mobile }}</span>
+              </div>
             </div>
-            <div class="store-card-actions q-mt-md">
-              <q-btn unelevated dense color="primary" icon="edit_note" label="Edit"
-                :to="`/dashboard/all-stores/${store.optimus_id}`" class="action-btn-mobile action-btn-edit-mobile" />
-              <q-btn unelevated dense color="negative" icon="delete_forever" label="Delete" v-if="!store.deleted_at"
-                @click="handleDeleteStore(store)" class="action-btn-mobile action-btn-delete-mobile" />
+            <div class="store-card-actions">
+              <q-btn unelevated dense color="primary" icon="edit" label="Edit"
+                :to="`/dashboard/all-stores/${store.optimus_id}`" class="action-btn action-btn-edit">
+                <q-tooltip>Edit Store</q-tooltip>
+              </q-btn>
+              <q-btn unelevated dense :color="store.deleted_at ? 'secondary' : 'negative'"
+                :icon="store.deleted_at ? 'restore' : 'delete'" :label="store.deleted_at ? 'Restore' : 'Delete'"
+                @click="store.deleted_at ? handleRestoreStore(store) : handleDeleteStore(store)" class="action-btn"
+                :class="store.deleted_at ? 'action-btn-restore' : 'action-btn-delete'">
+                <q-tooltip>{{ store.deleted_at ? 'Restore Store' : 'Delete Store' }}</q-tooltip>
+              </q-btn>
             </div>
           </q-card-section>
         </q-card>
       </div>
       <!-- Mobile Pagination -->
-      <div v-if="typedResult.length > 0" class="mobile-pagination q-mt-md">
-        <q-pagination v-model="pagination.page" :max="pagination.lastPage" :max-pages="5" direction-links boundary-links
-          color="primary" @update:model-value="handlePageChange" />
+      <div v-if="typedResult.length > 0" class="mobile-pagination">
+        <div class="pagination-wrapper">
+          <q-pagination v-model="pagination.page" :max="pagination.lastPage" :max-pages="5" direction-links
+            boundary-links color="primary" @update:model-value="handlePageChange" />
+        </div>
+        <div class="pagination-stats">
+          Showing {{ pagination.from }} - {{ pagination.to }} of {{ pagination.rowsNumber }} stores
+        </div>
       </div>
     </div>
   </div>

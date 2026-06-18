@@ -59,19 +59,21 @@
       <!-- Navigation Menu -->
       <q-list class="dashboard-menu" padding>
         <q-item-label header class="menu-section-header">
-          <q-icon name="settings" class="q-mr-sm" />
-          Menu
+          <q-icon name="apps" class="q-mr-sm" size="18px" />
+          Navigation
         </q-item-label>
         <q-item clickable :to="menu.path" v-for="menu in profile.userMenu" :key="menu.id" class="menu-item"
           active-class="menu-item-active" v-ripple>
-          <q-item-section avatar>
-            <q-icon :name="menu.icon" size="sm" />
+          <q-item-section avatar class="menu-icon-section">
+            <div class="menu-icon-wrapper">
+              <q-icon :name="menu.icon" size="20px" />
+            </div>
           </q-item-section>
           <q-item-section>
-            <q-item-label>{{ menu.name }}</q-item-label>
+            <q-item-label class="menu-item-label">{{ menu.name }}</q-item-label>
           </q-item-section>
-          <q-item-section side>
-            <q-icon name="chevron_right" size="xs" color="grey-5" />
+          <q-item-section side class="menu-arrow-section">
+            <q-icon name="chevron_right" size="16px" class="menu-arrow" />
           </q-item-section>
         </q-item>
       </q-list>
@@ -308,46 +310,135 @@ const logoutNow = async () => {
 }
 
 .menu-section-header {
-  padding: 12px 16px;
-  font-weight: 600;
-  color: #666;
-  font-size: 12px;
+  padding: 16px 20px 12px;
+  font-weight: 700;
+  color: #8b92a8;
+  font-size: 11px;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 1px;
   display: flex;
   align-items: center;
+  background: linear-gradient(90deg, transparent 0%, rgba(0, 0, 0, 0.02) 50%, transparent 100%);
 }
 
 .menu-item {
-  margin: 4px 8px;
-  border-radius: 8px;
-  transition: all 0.3s ease;
-  min-height: 48px;
+  margin: 6px 12px;
+  border-radius: 12px;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  min-height: 52px;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 3px;
+    height: 0;
+    background: var(--q-primary);
+    border-radius: 0 2px 2px 0;
+    transition: height 0.25s ease;
+  }
 
   &:hover {
-    background-color: #f5f5f5;
+    background: linear-gradient(135deg, #f8f9ff 0%, #f0f4ff 100%);
     transform: translateX(4px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+
+    .menu-icon-wrapper {
+      background: var(--q-primary);
+      color: white;
+      transform: scale(1.1);
+    }
+
+    .menu-arrow {
+      opacity: 1;
+      transform: translateX(0);
+    }
   }
 }
 
 .menu-item-active {
-  background-color: var(--q-primary);
+  background: var(--q-primary);
   color: white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  position: relative;
 
-  .q-icon {
+  &::before {
+    height: 60%;
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(0, 0, 0, 0.1) 100%);
+    border-radius: inherit;
+    pointer-events: none;
+  }
+
+  .menu-icon-wrapper {
+    background: rgba(255, 255, 255, 0.2);
     color: white;
   }
 
-  .q-item__label {
+  .menu-item-label {
     color: white;
     font-weight: 600;
   }
 
-  &:hover {
-    background-color: var(--q-primary);
-    opacity: 0.9;
-    transform: translateX(4px);
+  .menu-arrow {
+    color: white;
+    opacity: 1;
+    transform: translateX(0);
   }
+
+  &:hover {
+    background: var(--q-primary);
+    transform: translateX(4px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+
+    .menu-icon-wrapper {
+      background: rgba(255, 255, 255, 0.3);
+      transform: scale(1.1);
+    }
+  }
+}
+
+.menu-icon-section {
+  padding-right: 12px;
+}
+
+.menu-icon-wrapper {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: #f0f2f5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.25s ease;
+  color: #6b7280;
+}
+
+.menu-item-label {
+  font-weight: 500;
+  font-size: 14px;
+  color: #374151;
+  transition: color 0.25s ease;
+}
+
+.menu-arrow-section {
+  padding-left: 8px;
+}
+
+.menu-arrow {
+  color: #9ca3af;
+  opacity: 0;
+  transform: translateX(-4px);
+  transition: all 0.25s ease;
 }
 
 .drawer-footer {

@@ -4,15 +4,7 @@
     <div class="header-section">
       <div class="header-content">
         <div class="header-left">
-          <q-btn
-            flat
-            round
-            dense
-            color="grey-7"
-            icon="arrow_back"
-            @click="handleBack"
-            class="back-btn"
-          />
+          <q-btn flat round dense color="grey-7" icon="arrow_back" @click="handleBack" class="back-btn" />
           <div class="header-title">
             <h1 class="page-title">Item Prices</h1>
             <p class="page-subtitle">Manage pricing options and inventory</p>
@@ -28,29 +20,16 @@
           <!-- Item Details -->
           <div class="section-group">
             <div class="section-label">Item Details</div>
-            <q-input
-              v-model="item.name"
-              outlined
-              dense
-              label="Item Name"
-              hide-bottom-space
-              disable
-              class="item-name-input"
-            />
+            <q-input v-model="item.name" outlined dense label="Item Name" hide-bottom-space disable
+              class="item-name-input" />
           </div>
 
           <!-- Price Variations -->
           <div class="section-group">
             <div class="section-header">
               <div class="section-label">Price Variations</div>
-              <q-btn
-                unelevated
-                color="primary"
-                icon="add"
-                label="Add Price"
-                @click="addItemPrice"
-                class="add-price-btn"
-              />
+              <q-btn unelevated color="primary" icon="add" label="Add Price" @click="addItemPrice"
+                class="add-price-btn" />
             </div>
 
             <div v-if="item.item_price?.length === 0" class="empty-state">
@@ -59,110 +38,36 @@
               <p class="empty-subtext">Click "Add Price" to begin</p>
             </div>
 
-            <div
-              v-for="(itemPrice, index) in item.item_price"
-              :key="itemPrice.id || index"
-              class="price-card"
-            >
+            <div v-for="(itemPrice, index) in item.item_price" :key="itemPrice.id || index" class="price-card">
               <div class="price-card-header">
                 <span class="price-card-title">Price Option {{ index + 1 }}</span>
-                <q-btn
-                  flat
-                  round
-                  dense
-                  color="grey-6"
-                  icon="close"
-                  @click="deleteItemPrice(Number(index))"
-                  class="delete-btn"
-                >
+                <q-btn flat round dense color="grey-6" icon="close" @click="deleteItemPrice(Number(index))"
+                  class="delete-btn">
                   <q-tooltip>Remove</q-tooltip>
                 </q-btn>
               </div>
 
               <div class="price-fields">
-                <q-select
-                  dense
-                  v-model="itemPrice.unit"
-                  :options="units"
-                  label="Unit"
-                  hide-bottom-space
-                  use-input
-                  outlined
-                  :rules="[(val) => !!val || 'Unit is required.']"
-                  class="field"
-                />
-                <q-select
-                  dense
-                  v-model="itemPrice.color"
-                  :options="colors"
-                  label="Color"
-                  hide-bottom-space
-                  use-input
-                  outlined
-                  clearable
-                  class="field"
-                />
-                <q-select
-                  dense
-                  v-model="itemPrice.size"
-                  :options="sizes"
-                  label="Size"
-                  hide-bottom-space
-                  use-input
-                  outlined
-                  clearable
-                  class="field"
-                />
-                <input-amount
-                  label="Original Price"
-                  :value="itemPrice.original_price"
-                  @input="(amount) => changeOriginalPrice(itemPrice, amount)"
-                  class="field"
-                />
-                <input-amount
-                  label="Online Price"
-                  :value="itemPrice.online_price"
-                  @input="(amount) => changeOnlinePrice(itemPrice, amount)"
-                  class="field"
-                />
-                <input-amount
-                  label="Selling Price"
-                  :value="itemPrice.selling_price"
-                  @input="(amount) => changeSellingPrice(itemPrice, amount)"
-                  class="field"
-                />
-                <q-input
-                  v-model="itemPrice.qty"
-                  label="Quantity"
-                  outlined
-                  dense
-                  type="number"
-                  min="0"
+                <q-select dense v-model="itemPrice.unit" :options="units" label="Unit" hide-bottom-space use-input
+                  outlined :rules="[(val) => !!val || 'Unit is required.']" class="field" />
+                <input-amount label="Original Price" :value="itemPrice.original_price"
+                  @input="(amount) => changeOriginalPrice(itemPrice, amount)" class="field" />
+                <input-amount label="Online Price" :value="itemPrice.online_price"
+                  @input="(amount) => changeOnlinePrice(itemPrice, amount)" class="field" />
+                <input-amount label="Selling Price" :value="itemPrice.selling_price"
+                  @input="(amount) => changeSellingPrice(itemPrice, amount)" class="field" />
+                <q-input v-model="itemPrice.qty" label="Quantity" outlined dense type="number" min="0"
                   :rules="[(val) => (val !== null && val !== undefined && val !== '') || 'Quantity is required.']"
-                  class="field"
-                />
+                  class="field" />
               </div>
             </div>
           </div>
 
           <!-- Form Actions -->
           <div class="form-actions">
-            <q-btn
-              unelevated
-              color="primary"
-              icon="save"
-              label="Save Changes"
-              @click="createItemPrice"
-              class="save-btn"
-            />
-            <q-btn
-              outline
-              color="grey-7"
-              icon="cancel"
-              label="Cancel"
-              @click="handleBack"
-              class="cancel-btn"
-            />
+            <q-btn unelevated color="primary" icon="save" label="Save Changes" @click="createItemPrice"
+              class="save-btn" />
+            <q-btn outline color="grey-7" icon="cancel" label="Cancel" @click="handleBack" class="cancel-btn" />
           </div>
         </q-form>
       </q-card-section>
@@ -216,7 +121,7 @@ const getItem = async () => {
       optimus_id: props.itemId,
       query: {
         filters: `store_id:${props.storeId}`,
-        with: 'itemPrice.unit,itemPrice.color,itemPrice.size',
+        with: 'itemPrice.unit',
       },
     },
     true
@@ -224,22 +129,18 @@ const getItem = async () => {
 };
 
 const units = ref<any[]>([]);
-const colors = ref<any[]>([]);
-const sizes = ref<any[]>([]);
 
 const listingApi = async () => {
   const result: any = await get(
     {
       entity: 'listing_api',
       query: {
-        listingApi: 'units,colors,sizes',
+        listingApi: 'units',
       },
     },
     false
   );
   units.value = result.data.data.units;
-  colors.value = result.data.data.colors;
-  sizes.value = result.data.data.sizes;
 };
 
 // Function to add an attribute with an index
@@ -274,8 +175,6 @@ const createItemPrice = async () => {
 
   const itemPrices = item.value.item_price?.map((v: any) => {
     return {
-      color_id: v.color?.id,
-      size_id: v.size?.id,
       unit_id: v.unit?.id,
       original_price: v.original_price,
       online_price: v.online_price,
@@ -329,125 +228,273 @@ const handleBack = () => {
 </script>
 
 <style scoped lang="scss">
+// Premium Color Palette
+$primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+$primary-color: #667eea;
+$secondary-color: #764ba2;
+$surface-color: #ffffff;
+$background-color: #f8fafc;
+$text-primary: #1e293b;
+$text-secondary: #64748b;
+$text-muted: #94a3b8;
+$border-color: #e2e8f0;
+$border-hover: #cbd5e1;
+$shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+$shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+$shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+$shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+$error-color: #ef4444;
+$error-bg: #fef2f2;
+
 .item-price-container {
-  max-width: 1000px;
+  max-width: 1100px;
   margin: 0 auto;
-  padding: 24px;
+  padding: 32px;
+  background: $background-color;
+  min-height: 100vh;
 }
 
+// Header Section with Premium Styling
 .header-section {
-  margin-bottom: 24px;
+  margin-bottom: 28px;
+  position: relative;
 }
 
 .header-content {
   display: flex;
   align-items: center;
+  justify-content: space-between;
 }
 
 .header-left {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 16px;
 }
 
 .back-btn {
-  margin-right: 0;
+  background: $surface-color;
+  border: 1px solid $border-color;
+  box-shadow: $shadow-sm;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+  &:hover {
+    background: $background-color;
+    border-color: $border-hover;
+    transform: translateX(-2px);
+    box-shadow: $shadow-md;
+  }
 }
 
 .header-title {
   .page-title {
-    font-size: 24px;
-    font-weight: 600;
+    font-size: 28px;
+    font-weight: 700;
     margin: 0;
-    color: #1a1a1a;
+    background: $primary-gradient;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: -0.02em;
   }
 
   .page-subtitle {
-    font-size: 14px;
-    color: #666;
-    margin: 4px 0 0 0;
+    font-size: 15px;
+    color: $text-secondary;
+    margin: 6px 0 0 0;
+    font-weight: 400;
   }
 }
 
+// Main Card with Premium Glass Effect
 .main-card {
-  border-radius: 12px;
-  border: 1px solid #e0e0e0;
+  border-radius: 20px;
+  border: none;
+  background: $surface-color;
+  box-shadow: $shadow-xl;
   overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: $primary-gradient;
+  }
 }
 
 .card-content {
-  padding: 32px;
+  padding: 40px;
 }
 
 .price-form {
   display: flex;
   flex-direction: column;
-  gap: 32px;
+  gap: 40px;
 }
 
+// Section Styling
 .section-group {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 20px;
 }
 
 .section-label {
-  font-size: 14px;
-  font-weight: 600;
-  color: #333;
-  letter-spacing: 0.25px;
+  font-size: 13px;
+  font-weight: 700;
+  color: $text-primary;
+  letter-spacing: 0.5px;
   text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  &::before {
+    content: '';
+    width: 4px;
+    height: 16px;
+    background: $primary-gradient;
+    border-radius: 2px;
+  }
 }
 
 .section-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  padding-bottom: 8px;
+  border-bottom: 1px solid $border-color;
 }
 
+// Item Name Input Styling
 .item-name-input {
-  background: #f5f5f5;
+  background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+  border-radius: 12px;
+
+  :deep(.q-field__control) {
+    background: transparent;
+    border-radius: 12px;
+    height: 52px;
+  }
+
+  :deep(.q-field__label) {
+    font-weight: 500;
+    color: $text-secondary;
+  }
 }
 
+// Add Price Button with Gradient
 .add-price-btn {
-  height: 36px;
+  height: 42px;
+  padding: 0 20px;
+  border-radius: 10px;
+  font-weight: 600;
+  letter-spacing: 0.25px;
+  background: $primary-gradient;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+  }
 }
 
+// Empty State with Premium Design
 .empty-state {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 48px 24px;
-  border: 2px dashed #e0e0e0;
-  border-radius: 8px;
-  background: #fafafa;
+  padding: 64px 32px;
+  border: 2px dashed $border-color;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #fafafa 0%, #f8fafc 100%);
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(102, 126, 234, 0.03) 0%, transparent 70%);
+    animation: pulse-glow 4s ease-in-out infinite;
+  }
+
+  @keyframes pulse-glow {
+
+    0%,
+    100% {
+      transform: scale(1);
+      opacity: 0.5;
+    }
+
+    50% {
+      transform: scale(1.1);
+      opacity: 0.8;
+    }
+  }
+
+  .q-icon {
+    background: $primary-gradient;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    filter: drop-shadow(0 4px 6px rgba(102, 126, 234, 0.2));
+  }
 
   .empty-text {
-    font-size: 16px;
-    color: #666;
-    margin: 16px 0 4px 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: $text-primary;
+    margin: 20px 0 6px 0;
   }
 
   .empty-subtext {
-    font-size: 13px;
-    color: #999;
+    font-size: 14px;
+    color: $text-muted;
     margin: 0;
   }
 }
 
+// Price Cards with Premium Styling
 .price-card {
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
-  padding: 20px;
-  background: white;
-  transition: box-shadow 0.2s ease;
-  margin-bottom: 16px;
+  border: 1px solid $border-color;
+  border-radius: 16px;
+  padding: 24px;
+  background: $surface-color;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  margin-bottom: 20px;
+  position: relative;
+  overflow: hidden;
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: $primary-gradient;
+    transform: scaleY(0);
+    transition: transform 0.3s ease;
+  }
 
   &:hover {
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-    border-color: #bdbdbd;
+    box-shadow: $shadow-lg;
+    border-color: $border-hover;
+    transform: translateY(-2px);
+
+    &::after {
+      transform: scaleY(1);
+    }
   }
 }
 
@@ -455,52 +502,115 @@ const handleBack = () => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 16px;
-  padding-bottom: 12px;
-  border-bottom: 1px solid #f0f0f0;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid $border-color;
 }
 
 .price-card-title {
-  font-size: 14px;
-  font-weight: 600;
-  color: #333;
-}
+  font-size: 15px;
+  font-weight: 700;
+  color: $text-primary;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 
-.delete-btn {
-  &:hover {
-    color: #f44336;
-    background: #ffebee;
+  &::before {
+    content: '#';
+    width: 24px;
+    height: 24px;
+    background: $primary-gradient;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 12px;
+    font-weight: 700;
   }
 }
 
+.delete-btn {
+  transition: all 0.2s ease;
+
+  &:hover {
+    color: $error-color;
+    background: $error-bg;
+    transform: rotate(90deg);
+  }
+}
+
+// Price Fields Grid
 .price-fields {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 16px;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+
+  :deep(.q-field) {
+    .q-field__control {
+      border-radius: 10px;
+      transition: all 0.2s ease;
+    }
+
+    &.q-field--focused .q-field__control {
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
+    }
+  }
 }
 
 .field {
   width: 100%;
 }
 
+// Form Actions with Premium Buttons
 .form-actions {
   display: flex;
   justify-content: flex-end;
-  gap: 12px;
-  padding-top: 24px;
-  border-top: 1px solid #f0f0f0;
+  gap: 16px;
+  padding-top: 32px;
+  border-top: 1px solid $border-color;
 }
 
 .save-btn {
-  height: 40px;
-  padding: 0 24px;
+  height: 48px;
+  padding: 0 32px;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 15px;
+  letter-spacing: 0.25px;
+  background: $primary-gradient;
+  box-shadow: 0 4px 14px rgba(102, 126, 234, 0.4);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
 }
 
 .cancel-btn {
-  height: 40px;
-  padding: 0 24px;
+  height: 48px;
+  padding: 0 32px;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 15px;
+  letter-spacing: 0.25px;
+  border: 2px solid $border-color;
+  color: $text-secondary;
+  transition: all 0.3s ease;
+
+  &:hover {
+    border-color: $text-muted;
+    color: $text-primary;
+    background: #f8fafc;
+  }
 }
 
+// Responsive Design
 @media (max-width: 1024px) {
   .price-fields {
     grid-template-columns: repeat(2, 1fr);
@@ -513,17 +623,17 @@ const handleBack = () => {
   }
 
   .card-content {
-    padding: 20px;
+    padding: 24px;
   }
 
   .header-title .page-title {
-    font-size: 20px;
+    font-size: 22px;
   }
 
   .section-header {
     flex-direction: column;
     align-items: flex-start;
-    gap: 12px;
+    gap: 16px;
   }
 
   .price-fields {
@@ -537,6 +647,22 @@ const handleBack = () => {
   .save-btn,
   .cancel-btn {
     width: 100%;
+  }
+
+  .price-card {
+    padding: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .header-left {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .price-card-title {
+    font-size: 14px;
   }
 }
 </style>
