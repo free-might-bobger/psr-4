@@ -24,10 +24,12 @@
             lightning-fast delivery — all in one place.
           </p>
           <div class="hero-actions">
-            <q-btn to="/find-shops" size="lg" unelevated class="hero-btn hero-btn-primary" icon="near_me"
-              label="Shops Near Me" />
-            <q-btn to="/find-items" size="lg" unelevated class="hero-btn hero-btn-secondary" icon="search"
-              label="Search Items" />
+            <q-btn to="/find-shops" size="lg" unelevated class="hero-btn hero-btn-primary" icon="near_me" no-caps>
+              <span>Shops Near Me</span>
+            </q-btn>
+            <q-btn to="/find-items" size="lg" unelevated class="hero-btn hero-btn-secondary" icon="search" no-caps>
+              <span>Search Items</span>
+            </q-btn>
           </div>
           <div class="hero-trust">
             <div class="trust-avatars">
@@ -254,10 +256,14 @@
           in under 30 seconds.
         </p>
         <div class="cta-actions">
-          <q-btn to="/find-shops" size="lg" unelevated class="cta-btn cta-btn-primary" icon="near_me"
-            label="Find Shops Now" />
-          <q-btn to="/register" size="lg" unelevated class="cta-btn cta-btn-secondary" icon="person_add"
-            label="Create Free Account" />
+          <q-btn to="/find-shops" size="lg" unelevated class="cta-btn cta-btn-primary" icon="near_me" no-caps>
+            <span class="gt-xs">Find Shops Now</span>
+            <span class="lt-sm">Find Shops</span>
+          </q-btn>
+          <q-btn to="/register" size="lg" unelevated class="cta-btn cta-btn-secondary" icon="person_add" no-caps>
+            <span class="gt-xs">Create Free Account</span>
+            <span class="lt-sm">Sign Up Free</span>
+          </q-btn>
         </div>
         <div class="cta-footnote">
           <q-icon name="lock" size="14px" />
@@ -1232,11 +1238,13 @@ if (process.env.CLIENT && success === 'true') {
 
   .hero-actions {
     justify-content: center;
+    flex-direction: column;
+    align-items: center;
   }
 
   .hero-btn {
-    flex: 1;
-    min-width: 0;
+    width: 100%;
+    max-width: 320px;
   }
 
   .hero-trust {
