@@ -1,29 +1,36 @@
 <template>
   <div class="product-page">
-    <div class="product-container">
-      <!-- Header -->
-      <div class="product-header">
-        <BreadCrumbsWrapper v-if="store.name && item.name" :bread-crumbs="[
-          {
-            name: store.name,
-            path: `/public_stores/${route.params.id}`,
-          },
-          {
-            name: item.name || '',
-            path: '',
-          },
-        ]" />
-      </div>
 
-      <!-- Main Content -->
-      <div class="product-content" v-if="item">
+    <!-- Hero Breadcrumb Banner -->
+    <div class="product-hero">
+      <div class="hero-bg">
+        <div class="hero-orb orb-1"></div>
+        <div class="hero-orb orb-2"></div>
+        <div class="hero-grid"></div>
+      </div>
+      <div class="hero-inner">
+        <BreadCrumbsWrapper v-if="store.name && item.name" :bread-crumbs="[
+          { name: store.name, path: `/public_stores/${route.params.id}` },
+          { name: item.name || '', path: '' },
+        ]" />
+        <div class="hero-store-name" v-if="store.name">
+          <q-icon name="storefront" size="16px" class="q-mr-xs" />{{ store.name }}
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="product-container">
+      <div class="product-content" v-if="item.name">
+
         <!-- Left: Image Gallery -->
         <div class="product-gallery">
-          <div class="main-image-wrapper">
-            <img :src="item.images?.[slide]?.path_url || ''" class="main-image" :alt="item.name"
-              @click="openZoomModal(item.images?.[slide]?.path_url || '')" />
-            <q-btn icon="zoom_in" class="zoom-btn" round flat
-              @click="openZoomModal(item.images?.[slide]?.path_url || '')" />
+          <div class="main-image-wrapper" @click="openZoomModal(item.images?.[slide]?.path_url || '')">
+            <img :src="item.images?.[slide]?.path_url || ''" class="main-image" :alt="item.name" />
+            <div class="zoom-hint">
+              <q-icon name="zoom_in" size="18px" />
+              <span>Click to zoom</span>
+            </div>
           </div>
           <div class="thumbnail-list" v-if="item.images && item.images.length > 1">
             <div v-for="(image, index) in item.images" :key="image.id" class="thumbnail-item"
@@ -34,40 +41,50 @@
         </div>
 
         <!-- Right: Product Info -->
-        <div class="product-info">
-          <h1 class="product-name">{{ item.name }}</h1>
-          <div class="product-description" v-html="sanitizeHtml(item.description || '')"></div>
+        <div class="product-info-panel">
 
-          <div class="info-section">
-            <div class="section-label">Select Unit</div>
-            <div class="unit-selector" v-if="units.length > 0">
-              <button v-for="unit in units" :key="unit.id" class="unit-btn"
+          <h1 class="product-name">{{ item.name }}</h1>
+
+          <div class="product-description" v-if="item.description" v-html="sanitizeHtml(item.description)"></div>
+
+          <!-- Unit Selector -->
+          <div class="info-block" v-if="units.length > 0">
+            <div class="block-label">Select Unit</div>
+            <div class="unit-selector">
+              <button v-for="unit in units" :key="unit.id" class="unit-chip"
                 :class="{ active: selectedUnit === unit.id }" @click="selectedUnit = unit.id">
                 {{ unit.name }}
               </button>
             </div>
           </div>
 
-          <div class="info-section">
-            <div class="section-label">Price</div>
-            <div class="price-display">{{ getPriceRange(filteredItemPrice) }}</div>
+          <!-- Price -->
+          <div class="price-block">
+            <div class="price-label">Price</div>
+            <div class="price-value">{{ getPriceRange(filteredItemPrice) }}</div>
           </div>
 
-          <div class="purchase-section">
-            <div class="quantity-wrapper">
-              <div class="section-label">Quantity</div>
-              <div class="quantity-control">
-                <q-btn icon="remove" flat dense round size="sm" @click="qty > 1 ? qty-- : null" :disable="qty <= 1" />
-                <span class="quantity-value">{{ qty }}</span>
-                <q-btn icon="add" flat dense round size="sm" @click="qty++" />
+          <!-- Quantity + CTA -->
+          <div class="purchase-block">
+            <div class="qty-row">
+              <div class="block-label">Quantity</div>
+              <div class="qty-control">
+                <button class="qty-btn" @click="qty > 1 ? qty-- : null" :disabled="qty <= 1">
+                  <q-icon name="remove" size="16px" />
+                </button>
+                <span class="qty-value">{{ qty }}</span>
+                <button class="qty-btn" @click="qty++">
+                  <q-icon name="add" size="16px" />
+                </button>
               </div>
             </div>
 
-            <div class="action-buttons">
-              <q-btn color="primary" @click="userAddCart" size="lg" unelevated class="add-cart-btn" icon="shopping_cart"
-                label="Add to Cart" />
-            </div>
+            <button class="add-cart-btn" @click="userAddCart">
+              <q-icon name="shopping_cart" size="20px" class="q-mr-sm" />
+              Add to Cart
+            </button>
           </div>
+
         </div>
       </div>
     </div>
@@ -105,7 +122,7 @@
         </q-bar>
         <q-card-section class="q-pa-md">
           <p class="text-body2 text-grey-8 q-mb-md">
-            Allow camera and microphone. Your agent can join using the link below (no login required for you).
+            Allow camera and microphone. Your agent can join using the link below.
           </p>
           <div class="row q-col-gutter-sm q-mb-md">
             <div class="col-12 col-md-6">
@@ -130,24 +147,25 @@
 
     <!-- Store Conflict Dialog -->
     <q-dialog v-model="storeConflictDialog" persistent>
-      <q-card>
-        <q-card-section class="row items-center">
-          <div class="text-h6">Multiple Stores Detected</div>
-          <q-space />
-          <q-btn icon="close" flat round dense v-close-popup />
-        </q-card-section>
-
-        <q-card-section>
-          Your cart contains items from another store. Adding this item will remove the existing items from your cart.
+      <q-card class="conflict-dialog-card">
+        <div class="conflict-dialog-header">
+          <div class="conflict-icon-wrap">
+            <q-icon name="warning_amber" size="28px" color="white" />
+          </div>
+          <div class="conflict-title">Multiple Stores Detected</div>
+          <q-btn icon="close" flat round dense v-close-popup class="conflict-close" />
+        </div>
+        <q-card-section class="conflict-body">
+          Your cart contains items from another store. Adding this item will remove existing cart items.
           Do you want to proceed?
         </q-card-section>
-
-        <q-card-actions align="right">
-          <q-btn flat label="Cancel" color="grey-7" v-close-popup @click="handleStoreConflictCancel" />
-          <q-btn unelevated label="OK" color="primary" @click="handleStoreConflictOk" />
+        <q-card-actions align="right" class="conflict-actions">
+          <q-btn flat label="Cancel" no-caps class="conflict-cancel" v-close-popup @click="handleStoreConflictCancel" />
+          <q-btn unelevated label="Yes, Replace Cart" no-caps class="conflict-ok" @click="handleStoreConflictOk" />
         </q-card-actions>
       </q-card>
     </q-dialog>
+
   </div>
 </template>
 
@@ -591,85 +609,197 @@ const sanitizeHtml = (html: string) => {
 </script>
 
 <style scoped lang="scss">
+// ── Page ──────────────────────────────────────────────────────────────────
 .product-page {
-  background: #f8f9fa;
+  background: #f4f5f7;
   min-height: 100vh;
 }
 
+// ── Hero Banner ───────────────────────────────────────────────────────────
+.product-hero {
+  position: relative;
+  background: linear-gradient(145deg, #1e1b4b 0%, #312e81 55%, #4c1d95 100%);
+  overflow: hidden;
+}
+
+.hero-bg {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.hero-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(70px);
+  animation: heroOrb 12s ease-in-out infinite;
+
+  &.orb-1 {
+    width: 400px;
+    height: 400px;
+    background: rgba(139, 92, 246, 0.3);
+    top: -160px;
+    right: -80px;
+  }
+
+  &.orb-2 {
+    width: 200px;
+    height: 200px;
+    background: rgba(99, 102, 241, 0.2);
+    bottom: -40px;
+    left: -40px;
+    animation-delay: 5s;
+  }
+}
+
+.hero-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+
+@keyframes heroOrb {
+
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+
+  50% {
+    transform: translate(16px, -20px);
+  }
+}
+
+.hero-inner {
+  position: relative;
+  z-index: 1;
+  padding: 20px 32px 24px;
+
+  :deep(.q-breadcrumbs) {
+    color: rgba(255, 255, 255, 0.5);
+  }
+
+  :deep(.q-breadcrumbs__el) {
+    color: rgba(255, 255, 255, 0.5);
+  }
+
+  :deep(.q-breadcrumbs__separator) {
+    color: rgba(255, 255, 255, 0.3);
+  }
+
+  :deep(a) {
+    color: rgba(255, 255, 255, 0.7) !important;
+  }
+}
+
+.hero-store-name {
+  display: flex;
+  align-items: center;
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.4);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-top: 8px;
+}
+
+// ── Main Layout ───────────────────────────────────────────────────────────
 .product-container {
   max-width: 1400px;
   margin: 0 auto;
-  padding: 24px;
-}
-
-.product-header {
-  margin-bottom: 24px;
+  padding: 32px;
 }
 
 .product-content {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 40px;
+  gap: 32px;
   align-items: start;
 }
 
+// ── Gallery ───────────────────────────────────────────────────────────────
 .product-gallery {
-  background: #ffffff;
-  border-radius: 16px;
+  background: white;
+  border-radius: 20px;
   padding: 24px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.07);
+  position: sticky;
+  top: 16px;
 }
 
 .main-image-wrapper {
   position: relative;
   width: 100%;
   aspect-ratio: 1;
-  background: #f5f5f5;
-  border-radius: 12px;
+  background: #f8f9fa;
+  border-radius: 14px;
   overflow: hidden;
   margin-bottom: 16px;
   cursor: zoom-in;
+
+  &:hover .zoom-hint {
+    opacity: 1;
+  }
 }
 
 .main-image {
   width: 100%;
   height: 100%;
   object-fit: contain;
-  transition: transform 0.3s ease;
+  transition: transform 0.4s ease;
 }
 
-.zoom-btn {
+.main-image-wrapper:hover .main-image {
+  transform: scale(1.03);
+}
+
+.zoom-hint {
   position: absolute;
-  bottom: 16px;
-  right: 16px;
-  background: rgba(255, 255, 255, 0.95);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.55));
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 20px 12px 12px;
+  font-size: 13px;
+  font-weight: 600;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  pointer-events: none;
 }
 
 .thumbnail-list {
   display: flex;
-  gap: 12px;
+  gap: 10px;
   overflow-x: auto;
   padding: 4px;
 }
 
 .thumbnail-item {
-  width: 80px;
-  height: 80px;
-  border-radius: 8px;
+  width: 76px;
+  height: 76px;
+  border-radius: 10px;
   overflow: hidden;
   cursor: pointer;
   border: 2px solid transparent;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
   flex-shrink: 0;
+  background: #f3f4f6;
 
   &.active {
-    border-color: var(--q-primary);
-    box-shadow: 0 2px 8px rgba(25, 118, 210, 0.3);
+    border-color: #4f46e5;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
   }
 
   &:hover {
-    transform: scale(1.05);
+    transform: scale(1.06);
   }
 
   img {
@@ -679,123 +809,185 @@ const sanitizeHtml = (html: string) => {
   }
 }
 
-.product-info {
-  background: #ffffff;
-  border-radius: 16px;
-  padding: 32px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+// ── Product Info Panel ────────────────────────────────────────────────────
+.product-info-panel {
+  background: white;
+  border-radius: 20px;
+  padding: 36px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.07);
 }
 
 .product-name {
-  font-size: 32px;
-  font-weight: 700;
-  color: #1a1a1a;
-  margin: 0 0 16px 0;
-  line-height: 1.3;
+  font-size: 30px;
+  font-weight: 900;
+  color: #111827;
+  margin: 0 0 16px;
+  line-height: 1.25;
+  letter-spacing: -0.5px;
 }
 
 .product-description {
-  font-size: 16px;
-  line-height: 1.6;
-  color: #666;
-  margin: 0 0 32px 0;
-  white-space: pre-wrap;
+  font-size: 15px;
+  line-height: 1.7;
+  color: #6b7280;
+  margin: 0 0 28px;
+  padding-bottom: 28px;
+  border-bottom: 1px solid #f3f4f6;
 }
 
-.info-section {
-  margin-bottom: 32px;
+.info-block {
+  margin-bottom: 28px;
 }
 
-.section-label {
-  font-size: 14px;
-  font-weight: 600;
-  color: #333;
-  margin-bottom: 12px;
+.block-label {
+  font-size: 11px;
+  font-weight: 800;
+  color: #9ca3af;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 1.5px;
+  margin-bottom: 12px;
 }
 
 .unit-selector {
   display: flex;
-  gap: 12px;
+  gap: 10px;
   flex-wrap: wrap;
 }
 
-.unit-btn {
-  padding: 10px 20px;
-  border: 2px solid #e0e0e0;
-  background: #ffffff;
-  border-radius: 8px;
+.unit-chip {
+  padding: 9px 20px;
+  border: 2px solid #e5e7eb;
+  background: white;
+  border-radius: 10px;
   font-size: 14px;
-  font-weight: 500;
-  color: #666;
+  font-weight: 600;
+  color: #374151;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
 
   &:hover {
-    border-color: #bdbdbd;
-    background: #f5f5f5;
+    border-color: #a5b4fc;
+    background: #f5f3ff;
+    color: #4f46e5;
   }
 
   &.active {
-    border-color: var(--q-primary);
-    background: var(--q-primary);
-    color: #ffffff;
+    border-color: #4f46e5;
+    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+    color: white;
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
   }
 }
 
-.price-display {
-  font-size: 28px;
-  font-weight: 700;
-  color: var(--q-primary);
+// ── Price Block ───────────────────────────────────────────────────────────
+.price-block {
+  margin-bottom: 32px;
+  padding: 20px 24px;
+  background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%);
+  border-radius: 14px;
+  border: 1px solid #e9d5ff;
 }
 
-.purchase-section {
-  margin-top: 40px;
-  padding-top: 32px;
-  border-top: 1px solid #f0f0f0;
+.price-label {
+  font-size: 11px;
+  font-weight: 800;
+  color: #7c3aed;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin-bottom: 6px;
 }
 
-.quantity-wrapper {
-  margin-bottom: 24px;
+.price-value {
+  font-size: 32px;
+  font-weight: 900;
+  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  line-height: 1;
 }
 
-.quantity-control {
+// ── Purchase Block ────────────────────────────────────────────────────────
+.purchase-block {
+  padding-top: 28px;
+  border-top: 1px solid #f3f4f6;
+}
+
+.qty-row {
   display: flex;
   align-items: center;
-  gap: 16px;
-  background: #f5f5f5;
-  padding: 8px 16px;
-  border-radius: 8px;
-  width: fit-content;
+  justify-content: space-between;
+  margin-bottom: 20px;
 }
 
-.quantity-value {
-  font-size: 18px;
-  font-weight: 600;
-  color: #1a1a1a;
-  min-width: 40px;
-  text-align: center;
-}
-
-.action-buttons {
+.qty-control {
   display: flex;
+  align-items: center;
+  gap: 0;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.qty-btn {
+  width: 40px;
+  height: 40px;
+  background: #f9fafb;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #374151;
+  transition: background 0.15s;
+
+  &:hover:not(:disabled) {
+    background: #ede9fe;
+    color: #4f46e5;
+  }
+
+  &:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+  }
+}
+
+.qty-value {
+  font-size: 16px;
+  font-weight: 800;
+  color: #111827;
+  min-width: 44px;
+  text-align: center;
 }
 
 .add-cart-btn {
   width: 100%;
-  height: 52px;
+  height: 54px;
+  border: none;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+  color: white;
   font-size: 16px;
-  font-weight: 600;
-  border-radius: 10px;
-  transition: all 0.3s ease;
+  font-weight: 800;
+  letter-spacing: 0.3px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 20px rgba(99, 102, 241, 0.35);
+  transition: all 0.25s ease;
 
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(25, 118, 210, 0.3);
+    box-shadow: 0 10px 28px rgba(99, 102, 241, 0.45);
+  }
+
+  &:active {
+    transform: translateY(0);
   }
 }
 
+// ── Zoom Modal ────────────────────────────────────────────────────────────
 .zoom-modal-card {
   height: 100%;
   border-radius: 0;
@@ -823,14 +1015,14 @@ const sanitizeHtml = (html: string) => {
   cursor: zoom-in;
   user-select: none;
   background: #000;
-}
 
-.zoom-modal-container.is-zoomed {
-  cursor: grab;
-}
+  &.is-zoomed {
+    cursor: grab;
+  }
 
-.zoom-modal-container.is-dragging {
-  cursor: grabbing;
+  &.is-dragging {
+    cursor: grabbing;
+  }
 }
 
 .zoom-modal-image {
@@ -838,12 +1030,13 @@ const sanitizeHtml = (html: string) => {
   max-height: 100%;
   object-fit: contain;
   transition: transform 0.2s ease;
+
+  &.is-zoomed {
+    transition: none;
+  }
 }
 
-.zoom-modal-image.is-zoomed {
-  transition: none;
-}
-
+// ── Agent Call Dialog ─────────────────────────────────────────────────────
 .agent-call-dialog-card {
   width: 100%;
   max-width: 100%;
@@ -861,80 +1054,130 @@ const sanitizeHtml = (html: string) => {
   object-fit: cover;
 }
 
-.chat-box {
-  height: 50vh;
-  max-height: 560px;
-  overflow-y: auto;
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
-  background: #fafafa;
+// ── Store Conflict Dialog ─────────────────────────────────────────────────
+.conflict-dialog-card {
+  border-radius: 20px;
+  overflow: hidden;
+  min-width: 340px;
+  max-width: 440px;
 }
 
-.chat-row {
+.conflict-dialog-header {
   display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 20px 20px 20px 24px;
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
 }
 
-.chat-row.mine {
-  justify-content: flex-end;
+.conflict-icon-wrap {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
 }
 
-.chat-row.theirs {
-  justify-content: flex-start;
+.conflict-title {
+  flex: 1;
+  font-size: 16px;
+  font-weight: 800;
+  color: white;
 }
 
-.bubble {
-  max-width: min(80%, 520px);
-  padding: 8px 10px;
+.conflict-close {
+  color: rgba(255, 255, 255, 0.8) !important;
+}
+
+.conflict-body {
+  font-size: 14px;
+  color: #374151;
+  line-height: 1.65;
+  padding: 24px !important;
+}
+
+.conflict-actions {
+  padding: 0 20px 20px !important;
+  gap: 10px;
+}
+
+.conflict-cancel {
+  color: #6b7280 !important;
+  font-weight: 600;
   border-radius: 10px;
-  background: #fff;
-  border: 1px solid #ececec;
 }
 
-.chat-row.mine .bubble {
-  background: #eaf4ff;
-  border-color: #d3e7ff;
+.conflict-ok {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%) !important;
+  color: white !important;
+  font-weight: 700;
+  border-radius: 10px;
+  padding: 0 20px;
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
 }
 
+// ── Responsive ────────────────────────────────────────────────────────────
 @media (max-width: 1024px) {
   .product-content {
     grid-template-columns: 1fr;
     gap: 24px;
   }
 
-  .product-info {
-    order: -1;
+  .product-gallery {
+    position: static;
   }
 }
 
-@media (max-width: 600px) {
-  .product-container {
-    padding: 16px;
+@media (max-width: 768px) {
+  .hero-inner {
+    padding: 16px 20px 20px;
   }
 
-  .product-gallery,
-  .product-info {
+  .product-container {
     padding: 20px;
+  }
+
+  .product-info-panel {
+    padding: 24px;
   }
 
   .product-name {
     font-size: 24px;
   }
 
-  .product-description {
-    font-size: 14px;
+  .price-value {
+    font-size: 26px;
+  }
+}
+
+@media (max-width: 480px) {
+  .product-container {
+    padding: 12px;
   }
 
-  .price-display {
-    font-size: 24px;
+  .product-gallery {
+    padding: 16px;
   }
 
-  .action-buttons {
-    flex-direction: column;
+  .product-info-panel {
+    padding: 20px;
+  }
+
+  .product-name {
+    font-size: 22px;
   }
 
   .thumbnail-item {
     width: 60px;
     height: 60px;
+  }
+
+  .add-cart-btn {
+    height: 50px;
+    font-size: 15px;
   }
 }
 </style>
