@@ -31,4 +31,8 @@ class UserRepository extends BaseRepository
         $this->model = $this->model->where('lastname', 'LIKE', '%' . $value . '%');
     }
 
+    public function whereEmail($email):void {
+        $this->model = $this->model->whereEmail($email);
+    }
+
 }

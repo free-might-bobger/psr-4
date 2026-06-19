@@ -49,4 +49,9 @@ class UserController extends ApiController
         return response()->json('You have successfully invited the user');
     }
 
+    public function forgotPassword(Request $request): string {
+        $this->userService->forgotPassword($request->email);
+        return response()->json('A password reset link has been sent to your email address. Please check your inbox.');
+    }
+
 }

@@ -74,6 +74,9 @@
                 </template>
               </q-input>
             </div>
+            <div class="forgot-row">
+              <router-link to="/forgot-password" class="forgot-link">Forgot password?</router-link>
+            </div>
             <q-btn type="submit" no-caps unelevated class="submit-btn full-width" size="lg"
               :loading="isEmailSubmitting">
               <div class="submit-inner"><q-icon name="login" size="18px" /><span>Sign in to account</span></div>
@@ -557,6 +560,25 @@ onMounted(async () => {
 
   :deep(.q-field--focused .q-field__control) {
     box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.18), 0 1px 4px rgba(0, 0, 0, 0.06);
+  }
+}
+
+.forgot-row {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: -4px;
+}
+
+.forgot-link {
+  font-size: 13px;
+  font-weight: 700;
+  color: #4c1d95;
+  text-decoration: none;
+  transition: color 0.2s ease;
+
+  &:hover {
+    color: #6d28d9;
+    text-decoration: underline;
   }
 }
 

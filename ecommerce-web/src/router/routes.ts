@@ -57,34 +57,12 @@ const routes: RouteRecordRaw[] = [
     ],
   },
   {
-    path: '/join-call',
+    path: '/forgot-password',
     component: () => import('layouts/MainLayout.vue'),
     children: [
-      { path: ':roomId', component: () => import('pages/public/JoinCallPage.vue') },
+      { path: '', component: () => import('pages/PasswordResetPage.vue') },
     ],
   },
-  {
-    path: '/join-chat',
-    component: () => import('layouts/MainLayout.vue'),
-    children: [
-      { path: ':roomId', component: () => import('pages/public/JoinChatPage.vue') },
-    ],
-  },
-  // {
-  //   path: '/',
-  //   component: () => import('layouts/MainLayout.vue'),
-  //   children: [
-  //     { path: '', component: () => import('pages/IndexPage.vue') },
-  //     { path: 'cart', component: () => import('pages/cart/IndexPage.vue') },
-  //     { path: 'cart/checkout', component: () => import('pages/cart/CheckoutPage.vue') },
-  //     { path: 'about-us', component: () => import('pages/AboutUs.vue') },
-  //     { path: 'contact-us', component: () => import('pages/ContactUs.vue') },
-  //     { path: 'activation_code/:id', component: () => import('pages/ActivationCodePage.vue') },
-  //     { path: 'recover_password/:id', component: () => import('pages/PasswordResetPage.vue') },
-  //     { path: 'public_stores/:id', component: () => import('pages/public_stores/IndexPage.vue') },
-  //     { path: 'public_stores/:id/item/:item_id', component: () => import('pages/public_stores/item/IndexPage.vue') },
-  //   ],
-  // },
 
   // Always leave this as last one,
   // but you can also remove it

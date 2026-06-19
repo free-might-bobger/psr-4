@@ -10,16 +10,16 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 class PasswordRecovery extends Mailable
 {
     use Queueable, SerializesModels;
-    public $array;
+    public $user;
 
     /**
      * Create a new message instance.
      *
      * @return void
      */
-    public function __construct($array)
+    public function __construct($user)
     {
-        $this->array = $array;
+        $this->user = $user;
     }
 
     /**

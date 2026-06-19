@@ -36,6 +36,8 @@ use App\Http\Controllers\ {
     SharedItemAccessController
 };
 
+
+
 /* Route resouce */
 Route::get('find-store', [FindStoreController::class, 'findStore']);
 Route::get('find-store/{id}', [FindStoreController::class, 'show']);
@@ -113,6 +115,7 @@ Route::post('register/ {
             ', 'App\Http\Controllers\Api\User\UserController@activationCode');
 Route::post('register', [RegisterController::class, 'register']);
 Route::post('send-email-invitation', [UserController::class, 'inviteByEmail']);
+Route::post('forgot-password', [UserController::class, 'forgotPassword']);
 Route::post('create-new-activation-code', [MobileActivationCodeController::class, 'createNewActivationcode']);
 Route::get('verify/activation_code/{activation_code}', [RegisterController::class, 'verifyActivationCode']);
 Route::get('store-users/verification_code/{verification_code}', [StoreUserController::class, 'acceptStoreInvitation']);
