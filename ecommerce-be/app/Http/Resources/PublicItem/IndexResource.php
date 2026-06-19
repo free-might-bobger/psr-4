@@ -8,7 +8,7 @@ use App\Http\Resources\BaseResource;
 
 class IndexResource extends BaseResource
 {
-   public function __construct(LengthAwarePaginator|Model $resource) {
+   public function __construct(LengthAwarePaginator|Model|Collection $resource) {
         $this->fields = ['id', 'label', 'name', 'optimus_id', 'distance', 'store.id', 'store.label', 'store.name', 'store.optimus_id', 'store.latitude', 'store.longitude'];
         parent::__construct($resource);
     }

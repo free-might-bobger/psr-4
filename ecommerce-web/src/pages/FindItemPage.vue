@@ -1,158 +1,198 @@
 <template>
   <div class="map-page-container">
-    <!-- Header Section -->
-    <q-card flat bordered class="map-header-card q-mb-lg">
-      <q-card-section class="map-header-section">
-        <div class="map-header-main">
-          <div class="map-header-icon-wrapper">
-            <q-icon name="shopping_bag" size="40px" color="primary" />
+
+    <!-- Hero Header -->
+    <div class="map-hero">
+      <div class="map-hero-bg">
+        <div class="hero-orb orb-1"></div>
+        <div class="hero-orb orb-2"></div>
+        <div class="hero-orb orb-3"></div>
+        <div class="hero-grid"></div>
+      </div>
+      <div class="map-hero-inner">
+        <div class="hero-left">
+          <div class="hero-icon-wrap">
+            <q-icon name="shopping_bag" size="28px" color="white" />
           </div>
-          <div class="map-header-text">
-            <div class="map-header-title-wrapper">
-              <div class="map-header-title-with-icon">
-                <q-icon name="shopping_bag" size="md" color="primary" class="map-header-inline-icon" />
-                <h1 class="map-header-title">Find Nearby Items</h1>
-              </div>
-              <q-chip color="primary" text-color="white" size="sm" class="map-header-badge">
-                <q-icon name="store" size="xs" class="q-mr-xs" />
-                {{ nearestItems.length }} {{ nearestItems.length === 1 ? 'store' : 'stores' }} found
-              </q-chip>
-            </div>
-            <p class="map-header-description">
-              Discover Items near you and get directions instantly. Click on product markers to view
-              details.
-              <br /> Looking for shops? <router-link to="/find-shops" class="find-shops-link">FIND NEAREST SHOPS
-                HERE</router-link>
+          <div>
+            <div class="hero-eyebrow">Live Map Search</div>
+            <h1 class="hero-title">Find Nearby Items</h1>
+            <p class="hero-desc">
+              Search products across local stores and get directions instantly.
+              <router-link to="/find-shops" class="find-shops-link">Browse shops instead &rarr;</router-link>
             </p>
           </div>
         </div>
-        <div class="map-header-actions">
-          <q-btn color="primary" icon="my_location" label="Refresh Location" unelevated @click="localGetLocation"
-            class="refresh-location-btn" size="md" />
-          <q-btn color="secondary" icon="search" label="Find Nearest Items" outline @click="getNearestItems"
-            class="find-stores-btn" size="md" :loading="false" :disabled="!searchString" />
-          <q-input v-model="searchString" placeholder="Search items..." outlined dense debounce="1000"
-            class="search-input" clearable>
-            <template v-slot:prepend>
-              <q-icon name="search" />
-            </template>
-          </q-input>
+        <div class="hero-stats">
+          <div class="hero-stat">
+            <div class="hero-stat-value">{{ nearestItems.length }}</div>
+            <div class="hero-stat-label">{{ nearestItems.length === 1 ? 'Item' : 'Items' }} Found</div>
+          </div>
+          <div class="hero-stat-divider"></div>
+          <div class="hero-stat">
+            <div class="hero-stat-value">30<span style="font-size:16px">km</span></div>
+            <div class="hero-stat-label">Search Radius</div>
+          </div>
         </div>
-      </q-card-section>
-    </q-card>
+      </div>
 
-    <!-- Map and Store List Container -->
+      <!-- Action Bar -->
+      <div class="action-bar">
+        <div class="action-bar-inner">
+          <q-btn no-caps unelevated class="action-btn loc-action" icon="my_location" label="My Location"
+            @click="localGetLocation" />
+          <q-btn no-caps unelevated class="action-btn find-action" icon="search" label="Find Items"
+            @click="getNearestItems" :disable="!searchString" />
+          <div class="search-wrap">
+            <q-input v-model="searchString" placeholder="Type an item name to search..." outlined dense debounce="1000"
+              class="hero-search" clearable>
+              <template v-slot:prepend>
+                <q-icon name="search" size="18px" />
+              </template>
+            </q-input>
+          </div>
+        </div>
+        <div class="search-hint" v-if="!searchString">
+          <q-icon name="info" size="14px" class="q-mr-xs" />
+          Type a product name above, then click <strong>Find Items</strong>
+        </div>
+      </div>
+    </div>
+
+    <!-- Map + Panel Container -->
     <div class="map-store-container">
-      <!-- Store List Section -->
+
+      <!-- Items Panel -->
       <div class="store-list-section" v-if="showStoreList">
-        <q-card flat bordered class="store-list-card">
-          <q-card-section class="store-list-header">
-            <div class="store-list-title" @click="getNearestItems">
-              <q-icon name="store" color="primary" size="md" class="q-mr-sm" />
+        <div class="items-panel">
+          <div class="items-panel-header" @click="getNearestItems">
+            <div class="panel-header-left">
+              <div class="panel-icon"><q-icon name="shopping_bag" size="18px" color="white" /></div>
               <div>
-                <div class="text-h6 text-weight-bold">Nearby Items</div>
-                <div class="text-caption text-grey-6">Click to search for Items</div>
+                <div class="panel-title">Nearby Items</div>
+                <div class="panel-subtitle">Click to refresh results</div>
               </div>
             </div>
-          </q-card-section>
-          <q-separator />
-          <q-card-section class="store-list-content">
-            <div v-if="nearestItems.length === 0" class="empty-store-list">
-              <q-icon name="store" size="48px" color="grey-4" />
-              <div class="text-body2 text-grey-6 q-mt-md">No stores found yet</div>
-              <div class="text-caption text-grey-5 q-mt-xs">Click "Nearby Shops" above to search</div>
+            <div class="panel-count" v-if="nearestItems.length > 0">{{ nearestItems.length }}</div>
+          </div>
+
+          <div class="items-panel-body">
+            <div v-if="nearestItems.length === 0" class="empty-state">
+              <div class="empty-icon-wrap">
+                <q-icon name="search_off" size="30px" color="grey-4" />
+              </div>
+              <div class="empty-title">No items yet</div>
+              <div class="empty-sub">Type a product name and click<br />"Find Items" to search</div>
             </div>
-            <div v-else class="store-list-items">
-              <div v-for="item in nearestItems" :key="item.id" class="store-list-item"
+
+            <div v-else class="item-cards">
+              <div v-for="(item, idx) in nearestItems" :key="item.id" class="item-card"
                 @click="handleClickStoreAdvanceMarker(item.store)">
-                <div class="store-item-content">
-                  <q-icon name="store" color="positive" size="sm" class="store-item-icon" />
-                  <div class="store-item-info">
-                    <div class="text-body1 text-weight-medium store-item-name">{{ item.name }}</div>
-                    <div class="text-caption text-grey-6" v-if="item.store.distance">
-                      <q-icon name="straighten" size="xs" class="q-mr-xs" />
-                      {{ item.store.distance }} away
-                    </div>
+                <div class="item-card-badge">{{ idx + 1 }}</div>
+                <div class="item-card-body">
+                  <div class="item-card-name">{{ item.name }}</div>
+                  <div class="item-card-store">
+                    <q-icon name="storefront" size="12px" class="q-mr-xs" />
+                    {{ item.store?.name }}
+                  </div>
+                  <div class="item-card-dist" v-if="item.store?.distance">
+                    <q-icon name="near_me" size="11px" class="q-mr-xs" />
+                    {{ item.store.distance }} away
                   </div>
                 </div>
-                <q-icon name="chevron_right" color="grey-5" size="sm" />
+                <router-link :to="`/public_stores/${item.store?.optimus_id}/item/${item.optimus_id}`"
+                  class="item-card-link" @click.stop>
+                  <q-icon name="arrow_forward_ios" size="12px" />
+                </router-link>
               </div>
             </div>
-          </q-card-section>
-        </q-card>
+          </div>
+        </div>
       </div>
 
       <!-- Map Section -->
       <div class="map-section" ref="mapSectionRef">
-        <q-card flat bordered class="map-card">
-          <q-card-section class="q-pa-none">
-            <div class="map-wrapper">
-              <GoogleMap ref="mapRef" :api-key="GOOGLE_MAP_API_KEY" :map-id="GOOGLE_MAP_ID" class="google-map"
-                :center="{ lat: lat, lng: lng }" :zoom="currentZoom" :draggable="true" :clickable-icons="false">
-                <!-- My Location Marker -->
-                <AdvancedMarker :options="getLocationMarkerOptions()" @drag="markerDrag">
-                  <InfoWindow v-model="showInfoWindow"
-                    :options="{ position: { lat: lat, lng: lng }, headerContent: '&nbsp;&nbsp;&nbsp;Your Location', disableAutoPan: false }">
-                    <div class="info-window-content">
-                      <div class="info-window-header">
-                        <q-icon name="my_location" color="primary" size="sm" class="q-mr-xs" />
-                        <span class="text-weight-bold">Your Location</span>
-                      </div>
-                      <div class="info-window-body">
-                        <p class="text-caption text-grey-7 q-ma-none">
-                          This is your current location on the map
-                        </p>
-                      </div>
-                    </div>
-                  </InfoWindow>
-                </AdvancedMarker>
+        <div class="map-frame">
+          <GoogleMap ref="mapRef" :api-key="GOOGLE_MAP_API_KEY" :map-id="GOOGLE_MAP_ID" class="google-map"
+            :center="{ lat: lat, lng: lng }" :zoom="currentZoom" :draggable="true" :clickable-icons="false">
+            <AdvancedMarker :options="getLocationMarkerOptions()" @drag="markerDrag">
+              <InfoWindow v-model="showInfoWindow"
+                :options="{ position: { lat: lat, lng: lng }, headerContent: '&nbsp;&nbsp;&nbsp;Your Location', disableAutoPan: false }">
+                <div class="info-window-content">
+                  <div class="info-window-header">
+                    <q-icon name="my_location" color="primary" size="sm" class="q-mr-xs" />
+                    <span class="text-weight-bold">Your Location</span>
+                  </div>
+                  <div class="info-window-body">
+                    <p class="text-caption text-grey-7 q-ma-none">This is your current location on the map</p>
+                  </div>
+                </div>
+              </InfoWindow>
+            </AdvancedMarker>
 
-                <!-- Item Markers -->
-                <AdvancedMarker v-for="item in nearestItems" :key="item.id" :options="getStoreMarkerOptions(item.store)"
-                  @click="handleClickStoreAdvanceMarker(item.store)">
-                  <InfoWindow
-                    :options="{ headerContent: '&nbsp;&nbsp;&nbsp;' + item.store.name, disableAutoPan: false, closeButton: true } as any">
-                    <div class="info-window-content store-info-window">
-                      <div class="info-window-header">
-                        <q-icon name="store" color="positive" size="sm" class="q-mr-xs" />
-                        <span class="text-weight-bold">{{ item.store.name }}</span>
-                      </div>
-                      <div class="info-window-body">
-                        <div>{{ item.name }}</div>
-                        <div class="store-details" v-if="item.store.distance">
-                          <q-icon name="straighten" size="xs" class="q-mr-xs" />
-                          <span class="text-caption">{{ item.store.distance }}KM away</span>
-                        </div>
-                        <q-btn :to="`/public_stores/${item.store.optimus_id}/item/${item.optimus_id}`" color="primary"
-                          size="sm" unelevated class="q-mt-sm full-width" label="View Item" icon="arrow_forward" />
-                      </div>
+            <AdvancedMarker v-for="item in nearestItems" :key="item.id" :options="getStoreMarkerOptions(item.store)"
+              @click="handleClickStoreAdvanceMarker(item.store)">
+              <InfoWindow
+                :options="{ headerContent: '&nbsp;&nbsp;&nbsp;' + item.store.name, disableAutoPan: false, closeButton: true } as any">
+                <div class="info-window-content store-info-window">
+                  <div class="info-window-header">
+                    <q-icon name="store" color="positive" size="sm" class="q-mr-xs" />
+                    <span class="text-weight-bold">{{ item.store.name }}</span>
+                  </div>
+                  <div class="info-window-body">
+                    <div class="iw-item-name">{{ item.name }}</div>
+                    <div class="store-details" v-if="item.store.distance">
+                      <q-icon name="straighten" size="xs" class="q-mr-xs" />
+                      <span class="text-caption">{{ item.store.distance }} away</span>
                     </div>
-                  </InfoWindow>
-                </AdvancedMarker>
-              </GoogleMap>
-            </div>
-          </q-card-section>
-        </q-card>
+                    <q-btn :to="`/public_stores/${item.store.optimus_id}/item/${item.optimus_id}`" color="primary"
+                      size="sm" unelevated class="q-mt-sm full-width" label="View Item" icon="arrow_forward" no-caps />
+                  </div>
+                </div>
+              </InfoWindow>
+            </AdvancedMarker>
+          </GoogleMap>
+        </div>
       </div>
     </div>
 
-    <!-- Instructions Card -->
-    <q-card flat bordered class="instructions-card q-mt-md">
-      <q-card-section>
-        <div class="instructions-content">
-          <q-icon name="info" color="info" size="md" class="q-mr-md" />
+    <!-- How-to Strip -->
+    <div class="howto-strip">
+      <div class="howto-inner">
+        <div class="howto-step">
+          <div class="howto-icon"><q-icon name="edit" size="18px" color="white" /></div>
           <div>
-            <div class="text-subtitle2 text-weight-bold q-mb-xs">How to use the map</div>
-            <ul class="instructions-list">
-              <li>Click on "Nearby Shops" in the map to find shops in your area</li>
-              <li>Click on any green shop marker to view shop details and get directions</li>
-              <li>Drag the map to explore different areas</li>
-              <li>Use the refresh button to update your current location</li>
-            </ul>
+            <div class="howto-title">Type a Product</div>
+            <div class="howto-sub">Enter an item name in the search bar</div>
           </div>
         </div>
-      </q-card-section>
-    </q-card>
+        <div class="howto-arrow"><q-icon name="arrow_forward" size="16px" color="grey-4" /></div>
+        <div class="howto-step">
+          <div class="howto-icon"><q-icon name="search" size="18px" color="white" /></div>
+          <div>
+            <div class="howto-title">Find Items</div>
+            <div class="howto-sub">Click the button to search nearby</div>
+          </div>
+        </div>
+        <div class="howto-arrow"><q-icon name="arrow_forward" size="16px" color="grey-4" /></div>
+        <div class="howto-step">
+          <div class="howto-icon"><q-icon name="place" size="18px" color="white" /></div>
+          <div>
+            <div class="howto-title">Tap a Marker</div>
+            <div class="howto-sub">See item &amp; store details</div>
+          </div>
+        </div>
+        <div class="howto-arrow"><q-icon name="arrow_forward" size="16px" color="grey-4" /></div>
+        <div class="howto-step">
+          <div class="howto-icon"><q-icon name="shopping_cart" size="18px" color="white" /></div>
+          <div>
+            <div class="howto-title">Shop Local</div>
+            <div class="howto-sub">Visit the store and grab the item</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </div>
 </template>
 
@@ -268,10 +308,11 @@ const markerDrag = (e: { latLng: google.maps.LatLng }) => {
   lng.value = e.latLng.lng();
 };
 
+const kmRadius = ref(30);
 const nearestItems = ref<Array<ItemInterface>>([]);
 
 const getNearestItems = async () => {
-  nearestItems.value =  []
+  nearestItems.value = []
   localGetLocation();
   const result = await get(
     {
@@ -597,315 +638,618 @@ watch(searchString, async () => {
 </script>
 
 <style scoped lang="scss">
-.find-shops-link {
-  font-weight: 600;
-  color: #667eea;
-  text-decoration: none;
-  transition: all 0.2s ease;
-
-  &:hover {
-    color: #5568d3;
-    text-decoration: underline;
-  }
-}
-
+// ── Page ──────────────────────────────────────────────────────────────────
 .map-page-container {
-  padding: 24px;
   max-width: 1400px;
   margin: 0 auto;
+  width: 100%;
+  overflow-x: hidden;
 }
 
-.map-header-card {
-  border-radius: 16px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-  background: white;
+// ── Hero Header ───────────────────────────────────────────────────────────
+.map-hero {
+  position: relative;
+  background: linear-gradient(145deg, #064e3b 0%, #065f46 50%, #0f766e 100%);
   overflow: hidden;
-  transition: all 0.3s ease;
+  width: 100%;
+}
 
-  &:hover {
-    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.12);
+.map-hero-bg {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.hero-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(60px);
+  animation: heroOrb 12s ease-in-out infinite;
+
+  &.orb-1 {
+    width: 480px;
+    height: 480px;
+    background: rgba(16, 185, 129, 0.25);
+    top: -180px;
+    right: -80px;
+  }
+
+  &.orb-2 {
+    width: 320px;
+    height: 320px;
+    background: rgba(245, 158, 11, 0.2);
+    bottom: 20px;
+    left: -60px;
+    animation-delay: 4s;
+  }
+
+  &.orb-3 {
+    width: 200px;
+    height: 200px;
+    background: rgba(52, 211, 153, 0.15);
+    top: 40px;
+    left: 40%;
+    animation-delay: 8s;
   }
 }
 
-.map-header-section {
-  padding: 32px;
-  background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+.hero-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+  background-size: 48px 48px;
 }
 
-.map-header-main {
+@keyframes heroOrb {
+
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+
+  50% {
+    transform: translate(15px, -25px);
+  }
+}
+
+.map-hero-inner {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 32px;
+  padding: 36px 32px 28px;
+  flex-wrap: wrap;
+}
+
+.hero-left {
   display: flex;
   align-items: flex-start;
-  gap: 24px;
-  margin-bottom: 24px;
+  gap: 20px;
 }
 
-.map-header-icon-wrapper {
+.hero-icon-wrap {
+  width: 60px;
+  height: 60px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.18);
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 64px;
-  height: 64px;
-  border-radius: 16px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
   flex-shrink: 0;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
 
-  .q-icon {
-    color: white !important;
+.hero-eyebrow {
+  font-size: 11px;
+  font-weight: 800;
+  color: rgba(255, 255, 255, 0.45);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-bottom: 6px;
+}
+
+.hero-title {
+  font-size: 32px;
+  font-weight: 900;
+  color: white;
+  margin: 0 0 10px;
+  letter-spacing: -0.8px;
+  line-height: 1.1;
+}
+
+.hero-desc {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.55);
+  margin: 0;
+  line-height: 1.6;
+}
+
+.find-shops-link {
+  color: #fbbf24;
+  font-weight: 700;
+  text-decoration: none;
+  transition: opacity 0.2s;
+
+  &:hover {
+    opacity: 0.8;
   }
 }
 
-.map-header-text {
-  flex: 1;
+.hero-stats {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 16px;
+  padding: 20px 28px;
+  backdrop-filter: blur(10px);
+}
+
+.hero-stat-value {
+  font-size: 32px;
+  font-weight: 900;
+  color: white;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+
+.hero-stat-label {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.45);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.hero-stat-divider {
+  width: 1px;
+  height: 40px;
+  background: rgba(255, 255, 255, 0.15);
+}
+
+// ── Action Bar ────────────────────────────────────────────────────────────
+.action-bar {
+  position: relative;
+  z-index: 1;
+  padding: 0 32px 28px;
+}
+
+.action-bar-inner {
+  display: grid;
+  grid-template-columns: auto auto 1fr;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.action-btn {
+  height: 46px;
+  padding: 0 20px;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 14px;
+  white-space: nowrap;
+  transition: all 0.25s ease;
+
+  &.loc-action {
+    background: rgba(255, 255, 255, 0.12);
+    color: white;
+    border: 1.5px solid rgba(255, 255, 255, 0.22);
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: translateY(-1px);
+    }
+  }
+
+  &.find-action {
+    background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+    color: #1a1a1a;
+    box-shadow: 0 4px 14px rgba(251, 191, 36, 0.35);
+
+    &:hover:not(.disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(251, 191, 36, 0.45);
+    }
+  }
+}
+
+.search-wrap {
   min-width: 0;
 }
 
-.map-header-title-wrapper {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  flex-wrap: wrap;
-  margin-bottom: 12px;
-}
-
-.map-header-title-with-icon {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.map-header-inline-icon {
-  display: none;
-}
-
-.map-header-title {
-  font-size: 28px;
-  font-weight: 700;
-  color: #1a1a1a;
-  margin: 0;
-  line-height: 1.2;
-  letter-spacing: -0.5px;
-}
-
-.map-header-badge {
-  font-weight: 600;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.map-header-description {
-  font-size: 15px;
-  color: #666;
-  line-height: 1.6;
-  margin: 0;
-}
-
-.map-header-actions {
-  display: grid;
-  grid-template-columns: 1fr 1fr 2fr;
-  gap: 12px;
-  align-items: center;
-}
-
-.refresh-location-btn,
-.find-stores-btn {
-  height: 44px;
-  font-weight: 600;
-  border-radius: 10px;
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  }
-}
-
-.search-input {
-  height: 44px;
-
+.hero-search {
   :deep(.q-field__control) {
-    height: 44px;
-    border-radius: 10px;
-    transition: all 0.3s ease;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.2) !important;
+    backdrop-filter: blur(10px);
+    height: 46px;
+    transition: all 0.25s ease;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.15);
+    }
   }
 
-  :deep(.q-field__native) {
+  :deep(.q-field__native),
+  :deep(.q-field__native::placeholder) {
+    color: rgba(255, 255, 255, 0.7);
     font-size: 14px;
     font-weight: 500;
-    padding: 0 12px;
   }
 
   :deep(.q-field__prepend) {
-    padding-left: 12px;
-    color: #666;
-  }
-
-  :deep(.q-field--outlined .q-field__control) {
-    border: 2px solid #e0e0e0;
-    background: white;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-  }
-
-  :deep(.q-field--outlined:hover .q-field__control) {
-    border-color: #667eea;
-    box-shadow: 0 2px 12px rgba(102, 126, 234, 0.15);
+    color: rgba(255, 255, 255, 0.45);
   }
 
   :deep(.q-field--focused .q-field__control) {
-    border-color: #667eea;
-    box-shadow: 0 4px 16px rgba(102, 126, 234, 0.2);
-  }
-
-  :deep(.q-field__clearable) {
-    padding-right: 8px;
+    background: rgba(255, 255, 255, 0.18);
+    border-color: rgba(255, 255, 255, 0.4) !important;
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
   }
 }
 
-.refresh-location-btn {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
+.search-hint {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.4);
+  display: flex;
+  align-items: center;
+  font-weight: 500;
 
-  &:hover {
-    background: linear-gradient(135deg, #5568d3 0%, #6a3f8f 100%);
+  strong {
+    color: rgba(255, 255, 255, 0.65);
   }
 }
 
+// ── Map + Panel Layout ────────────────────────────────────────────────────
 .map-store-container {
   display: grid;
-  grid-template-columns: 400px 1fr;
-  gap: 24px;
+  grid-template-columns: 340px 1fr;
+  gap: 0;
   align-items: start;
+  background: #f4f5f7;
+  border-top: 3px solid rgba(16, 185, 129, 0.2);
+  min-width: 0;
+  width: 100%;
+  overflow: hidden;
 
   @media (max-width: 1024px) {
     grid-template-columns: 1fr;
   }
 }
 
-.map-section {
-  min-width: 0;
-}
-
-.map-card {
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-  transition: box-shadow 0.3s ease;
-
-  &:hover {
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
-  }
-}
-
-.map-wrapper {
-  position: relative;
-  width: 100%;
-  height: 600px;
-  border-radius: 12px;
-  overflow: hidden;
-}
-
+// ── Items Panel ───────────────────────────────────────────────────────────
 .store-list-section {
-  min-width: 0;
-}
-
-.store-list-card {
-  border-radius: 12px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-  max-height: 600px;
+  border-right: 1px solid #e5e7eb;
+  background: white;
+  height: 620px;
+  max-height: 620px;
   display: flex;
   flex-direction: column;
+  min-width: 0;
+  width: 100%;
 }
 
-.store-list-header {
+.items-panel {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.items-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   padding: 20px;
-  background: linear-gradient(135deg, #f5f7fa 0%, #ffffff 100%);
+  background: linear-gradient(135deg, #064e3b 0%, #065f46 100%);
   cursor: pointer;
-  transition: all 0.3s ease;
+  flex-shrink: 0;
+  transition: opacity 0.2s;
 
   &:hover {
-    background: linear-gradient(135deg, #e8f0f5 0%, #f5f7fa 100%);
+    opacity: 0.9;
   }
 }
 
-.store-list-title {
+.panel-header-left {
   display: flex;
   align-items: center;
   gap: 12px;
 }
 
-.store-list-content {
-  padding: 16px;
-  overflow-y: auto;
-  flex: 1;
-  max-height: 520px;
+.panel-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
 }
 
-.empty-store-list {
+.panel-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: white;
+  line-height: 1.2;
+}
+
+.panel-subtitle {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.5);
+  font-weight: 500;
+  margin-top: 2px;
+}
+
+.panel-count {
+  background: #fbbf24;
+  color: #1a1a1a;
+  font-size: 13px;
+  font-weight: 800;
+  min-width: 28px;
+  height: 28px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 8px;
+}
+
+.items-panel-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px;
+}
+
+.empty-state {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 40px 20px;
+  padding: 48px 20px;
   text-align: center;
-  min-height: 200px;
 }
 
-.store-list-items {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.store-list-item {
+.empty-icon-wrap {
+  width: 64px;
+  height: 64px;
+  border-radius: 16px;
+  background: #f3f4f6;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 12px 16px;
-  background: #f8f9fa;
-  border-radius: 8px;
-  border-left: 3px solid #34a853;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+
+.empty-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: #374151;
+  margin-bottom: 6px;
+}
+
+.empty-sub {
+  font-size: 13px;
+  color: #9ca3af;
+  font-weight: 500;
+  line-height: 1.6;
+}
+
+.item-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.item-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 12px;
+  background: #f9fafb;
+  border-radius: 10px;
+  border: 1px solid #f3f4f6;
   cursor: pointer;
   transition: all 0.2s ease;
 
   &:hover {
-    background: #e8f5e8;
-    transform: translateX(4px);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    background: #ecfdf5;
+    border-color: #6ee7b7;
+    transform: translateX(3px);
+    box-shadow: 0 2px 8px rgba(16, 185, 129, 0.1);
   }
 }
 
-.store-item-content {
+.item-card-badge {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #065f46 0%, #10b981 100%);
+  color: white;
+  font-size: 11px;
+  font-weight: 800;
   display: flex;
   align-items: center;
-  gap: 12px;
-  flex: 1;
-  min-width: 0;
-}
-
-.store-item-icon {
+  justify-content: center;
   flex-shrink: 0;
 }
 
-.store-item-info {
+.item-card-body {
   flex: 1;
   min-width: 0;
 }
 
-.store-item-name {
-  color: #1a1a1a;
-  line-height: 1.4;
+.item-card-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #111827;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  line-height: 1.3;
+  margin-bottom: 3px;
+}
+
+.item-card-store {
+  display: flex;
+  align-items: center;
+  font-size: 12px;
+  color: #6b7280;
+  font-weight: 500;
+  margin-bottom: 2px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
+.item-card-dist {
+  display: flex;
+  align-items: center;
+  font-size: 11px;
+  color: #9ca3af;
+  font-weight: 500;
+}
+
+.item-card-link {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: #f3f4f6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #9ca3af;
+  flex-shrink: 0;
+  text-decoration: none;
+  transition: all 0.2s;
+
+  &:hover {
+    background: #10b981;
+    color: white;
+  }
+}
+
+// ── Map Frame ─────────────────────────────────────────────────────────────
+.map-section {
+  min-width: 0;
+  width: 100%;
+  height: 620px;
+}
+
+.map-frame {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
 .google-map {
   width: 100%;
   height: 100%;
-  border-radius: 12px;
 }
 
-// Custom Animated Markers
+// ── How-to Strip ──────────────────────────────────────────────────────────
+.howto-strip {
+  background: white;
+  border-top: 1px solid #e9ecef;
+  padding: 24px 32px;
+}
+
+.howto-inner {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  max-width: 900px;
+}
+
+.howto-step {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  min-width: 160px;
+}
+
+.howto-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #065f46 0%, #10b981 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 4px 10px rgba(16, 185, 129, 0.25);
+}
+
+.howto-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 2px;
+}
+
+.howto-sub {
+  font-size: 12px;
+  color: #9ca3af;
+  font-weight: 500;
+  line-height: 1.3;
+}
+
+.howto-arrow {
+  flex-shrink: 0;
+  opacity: 0.5;
+}
+
+// ── Info Window ───────────────────────────────────────────────────────────
+.info-window-content {
+  min-width: 200px;
+  padding: 8px;
+}
+
+.info-window-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #e5e7eb;
+  font-size: 14px;
+  color: #111827;
+}
+
+.info-window-body {
+  padding-top: 4px;
+}
+
+.store-info-window {
+  min-width: 220px;
+}
+
+.iw-item-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 6px;
+}
+
+.store-details {
+  display: flex;
+  align-items: center;
+  color: #6b7280;
+  margin-bottom: 8px;
+  padding: 4px 0;
+}
+
+// ── Custom Animated Markers
 :deep(.custom-marker) {
   position: relative;
   width: 25px;
@@ -1124,108 +1468,145 @@ watch(searchString, async () => {
   background: white;
 }
 
-@media (max-width: 774px) {
-  .map-header-icon-wrapper {
-    display: none;
-  }
-
-  .map-header-inline-icon {
-    display: block !important;
-    font-size: 24px !important;
-  }
-
-  .map-header-title {
-    font-size: 20px;
-  }
-
-  .map-header-title-wrapper {
+@media (max-width: 768px) {
+  .map-hero-inner {
+    padding: 24px 20px 20px;
     flex-direction: column;
     align-items: flex-start;
-    gap: 12px;
-  }
-
-  .map-header-title-with-icon {
-    width: 100%;
-  }
-}
-
-@media (max-width: 768px) {
-  .map-page-container {
-    padding: 16px;
-  }
-
-  .map-header-section {
-    padding: 24px;
-  }
-
-  .map-header-main {
-    flex-direction: column;
     gap: 20px;
-    margin-bottom: 20px;
   }
 
-  .map-header-title {
-    font-size: 18px;
+  .hero-title {
+    font-size: 24px;
   }
 
-  .map-header-actions {
+  .hero-stats {
+    width: 100%;
+    justify-content: center;
+    padding: 16px 20px;
+  }
+
+  .action-bar {
+    padding: 0 20px 20px;
+  }
+
+  .action-bar-inner {
     grid-template-columns: 1fr 1fr;
     grid-template-rows: auto auto;
   }
 
-  .refresh-location-btn,
-  .find-stores-btn {
-    grid-column: span 1;
-  }
-
-  .search-input {
+  .search-wrap {
     grid-column: 1 / -1;
   }
 
-  .map-wrapper {
-    height: 500px;
+  .store-list-section {
+    height: auto;
+    max-height: none;
+    border-right: none;
+    border-bottom: 1px solid #e5e7eb;
   }
 
-  .instructions-content {
-    flex-direction: column;
+  .items-panel {
+    height: auto;
   }
-}
 
-@media (max-width: 600px) {
-  .map-header-section {
+  .items-panel-body {
+    overflow-y: visible;
+  }
+
+  .map-section {
+    height: 420px;
+  }
+
+  .howto-strip {
     padding: 20px;
   }
 
-  .map-header-icon-wrapper {
+  .howto-inner {
+    gap: 12px;
+  }
+
+  .howto-arrow {
+    display: none;
+  }
+
+  .howto-step {
+    min-width: 140px;
+    flex: 1 1 calc(50% - 12px);
+  }
+}
+
+@media (max-width: 595px) {
+  .map-hero-inner {
+    padding: 20px 16px 16px;
+  }
+
+  .hero-icon-wrap {
     width: 48px;
     height: 48px;
-
-    .q-icon {
-      font-size: 28px !important;
-    }
   }
 
-  .map-header-title {
-    font-size: 22px;
+  .hero-eyebrow {
+    font-size: 10px;
   }
 
-  .map-header-description {
-    font-size: 14px;
+  .hero-title {
+    font-size: 20px;
   }
 
-  .map-header-actions {
+  .hero-desc {
+    font-size: 13px;
+  }
+
+  .hero-stats {
+    padding: 14px 16px;
+    gap: 16px;
+  }
+
+  .hero-stat-value {
+    font-size: 24px;
+  }
+
+  .action-bar {
+    padding: 0 16px 20px;
+  }
+
+  .action-bar-inner {
     grid-template-columns: 1fr;
-    grid-template-rows: auto auto auto;
+    gap: 10px;
   }
 
-  .refresh-location-btn,
-  .find-stores-btn,
-  .search-input {
+  .action-btn {
+    width: 100%;
+  }
+
+  .search-wrap {
     grid-column: 1;
   }
 
-  .map-wrapper {
-    height: 400px;
+  .store-list-section {
+    height: auto;
+    max-height: none;
+  }
+
+  .items-panel {
+    height: auto;
+  }
+
+  .items-panel-body {
+    overflow-y: visible;
+  }
+
+  .map-section {
+    height: 360px;
+  }
+
+  .howto-step {
+    flex: 1 1 100%;
+  }
+
+  .howto-strip {
+    padding: 16px;
   }
 }
 </style>
