@@ -54,4 +54,13 @@ class UserController extends ApiController
         return response()->json('A password reset link has been sent to your email address. Please check your inbox.');
     }
 
+    public function resetPassword(Request $request): string {
+        $this->userService->resetPassword(
+            $request->email,
+            $request->token,
+            $request->password
+        );
+        return response()->json('Your password has been reset successfully. You can now sign in with your new password.');
+    }
+
 }

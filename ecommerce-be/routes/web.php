@@ -116,6 +116,7 @@ Route::post('register/ {
 Route::post('register', [RegisterController::class, 'register']);
 Route::post('send-email-invitation', [UserController::class, 'inviteByEmail']);
 Route::post('forgot-password', [UserController::class, 'forgotPassword']);
+Route::post('reset-password', [UserController::class, 'resetPassword']);
 Route::post('create-new-activation-code', [MobileActivationCodeController::class, 'createNewActivationcode']);
 Route::get('verify/activation_code/{activation_code}', [RegisterController::class, 'verifyActivationCode']);
 Route::get('store-users/verification_code/{verification_code}', [StoreUserController::class, 'acceptStoreInvitation']);
