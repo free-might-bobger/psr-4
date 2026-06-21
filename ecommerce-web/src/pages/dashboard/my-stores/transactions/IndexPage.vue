@@ -1,17 +1,23 @@
 <template>
   <div class="stores-page-container">
     <!-- Header Section -->
-    <div class="page-header q-mb-md">
+    <div class="page-header q-mb-lg">
+      <div class="header-bg-accent"></div>
       <div class="header-content">
         <div class="header-title-section">
-          <q-icon name="receipt_long" size="32px" color="primary" class="q-mr-sm" />
-          <h2 class="page-title">All Transactions</h2>
+          <div class="header-icon-wrap">
+            <q-icon name="receipt_long" size="26px" color="white" />
+          </div>
+          <div>
+            <h2 class="page-title">All Transactions</h2>
+            <div class="page-subtitle">Store transaction history</div>
+          </div>
         </div>
         <div class="header-actions">
           <q-input v-model="search" placeholder="Search transactions..." outlined dense clearable debounce="1000"
             class="search-input">
             <template v-slot:prepend>
-              <q-icon name="search" />
+              <q-icon name="search" color="grey-5" />
             </template>
           </q-input>
         </div>
@@ -21,38 +27,30 @@
     <!-- Desktop Grid View -->
     <div class="desktop-only">
       <div v-if="typedResult.length === 0" class="empty-state-desktop">
-        <q-icon name="receipt_long" size="80px" color="grey-4" />
-        <div class="text-h5 q-mt-md text-grey-6">No transactions found</div>
-        <div class="text-body2 text-grey-5 q-mt-sm">Your transaction history will appear here</div>
+        <div class="empty-icon-wrap">
+          <q-icon name="receipt_long" size="48px" color="white" />
+        </div>
+        <div class="empty-title q-mt-md">No transactions found</div>
+        <div class="empty-subtitle q-mt-sm">Your transaction history will appear here</div>
       </div>
       <div v-else>
         <!-- Grid Header -->
         <div class="grid-header transactions-grid-header">
-          <div class="grid-header-cell header-name">
-            <q-icon name="tag" size="20px" color="primary" class="q-mr-xs" />
-            <span class="header-label">Reference</span>
-          </div>
-          <div class="grid-header-cell header-name">
-            <q-icon name="tag" size="20px" color="primary" class="q-mr-xs" />
-            <span class="header-label">Order Status</span>
-          </div>
-          <div class="grid-header-cell header-mobile">
-            <q-icon name="payments" size="20px" color="primary" class="q-mr-xs" />
-            <span class="header-label">Summary</span>
-          </div>
-          <div class="grid-header-cell header-actions">
-            <q-icon name="settings" size="20px" color="primary" class="q-mr-xs" />
-            <span class="header-label">Actions</span>
-          </div>
+          <div class="grid-header-cell">Reference</div>
+          <div class="grid-header-cell">Status</div>
+          <div class="grid-header-cell">Summary</div>
+          <div class="grid-header-cell" style="text-align:right">Actions</div>
         </div>
 
         <!-- Grid Rows -->
         <div class="stores-grid">
-          <q-card v-for="transaction in typedResult" :key="transaction.optimus_id" flat bordered
-            class="store-grid-item">
+          <div v-for="transaction in typedResult" :key="transaction.optimus_id" class="store-grid-item">
             <div class="grid-row transaction-grid-row">
               <div class="grid-cell cell-name">
                 <router-link :to="`${$route.path}/${transaction.optimus_id}`" class="transaction-reference">
+                  <div class="ref-icon-wrap">
+                    <q-icon name="receipt" size="16px" color="white" />
+                  </div>
                   <div class="transaction-reference-text">
                     <div class="transaction-reference-id">{{ transaction.reference_id }}</div>
                     <div class="transaction-date">
@@ -69,8 +67,7 @@
               <div class="grid-cell cell-mobile">
                 <div class="transaction-summary">
                   <div class="transaction-total">
-                    Grand Total:
-                    <span>{{ transaction.grand_total }}</span>
+                    Grand Total: <span>{{ transaction.grand_total }}</span>
                   </div>
                   <div class="transaction-meta">
                     <div class="transaction-meta-item">
@@ -86,30 +83,29 @@
               </div>
               <div class="grid-cell cell-actions">
                 <div class="action-buttons">
-                  <q-btn round dense color="primary" icon="view_list" :to="`${$route.path}/${transaction.optimus_id}`"
-                    class="action-btn-grid action-btn-edit">
+                  <q-btn unelevated dense icon="view_list" :to="`${$route.path}/${transaction.optimus_id}`"
+                    class="view-btn">
                     <q-tooltip>View details</q-tooltip>
                   </q-btn>
                 </div>
               </div>
             </div>
-          </q-card>
+          </div>
         </div>
 
         <!-- Pagination -->
         <div class="grid-pagination">
           <div class="pagination-info">
-            Showing {{ pagination.from }} - {{ pagination.to }} of {{ pagination.rowsNumber }} transactions
+            Showing {{ pagination.from }} – {{ pagination.to }} of {{ pagination.rowsNumber }} transactions
           </div>
           <div class="pagination-controls">
-            <q-btn v-if="pagination.lastPage > 2" flat round dense icon="first_page" color="grey-8"
-              :disable="pagination.page === 1" @click="goToFirstPage" />
-            <q-btn flat round dense icon="chevron_left" color="grey-8" :disable="pagination.page === 1"
-              @click="goToPreviousPage" />
+            <q-btn v-if="pagination.lastPage > 2" flat round dense icon="first_page" :disable="pagination.page === 1"
+              @click="goToFirstPage" />
+            <q-btn flat round dense icon="chevron_left" :disable="pagination.page === 1" @click="goToPreviousPage" />
             <span class="page-number">{{ pagination.page }} / {{ pagination.lastPage }}</span>
-            <q-btn flat round dense icon="chevron_right" color="grey-8"
-              :disable="pagination.page === pagination.lastPage" @click="goToNextPage" />
-            <q-btn v-if="pagination.lastPage > 2" flat round dense icon="last_page" color="grey-8"
+            <q-btn flat round dense icon="chevron_right" :disable="pagination.page === pagination.lastPage"
+              @click="goToNextPage" />
+            <q-btn v-if="pagination.lastPage > 2" flat round dense icon="last_page"
               :disable="pagination.page === pagination.lastPage" @click="goToLastPage" />
           </div>
         </div>
@@ -119,26 +115,33 @@
     <!-- Mobile Card View -->
     <div class="mobile-only">
       <div v-if="typedResult.length === 0" class="empty-state">
-        <q-icon name="receipt_long" size="64px" color="grey-4" />
-        <div class="text-h6 q-mt-md text-grey-6">No transactions found</div>
-        <div class="text-body2 text-grey-5 q-mt-sm">Your transaction history will appear here</div>
+        <div class="empty-icon-wrap">
+          <q-icon name="receipt_long" size="40px" color="white" />
+        </div>
+        <div class="empty-title q-mt-md">No transactions found</div>
+        <div class="empty-subtitle q-mt-xs">Your transaction history will appear here</div>
       </div>
       <div v-else class="stores-cards">
-        <q-card v-for="transaction in typedResult" :key="transaction.optimus_id" flat bordered
-          class="store-card q-mb-md">
-          <q-card-section>
-            <div class="store-card-header transaction-store-card-header">
-              <div class="store-card-title">
-                <div class="transaction-reference-id">#{{ transaction.reference_id }}</div>
+        <div v-for="transaction in typedResult" :key="transaction.optimus_id" class="store-card q-mb-sm">
+          <div class="mobile-card-accent"></div>
+          <div class="mobile-card-body">
+            <div class="mobile-card-top">
+              <div class="mobile-ref-wrap">
+                <div class="mobile-ref-icon">
+                  <q-icon name="receipt" size="14px" color="white" />
+                </div>
+                <div>
+                  <div class="transaction-reference-id">{{ transaction.reference_id }}</div>
+                  <div class="transaction-date">
+                    <q-icon name="calendar_today" size="xs" class="q-mr-xs" />
+                    {{ formatDate(transaction.created_at) }}
+                  </div>
+                </div>
               </div>
-              <div class="transaction-header-badge">
-                <q-badge :color="getStatusColor(transaction.status?.label)"
-                  :label="transaction.status?.label || 'Pending'" class="status-badge" />
-              </div>
+              <q-badge :color="getStatusColor(transaction.status?.label)"
+                :label="transaction.status?.label || 'Pending'" class="status-badge" />
             </div>
-            <div class="store-card-info">
-              <span class="text-body2 text-grey-7">{{ formatDate(transaction.created_at) }}</span>
-            </div>
+            <div class="mobile-divider"></div>
             <div class="transaction-mobile-details">
               <div class="transaction-detail-row">
                 <span class="transaction-detail-label">Grand Total</span>
@@ -153,14 +156,12 @@
                 <span class="transaction-detail-value">{{ transaction.receive_method?.name || 'N/A' }}</span>
               </div>
             </div>
-            <div class="store-card-actions q-mt-md">
-              <q-btn unelevated dense color="negative" icon="check_circle" label="Received"
-                :to="`${$route.path}/${transaction.optimus_id}`" class="action-btn-mobile action-btn-delete-mobile" />
-              <q-btn unelevated dense color="primary" icon="view_list" label="View"
-                :to="`${$route.path}/${transaction.optimus_id}`" class="action-btn-mobile action-btn-edit-mobile" />
+            <div class="mobile-card-actions">
+              <q-btn unelevated dense icon="view_list" label="View Details"
+                :to="`${$route.path}/${transaction.optimus_id}`" class="mobile-view-btn" />
             </div>
-          </q-card-section>
-        </q-card>
+          </div>
+        </div>
       </div>
       <div v-if="typedResult.length > 0" class="mobile-pagination q-mt-md">
         <q-pagination v-model="pagination.page" :max="pagination.lastPage" :max-pages="5" direction-links boundary-links
@@ -256,14 +257,219 @@ const formatDate = (dateString: string | undefined): string => {
 </script>
 
 <style scoped lang="scss">
-@import 'src/css/dashboard/all-stores/index.scss';
+// ── Dark theme tokens ──────────────────────────────────────────────────────
+$dark-base: #0f172a;
+$dark-card: #1e293b;
+$dark-elevated: #273549;
+$border: rgba(255, 255, 255, 0.08);
+$accent: #6366f1;
+$accent-2: #7c3aed;
+$white: #ffffff;
+$muted: rgba(255, 255, 255, 0.5);
+
+// ── Container ──────────────────────────────────────────────────────────────
+.stores-page-container {
+  padding: 28px 24px;
+  max-width: 1400px;
+  margin: 0 auto;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: $dark-base !important;
+  color: $white;
+}
+
+// ── Header ─────────────────────────────────────────────────────────────────
+.page-header {
+  position: relative;
+  background: $dark-card;
+  border-radius: 20px;
+  border: 1px solid $border;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+}
+
+.header-bg-accent {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.18) 0%, rgba(124, 58, 237, 0.10) 60%, transparent 100%);
+  pointer-events: none;
+}
+
+.header-content {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 24px;
+  padding: 28px 32px;
+}
+
+.header-title-section {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.header-icon-wrap {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, $accent 0%, $accent-2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 16px rgba(99, 102, 241, 0.4);
+  flex-shrink: 0;
+}
+
+.page-title {
+  font-size: 24px !important;
+  font-weight: 800 !important;
+  color: $white !important;
+  margin: 0 0 4px !important;
+  letter-spacing: -0.3px;
+  line-height: 1.2;
+}
+
+.page-subtitle {
+  font-size: 13px;
+  color: $muted;
+  font-weight: 500;
+}
+
+.search-input {
+  min-width: 280px;
+  max-width: 380px;
+
+  :deep(.q-field__control) {
+    background: $dark-elevated !important;
+    border-radius: 12px !important;
+  }
+
+  :deep(.q-field__native),
+  :deep(.q-field__input) {
+    color: $white !important;
+  }
+
+  :deep(.q-field__label) {
+    color: $muted !important;
+  }
+
+  :deep(.q-field__prepend .q-icon),
+  :deep(.q-field__append .q-icon) {
+    color: $muted !important;
+  }
+
+  :deep(.q-field--outlined .q-field__control:before) {
+    border-color: $border !important;
+  }
+
+  :deep(.q-field--outlined:hover .q-field__control:before) {
+    border-color: rgba(99, 102, 241, 0.4) !important;
+  }
+
+  :deep(.q-field--focused .q-field__control:before) {
+    border-color: $accent !important;
+  }
+}
+
+// ── Empty states ───────────────────────────────────────────────────────────
+.empty-state-desktop,
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 20px;
+  text-align: center;
+  background: $dark-card;
+  border-radius: 20px;
+  border: 1px solid $border;
+}
+
+.empty-icon-wrap {
+  width: 80px;
+  height: 80px;
+  border-radius: 24px;
+  background: linear-gradient(135deg, $accent 0%, $accent-2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 24px rgba(99, 102, 241, 0.35);
+}
+
+.empty-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: $white;
+}
+
+.empty-subtitle {
+  font-size: 14px;
+  color: $muted;
+}
+
+// ── Desktop grid container ─────────────────────────────────────────────────
+.stores-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  background: $dark-card;
+  border: 1px solid $border;
+  border-top: none;
+  border-radius: 0 0 16px 16px;
+  overflow: hidden;
+}
+
+// ── Grid header ────────────────────────────────────────────────────────────
+.grid-header {
+  display: grid;
+  background: $dark-elevated;
+  border: 1px solid $border;
+  border-radius: 16px 16px 0 0;
+  padding: 0;
+  overflow: hidden;
+}
 
 .transactions-grid-header {
-  grid-template-columns: 2fr 1.5fr 2fr 1fr;
+  grid-template-columns: 2fr 1.5fr 2fr 120px;
+}
+
+.grid-header-cell {
+  padding: 14px 20px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: $muted;
+}
+
+// ── Grid rows ──────────────────────────────────────────────────────────────
+.store-grid-item {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  transition: background 0.15s;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.025);
+  }
+}
+
+.grid-row {
+  display: grid;
+  align-items: center;
 }
 
 .transaction-grid-row {
-  grid-template-columns: 2fr 1.5fr 2fr 1fr;
+  grid-template-columns: 2fr 1.5fr 2fr 120px;
+}
+
+.grid-cell {
+  padding: 16px 20px;
+  color: $white;
+  font-size: 14px;
 }
 
 .cell-status {
@@ -271,50 +477,34 @@ const formatDate = (dateString: string | undefined): string => {
   align-items: center;
 }
 
-.status-badge {
-  font-size: 12px;
-  font-weight: 600;
-  padding: 6px 12px;
-  border-radius: 16px;
-}
-
-/* Mobile card: wrap status badge to next line when header row is too tight */
-.store-card-header.transaction-store-card-header {
-  flex-wrap: wrap;
-  align-items: flex-start;
-  gap: 8px 12px;
-}
-
-.store-card-header.transaction-store-card-header .store-card-title {
-  flex: 1 1 auto;
-  min-width: 0;
-  max-width: 100%;
-}
-
-.store-card-header.transaction-store-card-header .transaction-reference-id {
-  word-break: break-word;
-}
-
-.store-card-header.transaction-store-card-header .transaction-header-badge {
-  flex: 0 1 auto;
-  min-width: 0;
-  max-width: 100%;
+.cell-actions {
   display: flex;
   justify-content: flex-end;
 }
 
-.store-card-header.transaction-store-card-header .transaction-header-badge :deep(.q-badge) {
-  white-space: normal;
-  text-align: center;
-  word-break: break-word;
-  max-width: 100%;
-}
-
+// ── Reference cell ─────────────────────────────────────────────────────────
 .transaction-reference {
   display: flex;
   align-items: center;
   gap: 12px;
-  color: #1a1a1a;
+  text-decoration: none;
+  color: $white;
+
+  &:hover .transaction-reference-id {
+    color: #a5b4fc;
+  }
+}
+
+.ref-icon-wrap {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, $accent 0%, $accent-2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 3px 10px rgba(99, 102, 241, 0.3);
 }
 
 .transaction-reference-text {
@@ -324,40 +514,54 @@ const formatDate = (dateString: string | undefined): string => {
 }
 
 .transaction-reference-id {
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 700;
-  color: #1a1a1a;
+  color: $white;
+  transition: color 0.2s;
+  word-break: break-word;
 }
 
 .transaction-date {
   font-size: 12px;
-  color: #666;
+  color: $muted;
   display: flex;
   align-items: center;
 }
 
+// ── Status badge ───────────────────────────────────────────────────────────
+.status-badge {
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  padding: 5px 12px !important;
+  border-radius: 20px !important;
+  letter-spacing: 0.3px;
+}
+
+// ── Summary cell ───────────────────────────────────────────────────────────
 .transaction-summary {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
 }
 
 .transaction-total {
-  font-size: 14px;
-  color: #1a1a1a;
-  font-weight: 600;
+  font-size: 13px;
+  color: $muted;
+  font-weight: 500;
 
   span {
+    color: $white;
     font-weight: 700;
+    font-size: 14px;
   }
 }
 
 .transaction-meta {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  color: #666;
-  font-size: 13px;
+  gap: 4px;
+  font-size: 12px;
+  color: $muted;
 }
 
 .transaction-meta-item {
@@ -365,8 +569,134 @@ const formatDate = (dateString: string | undefined): string => {
   align-items: center;
 }
 
+// ── View button (desktop) ──────────────────────────────────────────────────
+.view-btn {
+  background: rgba(99, 102, 241, 0.15) !important;
+  color: #a5b4fc !important;
+  border: 1px solid rgba(99, 102, 241, 0.3) !important;
+  border-radius: 10px !important;
+  font-weight: 700 !important;
+  font-size: 12px !important;
+  text-transform: none !important;
+  padding: 6px 14px !important;
+  transition: background 0.2s !important;
+
+  &:hover {
+    background: rgba(99, 102, 241, 0.28) !important;
+    color: $white !important;
+  }
+}
+
+// ── Pagination footer ──────────────────────────────────────────────────────
+.grid-pagination {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 20px;
+  background: $dark-elevated;
+  border: 1px solid $border;
+  border-top: none;
+  border-radius: 0 0 16px 16px;
+  margin-top: 0;
+}
+
+.pagination-info {
+  font-size: 13px;
+  color: $muted;
+  font-weight: 500;
+}
+
+.pagination-controls {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+
+  :deep(.q-btn) {
+    color: $muted !important;
+
+    &:hover {
+      color: $white !important;
+      background: rgba(255, 255, 255, 0.06) !important;
+    }
+  }
+}
+
+.page-number {
+  font-size: 14px;
+  color: $white;
+  font-weight: 700;
+  min-width: 60px;
+  text-align: center;
+  padding: 0 8px;
+}
+
+// ── Mobile cards ───────────────────────────────────────────────────────────
+.stores-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.store-card {
+  position: relative;
+  background: $dark-card;
+  border: 1px solid $border;
+  border-radius: 16px;
+  overflow: hidden;
+  display: flex;
+  transition: box-shadow 0.2s, border-color 0.2s;
+
+  &:hover {
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.3);
+    border-color: rgba(99, 102, 241, 0.3);
+  }
+}
+
+.mobile-card-accent {
+  width: 3px;
+  flex-shrink: 0;
+  background: linear-gradient(180deg, $accent 0%, $accent-2 100%);
+}
+
+.mobile-card-body {
+  flex: 1;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.mobile-card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.mobile-ref-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.mobile-ref-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 9px;
+  background: linear-gradient(135deg, $accent 0%, $accent-2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 3px 10px rgba(99, 102, 241, 0.3);
+}
+
+.mobile-divider {
+  height: 1px;
+  background: $border;
+}
+
 .transaction-mobile-details {
-  margin-top: 12px;
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -375,34 +705,86 @@ const formatDate = (dateString: string | undefined): string => {
 .transaction-detail-row {
   display: flex;
   justify-content: space-between;
-  font-size: 14px;
-  color: #1a1a1a;
+  align-items: center;
+  font-size: 13px;
 }
 
 .transaction-detail-label {
-  color: #666;
+  color: $muted;
   font-weight: 500;
 }
 
 .transaction-detail-value {
-  font-weight: 600;
+  color: $white;
+  font-weight: 700;
 }
 
+.mobile-card-actions {
+  padding-top: 4px;
+}
+
+.mobile-view-btn {
+  width: 100%;
+  background: rgba(99, 102, 241, 0.15) !important;
+  color: #a5b4fc !important;
+  border: 1px solid rgba(99, 102, 241, 0.3) !important;
+  border-radius: 10px !important;
+  font-weight: 700 !important;
+  font-size: 13px !important;
+  text-transform: none !important;
+  height: 36px !important;
+
+  &:hover {
+    background: rgba(99, 102, 241, 0.28) !important;
+    color: $white !important;
+  }
+}
+
+.mobile-pagination {
+  display: flex;
+  justify-content: center;
+  padding: 16px 0 4px;
+}
+
+// ── Responsive ─────────────────────────────────────────────────────────────
 @media (max-width: 768px) {
-  .transactions-grid-header {
-    display: none;
+  .stores-page-container {
+    padding: 16px 12px;
   }
 
-  .transaction-grid-row {
-    grid-template-columns: 1fr;
+  .header-content {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 20px;
   }
 
-  .transaction-reference {
-    gap: 10px;
+  .page-title {
+    font-size: 20px !important;
   }
 
-  .transaction-reference-id {
-    font-size: 18px;
+  .search-input {
+    min-width: 0;
+    max-width: 100%;
   }
+}
+</style>
+
+<style>
+.stores-page-container .stores-grid {
+  background: #1e293b !important;
+}
+
+.stores-page-container .store-grid-item:hover {
+  background: rgba(255, 255, 255, 0.025) !important;
+}
+
+.stores-page-container .empty-state-desktop,
+.stores-page-container .empty-state {
+  background: #1e293b !important;
+}
+
+.stores-page-container .store-card {
+  background: #1e293b !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
 }
 </style>

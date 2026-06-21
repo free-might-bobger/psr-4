@@ -1,77 +1,105 @@
 <template>
   <div class="item-price-container">
-    <!-- Header Section -->
-    <div class="header-section">
-      <div class="header-content">
-        <div class="header-left">
-          <q-btn flat round dense color="grey-7" icon="arrow_back" @click="handleBack" class="back-btn" />
-          <div class="header-title">
+
+    <!-- Hero Header -->
+    <div class="page-hero q-mb-xl">
+      <div class="hero-accent-overlay"></div>
+      <div class="hero-inner">
+        <div class="hero-left">
+          <q-btn flat round dense icon="arrow_back" @click="handleBack" class="hero-back-btn">
+            <q-tooltip>Back</q-tooltip>
+          </q-btn>
+          <div class="hero-icon-wrap">
+            <q-icon name="sell" size="24px" color="white" />
+          </div>
+          <div>
             <h1 class="page-title">Item Prices</h1>
-            <p class="page-subtitle">Manage pricing options and inventory</p>
+            <div class="page-subtitle">Manage pricing options and inventory</div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Content Card -->
-    <q-card flat bordered class="main-card">
-      <q-card-section class="card-content">
-        <q-form @reset="onReset" class="price-form" ref="myForm">
-          <!-- Item Details -->
-          <div class="section-group">
-            <div class="section-label">Item Details</div>
-            <q-input v-model="item.name" outlined dense label="Item Name" hide-bottom-space disable
-              class="item-name-input" />
+    <q-form @reset="onReset" class="price-form" ref="myForm">
+
+      <!-- Item Details section -->
+      <div class="section-card q-mb-lg">
+        <div class="section-card-header">
+          <div class="section-icon-wrap">
+            <q-icon name="inventory_2" size="17px" color="white" />
           </div>
+          <div>
+            <div class="section-title">Item Details</div>
+            <div class="section-sub">Read-only item info</div>
+          </div>
+        </div>
+        <div class="card-divider"></div>
+        <div class="section-body">
+          <q-input v-model="item.name" outlined dense label="Item Name" hide-bottom-space disable
+            class="dark-field item-name-input" />
+        </div>
+      </div>
 
-          <!-- Price Variations -->
-          <div class="section-group">
-            <div class="section-header">
-              <div class="section-label">Price Variations</div>
-              <q-btn unelevated color="primary" icon="add" label="Add Price" @click="addItemPrice"
-                class="add-price-btn" />
-            </div>
+      <!-- Price Variations section -->
+      <div class="section-card q-mb-lg">
+        <div class="section-card-header">
+          <div class="section-icon-wrap section-icon-wrap--green">
+            <q-icon name="attach_money" size="17px" color="white" />
+          </div>
+          <div class="section-header-text">
+            <div class="section-title">Price Variations</div>
+            <div class="section-sub">Add or edit price options per unit</div>
+          </div>
+          <q-btn unelevated icon="add" label="Add Price" @click="addItemPrice" class="add-price-btn" />
+        </div>
+        <div class="card-divider"></div>
 
-            <div v-if="item.item_price?.length === 0" class="empty-state">
-              <q-icon name="sell" size="64px" color="grey-3" />
-              <p class="empty-text">No prices added yet</p>
-              <p class="empty-subtext">Click "Add Price" to begin</p>
-            </div>
+        <!-- Empty state -->
+        <div v-if="item.item_price?.length === 0" class="empty-state">
+          <div class="empty-icon-wrap">
+            <q-icon name="sell" size="36px" color="white" />
+          </div>
+          <div class="empty-text">No prices added yet</div>
+          <div class="empty-subtext">Click "Add Price" to begin</div>
+        </div>
 
-            <div v-for="(itemPrice, index) in item.item_price" :key="itemPrice.id || index" class="price-card">
-              <div class="price-card-header">
-                <span class="price-card-title">Price Option {{ index + 1 }}</span>
-                <q-btn flat round dense color="grey-6" icon="close" @click="deleteItemPrice(Number(index))"
-                  class="delete-btn">
-                  <q-tooltip>Remove</q-tooltip>
-                </q-btn>
+        <!-- Price cards -->
+        <div class="price-cards-list">
+          <div v-for="(itemPrice, index) in item.item_price" :key="itemPrice.id || index" class="price-card">
+            <div class="price-card-header">
+              <div class="price-card-num">
+                <div class="price-num-badge">{{ Number(index) + 1 }}</div>
+                <span class="price-card-title">Price Option {{ Number(index) + 1 }}</span>
               </div>
-
-              <div class="price-fields">
-                <q-select dense v-model="itemPrice.unit" :options="units" label="Unit" hide-bottom-space use-input
-                  outlined :rules="[(val) => !!val || 'Unit is required.']" class="field" />
-                <input-amount label="Original Price" :value="itemPrice.original_price"
-                  @input="(amount) => changeOriginalPrice(itemPrice, amount)" class="field" />
-                <input-amount label="Online Price" :value="itemPrice.online_price"
-                  @input="(amount) => changeOnlinePrice(itemPrice, amount)" class="field" />
-                <input-amount label="Selling Price" :value="itemPrice.selling_price"
-                  @input="(amount) => changeSellingPrice(itemPrice, amount)" class="field" />
-                <q-input v-model="itemPrice.qty" label="Quantity" outlined dense type="number" min="0"
-                  :rules="[(val) => (val !== null && val !== undefined && val !== '') || 'Quantity is required.']"
-                  class="field" />
-              </div>
+              <q-btn flat round dense icon="close" @click="deleteItemPrice(Number(index))" class="delete-btn">
+                <q-tooltip>Remove</q-tooltip>
+              </q-btn>
+            </div>
+            <div class="price-card-divider"></div>
+            <div class="price-fields">
+              <q-select dense v-model="itemPrice.unit" :options="units" label="Unit" hide-bottom-space use-input
+                outlined :rules="[(val) => !!val || 'Unit is required.']" class="dark-field field" />
+              <input-amount label="Original Price" :value="itemPrice.original_price"
+                @input="(amount) => changeOriginalPrice(itemPrice, amount)" class="dark-field field" />
+              <input-amount label="Online Price" :value="itemPrice.online_price"
+                @input="(amount) => changeOnlinePrice(itemPrice, amount)" class="dark-field field" />
+              <input-amount label="Selling Price" :value="itemPrice.selling_price"
+                @input="(amount) => changeSellingPrice(itemPrice, amount)" class="dark-field field" />
+              <q-input v-model="itemPrice.qty" label="Quantity" outlined dense type="number" min="0"
+                :rules="[(val) => (val !== null && val !== undefined && val !== '') || 'Quantity is required.']"
+                class="dark-field field" />
             </div>
           </div>
+        </div>
+      </div>
 
-          <!-- Form Actions -->
-          <div class="form-actions">
-            <q-btn unelevated color="primary" icon="save" label="Save Changes" @click="createItemPrice"
-              class="save-btn" />
-            <q-btn outline color="grey-7" icon="cancel" label="Cancel" @click="handleBack" class="cancel-btn" />
-          </div>
-        </q-form>
-      </q-card-section>
-    </q-card>
+      <!-- Form Actions -->
+      <div class="form-actions">
+        <q-btn unelevated icon="save" label="Save Changes" @click="createItemPrice" class="save-btn" />
+        <q-btn flat icon="cancel" label="Cancel" @click="handleBack" class="cancel-btn" />
+      </div>
+
+    </q-form>
   </div>
 </template>
 
@@ -228,273 +256,281 @@ const handleBack = () => {
 </script>
 
 <style scoped lang="scss">
-// Premium Color Palette
-$primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-$primary-color: #667eea;
-$secondary-color: #764ba2;
-$surface-color: #ffffff;
-$background-color: #f8fafc;
-$text-primary: #1e293b;
-$text-secondary: #64748b;
-$text-muted: #94a3b8;
-$border-color: #e2e8f0;
-$border-hover: #cbd5e1;
-$shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-$shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-$shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-$shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-$error-color: #ef4444;
-$error-bg: #fef2f2;
+// ── Dark theme tokens ──────────────────────────────────────────────────────
+$dark-base: #0f172a;
+$dark-card: #1e293b;
+$dark-elevated: #273549;
+$border: rgba(255, 255, 255, 0.08);
+$accent: #6366f1;
+$accent-2: #7c3aed;
+$green: #10b981;
+$green-2: #059669;
+$white: #ffffff;
+$muted: rgba(255, 255, 255, 0.5);
 
+// ── Container ──────────────────────────────────────────────────────────────
 .item-price-container {
-  max-width: 1100px;
+  max-width: 1000px;
   margin: 0 auto;
-  padding: 32px;
-  background: $background-color;
-  min-height: 100vh;
+  padding: 28px 24px;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  color: $white;
 }
 
-// Header Section with Premium Styling
-.header-section {
-  margin-bottom: 28px;
+// ── Hero header ────────────────────────────────────────────────────────────
+.page-hero {
   position: relative;
+  background: $dark-card;
+  border-radius: 20px;
+  border: 1px solid $border;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
 }
 
-.header-content {
+.hero-accent-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.18) 0%, rgba(124, 58, 237, 0.10) 60%, transparent 100%);
+  pointer-events: none;
+}
+
+.hero-inner {
+  position: relative;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  padding: 26px 30px;
 }
 
-.header-left {
+.hero-left {
   display: flex;
   align-items: center;
   gap: 16px;
 }
 
-.back-btn {
-  background: $surface-color;
-  border: 1px solid $border-color;
-  box-shadow: $shadow-sm;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+.hero-back-btn {
+  color: $muted !important;
+  border: 1px solid $border !important;
+  border-radius: 10px !important;
+  transition: color 0.2s, background 0.2s !important;
 
   &:hover {
-    background: $background-color;
-    border-color: $border-hover;
-    transform: translateX(-2px);
-    box-shadow: $shadow-md;
+    color: $white !important;
+    background: rgba(255, 255, 255, 0.07) !important;
   }
 }
 
-.header-title {
-  .page-title {
-    font-size: 28px;
-    font-weight: 700;
-    margin: 0;
-    background: $primary-gradient;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    letter-spacing: -0.02em;
-  }
-
-  .page-subtitle {
-    font-size: 15px;
-    color: $text-secondary;
-    margin: 6px 0 0 0;
-    font-weight: 400;
-  }
+.hero-icon-wrap {
+  width: 50px;
+  height: 50px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, $accent 0%, $accent-2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 16px rgba(99, 102, 241, 0.4);
+  flex-shrink: 0;
 }
 
-// Main Card with Premium Glass Effect
-.main-card {
-  border-radius: 20px;
-  border: none;
-  background: $surface-color;
-  box-shadow: $shadow-xl;
-  overflow: hidden;
-  position: relative;
-
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 4px;
-    background: $primary-gradient;
-  }
+.page-title {
+  font-size: 22px;
+  font-weight: 800;
+  color: $white;
+  margin: 0 0 3px;
+  letter-spacing: -0.3px;
+  line-height: 1.2;
 }
 
-.card-content {
-  padding: 40px;
+.page-subtitle {
+  font-size: 13px;
+  color: $muted;
+  font-weight: 500;
 }
 
+// ── Form ───────────────────────────────────────────────────────────────────
 .price-form {
   display: flex;
   flex-direction: column;
-  gap: 40px;
 }
 
-// Section Styling
-.section-group {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
+// ── Section cards ──────────────────────────────────────────────────────────
+.section-card {
+  background: $dark-card;
+  border: 1px solid $border;
+  border-radius: 20px;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.25);
+  overflow: hidden;
 }
 
-.section-label {
-  font-size: 13px;
-  font-weight: 700;
-  color: $text-primary;
-  letter-spacing: 0.5px;
-  text-transform: uppercase;
+.section-card-header {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 14px;
+  padding: 18px 24px;
+  background: $dark-elevated;
+}
 
-  &::before {
-    content: '';
-    width: 4px;
-    height: 16px;
-    background: $primary-gradient;
-    border-radius: 2px;
+.section-header-text {
+  flex: 1;
+}
+
+.section-icon-wrap {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, $accent 0%, $accent-2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 3px 12px rgba(99, 102, 241, 0.35);
+  flex-shrink: 0;
+
+  &--green {
+    background: linear-gradient(135deg, $green 0%, $green-2 100%);
+    box-shadow: 0 3px 12px rgba(16, 185, 129, 0.35);
   }
 }
 
-.section-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding-bottom: 8px;
-  border-bottom: 1px solid $border-color;
+.section-title {
+  font-size: 14px;
+  font-weight: 800;
+  color: $white;
+  line-height: 1.2;
 }
 
-// Item Name Input Styling
-.item-name-input {
-  background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
-  border-radius: 12px;
+.section-sub {
+  font-size: 12px;
+  color: $muted;
+  margin-top: 2px;
+}
 
+.card-divider {
+  height: 1px;
+  background: $border;
+}
+
+.section-body {
+  padding: 24px;
+}
+
+// ── Dark inputs ────────────────────────────────────────────────────────────
+.dark-field {
   :deep(.q-field__control) {
-    background: transparent;
-    border-radius: 12px;
-    height: 52px;
+    background: $dark-elevated !important;
+    border-radius: 12px !important;
+  }
+
+  :deep(.q-field__native),
+  :deep(.q-field__input) {
+    color: $white !important;
   }
 
   :deep(.q-field__label) {
-    font-weight: 500;
-    color: $text-secondary;
+    color: $muted !important;
+  }
+
+  :deep(.q-field__prepend .q-icon),
+  :deep(.q-field__append .q-icon) {
+    color: $muted !important;
+  }
+
+  :deep(.q-field--outlined .q-field__control:before) {
+    border-color: $border !important;
+  }
+
+  :deep(.q-field--outlined:hover .q-field__control:before) {
+    border-color: rgba(99, 102, 241, 0.4) !important;
+  }
+
+  :deep(.q-field--focused .q-field__control:before) {
+    border-color: $accent !important;
+  }
+
+  :deep(.q-field--disabled .q-field__control) {
+    opacity: 0.5 !important;
   }
 }
 
-// Add Price Button with Gradient
+.item-name-input {
+  :deep(.q-field__control) {
+    cursor: not-allowed;
+  }
+}
+
+// ── Add Price button ────────────────────────────────────────────────────────
 .add-price-btn {
-  height: 42px;
-  padding: 0 20px;
-  border-radius: 10px;
-  font-weight: 600;
-  letter-spacing: 0.25px;
-  background: $primary-gradient;
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  margin-left: auto;
+  background: linear-gradient(135deg, $accent 0%, $accent-2 100%) !important;
+  color: $white !important;
+  border-radius: 10px !important;
+  font-weight: 700 !important;
+  font-size: 13px !important;
+  text-transform: none !important;
+  letter-spacing: 0 !important;
+  height: 38px !important;
+  padding: 0 16px !important;
+  box-shadow: 0 4px 14px rgba(99, 102, 241, 0.4) !important;
+  flex-shrink: 0;
 
   &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+    box-shadow: 0 6px 20px rgba(99, 102, 241, 0.55) !important;
   }
 }
 
-// Empty State with Premium Design
+// ── Empty state ────────────────────────────────────────────────────────────
 .empty-state {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 64px 32px;
-  border: 2px dashed $border-color;
+  padding: 60px 32px;
+  border: 2px dashed rgba(255, 255, 255, 0.10);
   border-radius: 16px;
-  background: linear-gradient(135deg, #fafafa 0%, #f8fafc 100%);
-  position: relative;
-  overflow: hidden;
-
-  &::before {
-    content: '';
-    position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background: radial-gradient(circle, rgba(102, 126, 234, 0.03) 0%, transparent 70%);
-    animation: pulse-glow 4s ease-in-out infinite;
-  }
-
-  @keyframes pulse-glow {
-
-    0%,
-    100% {
-      transform: scale(1);
-      opacity: 0.5;
-    }
-
-    50% {
-      transform: scale(1.1);
-      opacity: 0.8;
-    }
-  }
-
-  .q-icon {
-    background: $primary-gradient;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    filter: drop-shadow(0 4px 6px rgba(102, 126, 234, 0.2));
-  }
-
-  .empty-text {
-    font-size: 18px;
-    font-weight: 600;
-    color: $text-primary;
-    margin: 20px 0 6px 0;
-  }
-
-  .empty-subtext {
-    font-size: 14px;
-    color: $text-muted;
-    margin: 0;
-  }
+  margin: 20px 24px 24px;
+  text-align: center;
 }
 
-// Price Cards with Premium Styling
-.price-card {
-  border: 1px solid $border-color;
-  border-radius: 16px;
-  padding: 24px;
-  background: $surface-color;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  margin-bottom: 20px;
-  position: relative;
-  overflow: hidden;
+.empty-icon-wrap {
+  width: 72px;
+  height: 72px;
+  border-radius: 20px;
+  background: linear-gradient(135deg, $accent 0%, $accent-2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 24px rgba(99, 102, 241, 0.35);
+  margin-bottom: 16px;
+}
 
-  &::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 4px;
-    height: 100%;
-    background: $primary-gradient;
-    transform: scaleY(0);
-    transition: transform 0.3s ease;
-  }
+.empty-text {
+  font-size: 16px;
+  font-weight: 700;
+  color: $white;
+  margin-bottom: 6px;
+}
+
+.empty-subtext {
+  font-size: 13px;
+  color: $muted;
+}
+
+// ── Price cards list ───────────────────────────────────────────────────────
+.price-cards-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 20px 24px 24px;
+}
+
+.price-card {
+  background: $dark-elevated;
+  border: 1px solid $border;
+  border-radius: 16px;
+  overflow: hidden;
+  transition: border-color 0.2s, box-shadow 0.2s;
 
   &:hover {
-    box-shadow: $shadow-lg;
-    border-color: $border-hover;
-    transform: translateY(-2px);
-
-    &::after {
-      transform: scaleY(1);
-    }
+    border-color: rgba(99, 102, 241, 0.3);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
   }
 }
 
@@ -502,138 +538,130 @@ $error-bg: #fef2f2;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 20px;
-  padding-bottom: 16px;
-  border-bottom: 1px solid $border-color;
+  padding: 14px 18px;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.price-card-num {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.price-num-badge {
+  width: 26px;
+  height: 26px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, $accent 0%, $accent-2 100%);
+  color: $white;
+  font-size: 12px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.35);
+  flex-shrink: 0;
 }
 
 .price-card-title {
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 700;
-  color: $text-primary;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-
-  &::before {
-    content: '#';
-    width: 24px;
-    height: 24px;
-    background: $primary-gradient;
-    border-radius: 6px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-size: 12px;
-    font-weight: 700;
-  }
+  color: $white;
 }
 
 .delete-btn {
-  transition: all 0.2s ease;
+  color: $muted !important;
+  border-radius: 8px !important;
+  transition: color 0.2s, background 0.2s !important;
 
   &:hover {
-    color: $error-color;
-    background: $error-bg;
-    transform: rotate(90deg);
+    color: #fca5a5 !important;
+    background: rgba(239, 68, 68, 0.12) !important;
   }
 }
 
-// Price Fields Grid
+.price-card-divider {
+  height: 1px;
+  background: $border;
+}
+
+// ── Price fields grid ──────────────────────────────────────────────────────
 .price-fields {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 20px;
-
-  :deep(.q-field) {
-    .q-field__control {
-      border-radius: 10px;
-      transition: all 0.2s ease;
-    }
-
-    &.q-field--focused .q-field__control {
-      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
-    }
-  }
+  gap: 16px;
+  padding: 20px 18px;
 }
 
 .field {
   width: 100%;
 }
 
-// Form Actions with Premium Buttons
+// ── Form Actions ───────────────────────────────────────────────────────────
 .form-actions {
   display: flex;
   justify-content: flex-end;
-  gap: 16px;
-  padding-top: 32px;
-  border-top: 1px solid $border-color;
+  gap: 12px;
+  padding-top: 4px;
 }
 
 .save-btn {
-  height: 48px;
-  padding: 0 32px;
-  border-radius: 12px;
-  font-weight: 600;
-  font-size: 15px;
-  letter-spacing: 0.25px;
-  background: $primary-gradient;
-  box-shadow: 0 4px 14px rgba(102, 126, 234, 0.4);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  background: linear-gradient(135deg, $accent 0%, $accent-2 100%) !important;
+  color: $white !important;
+  border-radius: 12px !important;
+  font-weight: 700 !important;
+  font-size: 14px !important;
+  text-transform: none !important;
+  letter-spacing: 0 !important;
+  height: 44px !important;
+  padding: 0 28px !important;
+  box-shadow: 0 4px 16px rgba(99, 102, 241, 0.4) !important;
 
   &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
-  }
-
-  &:active {
-    transform: translateY(0);
+    box-shadow: 0 6px 22px rgba(99, 102, 241, 0.55) !important;
   }
 }
 
 .cancel-btn {
-  height: 48px;
-  padding: 0 32px;
-  border-radius: 12px;
-  font-weight: 600;
-  font-size: 15px;
-  letter-spacing: 0.25px;
-  border: 2px solid $border-color;
-  color: $text-secondary;
-  transition: all 0.3s ease;
+  color: $muted !important;
+  border: 1px solid $border !important;
+  border-radius: 12px !important;
+  font-weight: 600 !important;
+  font-size: 14px !important;
+  text-transform: none !important;
+  letter-spacing: 0 !important;
+  height: 44px !important;
+  padding: 0 24px !important;
 
   &:hover {
-    border-color: $text-muted;
-    color: $text-primary;
-    background: #f8fafc;
+    color: $white !important;
+    background: rgba(255, 255, 255, 0.06) !important;
+    border-color: rgba(255, 255, 255, 0.15) !important;
   }
 }
 
-// Responsive Design
-@media (max-width: 1024px) {
-  .price-fields {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
+// ── Responsive ─────────────────────────────────────────────────────────────
 @media (max-width: 768px) {
   .item-price-container {
-    padding: 16px;
+    padding: 16px 12px;
   }
 
-  .card-content {
-    padding: 24px;
+  .hero-inner {
+    padding: 20px;
   }
 
-  .header-title .page-title {
-    font-size: 22px;
+  .page-title {
+    font-size: 18px;
   }
 
-  .section-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 16px;
+  .section-card-header {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .add-price-btn {
+    margin-left: 0;
+    width: 100% !important;
   }
 
   .price-fields {
@@ -646,23 +674,22 @@ $error-bg: #fef2f2;
 
   .save-btn,
   .cancel-btn {
-    width: 100%;
+    width: 100% !important;
   }
 
-  .price-card {
-    padding: 20px;
+  .section-body {
+    padding: 16px;
+  }
+
+  .price-cards-list {
+    padding: 14px 16px 18px;
   }
 }
+</style>
 
-@media (max-width: 480px) {
-  .header-left {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 12px;
-  }
-
-  .price-card-title {
-    font-size: 14px;
-  }
+<style>
+.item-price-container .section-card .q-card__section {
+  background: transparent !important;
+  color: #ffffff !important;
 }
 </style>

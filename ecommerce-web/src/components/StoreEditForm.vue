@@ -1,186 +1,151 @@
 <template>
-  <!-- Form Section -->
-  <q-card flat bordered class="form-card">
-    <q-card-section>
-      <q-form @submit.prevent="handleSubmit" class="edit-store-form" ref="myForm">
-          <!-- Store Information Section -->
-          <div class="form-section">
-            <div class="section-header">
-              <q-icon name="info" color="primary" size="24px" class="q-mr-sm" />
-              <h2 class="section-title">Store Information</h2>
-            </div>
-            
-            <div class="form-row">
-              <div class="form-col">
-                <q-input
-                  clearable
-                  v-model="localStore.name"
-                  dense
-                  outlined
-                  label="Store Name"
-                  :rules="[(val) => (val && val.length > 0) || 'Store name is required.']"
-                  hide-bottom-space
-                  class="form-input"
-                >
-                  <template v-slot:prepend>
-                    <q-icon name="store" color="primary" />
-                  </template>
-                </q-input>
-              </div>
-              
-              <div class="form-col">
-                <q-input
-                  clearable
-                  v-model="localStore.mobile"
-                  dense
-                  outlined
-                  label="Mobile Number"
-                  :rules="[(val) => (val && val.length > 0) || 'Mobile number is required.']"
-                  hide-bottom-space
-                  class="form-input"
-                >
-                  <template v-slot:prepend>
-                    <q-icon name="phone" color="primary" />
-                  </template>
-                </q-input>
-              </div>
-            </div>
-          </div>
+  <q-card flat class="form-card">
+    <q-form @submit.prevent="handleSubmit" ref="myForm">
 
-          <div class="q-mt-md">
+      <!-- Store Information Section -->
+      <div class="form-section-card q-mb-lg">
+        <div class="form-section-header">
+          <div class="form-section-icon">
+            <q-icon name="info" size="18px" color="white" />
+          </div>
+          <div>
+            <div class="form-section-title">Store Information</div>
+            <div class="form-section-sub">Basic details about your store</div>
+          </div>
+        </div>
+        <div class="card-divider"></div>
+        <div class="form-section-body">
+          <div class="form-row">
             <div class="form-col">
-              <label class="field-label">Description</label>
-              <div class="wysiwyg-editor">
-                <div class="editor-toolbar">
-                  <q-btn flat dense size="sm" @click="execCommand('bold')" icon="format_bold">
-                    <q-tooltip>Bold</q-tooltip>
-                  </q-btn>
-                  <q-btn flat dense size="sm" @click="execCommand('italic')" icon="format_italic">
-                    <q-tooltip>Italic</q-tooltip>
-                  </q-btn>
-                  <q-btn flat dense size="sm" @click="execCommand('underline')" icon="format_underlined">
-                    <q-tooltip>Underline</q-tooltip>
-                  </q-btn>
-                  <q-btn flat dense size="sm" @click="execCommand('insertUnorderedList')" icon="format_list_bulleted">
-                    <q-tooltip>Bullet List</q-tooltip>
-                  </q-btn>
-                  <q-btn flat dense size="sm" @click="execCommand('insertOrderedList')" icon="format_list_numbered">
-                    <q-tooltip>Numbered List</q-tooltip>
-                  </q-btn>
-                </div>
-                <div
-                  class="editor-content"
-                  contenteditable="true"
-                  @input="onEditorInput"
-                  ref="editorRef"
-                  data-placeholder="Enter store description..."
-                ></div>
-              </div>
-              <div v-if="!store.desc" class="field-error">Description is required.</div>
+              <q-input clearable v-model="localStore.name" dense outlined label="Store Name"
+                :rules="[(val) => (val && val.length > 0) || 'Store name is required.']" hide-bottom-space
+                class="dark-input">
+                <template v-slot:prepend>
+                  <q-icon name="store" color="grey-5" />
+                </template>
+              </q-input>
+            </div>
+            <div class="form-col">
+              <q-input clearable v-model="localStore.mobile" dense outlined label="Mobile Number"
+                :rules="[(val) => (val && val.length > 0) || 'Mobile number is required.']" hide-bottom-space
+                class="dark-input">
+                <template v-slot:prepend>
+                  <q-icon name="phone" color="grey-5" />
+                </template>
+              </q-input>
             </div>
           </div>
 
-          <!-- Location Section -->
-          <div class="form-section q-mt-lg">
-            <div class="section-header">
-              <q-icon name="place" color="primary" size="24px" class="q-mr-sm" />
-              <h2 class="section-title">Store Location</h2>
-            </div>
-            
-            <div class="location-info q-mb-md">
-              <q-banner rounded class="bg-blue-1 text-blue-8">
-                <template v-slot:avatar>
-                  <q-icon name="info" color="primary" />
-                </template>
-                Drag the marker on the map to set the store location. The coordinates will update automatically.
-              </q-banner>
-            </div>
-
-            <div class="coordinates-display q-mb-md">
-              <div class="coordinate-item">
-                <q-icon name="my_location" color="primary" size="20px" class="q-mr-sm" />
-                <div>
-                  <div class="coordinate-label">Latitude</div>
-                  <div class="coordinate-value">{{ localStore.latitude?.toFixed(6) || 'N/A' }}</div>
-                </div>
+          <div class="q-mt-lg">
+            <label class="field-label">Description</label>
+            <div class="wysiwyg-editor">
+              <div class="editor-toolbar">
+                <q-btn flat dense size="sm" @click="execCommand('bold')" icon="format_bold" class="toolbar-btn">
+                  <q-tooltip>Bold</q-tooltip>
+                </q-btn>
+                <q-btn flat dense size="sm" @click="execCommand('italic')" icon="format_italic" class="toolbar-btn">
+                  <q-tooltip>Italic</q-tooltip>
+                </q-btn>
+                <q-btn flat dense size="sm" @click="execCommand('underline')" icon="format_underlined"
+                  class="toolbar-btn">
+                  <q-tooltip>Underline</q-tooltip>
+                </q-btn>
+                <div class="toolbar-divider"></div>
+                <q-btn flat dense size="sm" @click="execCommand('insertUnorderedList')" icon="format_list_bulleted"
+                  class="toolbar-btn">
+                  <q-tooltip>Bullet List</q-tooltip>
+                </q-btn>
+                <q-btn flat dense size="sm" @click="execCommand('insertOrderedList')" icon="format_list_numbered"
+                  class="toolbar-btn">
+                  <q-tooltip>Numbered List</q-tooltip>
+                </q-btn>
               </div>
-              <div class="coordinate-item">
-                <q-icon name="my_location" color="primary" size="20px" class="q-mr-sm" />
-                <div>
-                  <div class="coordinate-label">Longitude</div>
-                  <div class="coordinate-value">{{ localStore.longitude?.toFixed(6) || 'N/A' }}</div>
-                </div>
+              <div class="editor-content" contenteditable="true" @input="onEditorInput" ref="editorRef"
+                data-placeholder="Enter store description..."></div>
+            </div>
+            <div v-if="!store.desc" class="field-error">Description is required.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Location Section -->
+      <div class="form-section-card q-mb-lg">
+        <div class="form-section-header">
+          <div class="form-section-icon form-section-icon--green">
+            <q-icon name="place" size="18px" color="white" />
+          </div>
+          <div>
+            <div class="form-section-title">Store Location</div>
+            <div class="form-section-sub">Drag the map marker to set the location</div>
+          </div>
+        </div>
+        <div class="card-divider"></div>
+        <div class="form-section-body">
+
+          <div class="location-hint q-mb-lg">
+            <q-icon name="info" size="16px" class="q-mr-sm" />
+            Drag the marker on the map to set the store location. Coordinates will update automatically.
+          </div>
+
+          <div class="coordinates-display q-mb-lg">
+            <div class="coordinate-item">
+              <div class="coordinate-icon">
+                <q-icon name="my_location" size="16px" color="white" />
+              </div>
+              <div>
+                <div class="coordinate-label">Latitude</div>
+                <div class="coordinate-value">{{ localStore.latitude?.toFixed(6) || 'N/A' }}</div>
               </div>
             </div>
+            <div class="coordinate-item">
+              <div class="coordinate-icon">
+                <q-icon name="explore" size="16px" color="white" />
+              </div>
+              <div>
+                <div class="coordinate-label">Longitude</div>
+                <div class="coordinate-value">{{ localStore.longitude?.toFixed(6) || 'N/A' }}</div>
+              </div>
+            </div>
+          </div>
 
-            <div class="map-container">
-              <GoogleMap 
-                ref="mapRef" 
-                :api-key="GOOGLE_MAP_API_KEY" 
-                :map-id="GOOGLE_MAP_ID" 
-                class="google-map"
-                :center="{ lat: localStore.latitude || 14.5995, lng: localStore.longitude || 120.9842 }" 
-                :zoom="currentZoom" 
-                :draggable="true" 
-                :clickable-icons="false"
-              >
-                <!-- Store Location Marker -->
-                <AdvancedMarker 
-                  :options="getStoreMarkerOptions()" 
-                  @drag="markerDrag"
-                >
-                  <InfoWindow 
-                    v-model="showInfoWindow"
-                    :options="{ 
-                      position: { lat: localStore.latitude || 14.5995, lng: localStore.longitude || 120.9842 }, 
-                      headerContent: '&nbsp;&nbsp;&nbsp;' + (localStore.name || 'Store Location'), 
-                      disableAutoPan: false 
-                    }"
-                  >
-                    <div class="info-window-content">
-                      <div class="info-window-header">
-                        <q-icon name="store" color="primary" size="sm" class="q-mr-xs" />
-                        <span class="text-weight-bold">{{ localStore.name || 'Store Location' }}</span>
-                      </div>
-                      <div class="info-window-body">
-                        <p class="text-caption text-grey-7 q-ma-none">
-                          Drag the marker to update the store location
-                        </p>
-                        <div class="text-caption q-mt-xs">
-                          <strong>Lat:</strong> {{ localStore.latitude?.toFixed(6) || 'N/A' }}<br>
-                          <strong>Lng:</strong> {{ localStore.longitude?.toFixed(6) || 'N/A' }}
-                        </div>
+          <div class="map-container">
+            <GoogleMap ref="mapRef" :api-key="GOOGLE_MAP_API_KEY" :map-id="GOOGLE_MAP_ID" class="google-map"
+              :center="{ lat: localStore.latitude || 14.5995, lng: localStore.longitude || 120.9842 }"
+              :zoom="currentZoom" :draggable="true" :clickable-icons="false">
+              <AdvancedMarker :options="getStoreMarkerOptions()" @drag="markerDrag">
+                <InfoWindow v-model="showInfoWindow" :options="{
+                  position: { lat: localStore.latitude || 14.5995, lng: localStore.longitude || 120.9842 },
+                  headerContent: '&nbsp;&nbsp;&nbsp;' + (localStore.name || 'Store Location'),
+                  disableAutoPan: false
+                }">
+                  <div class="info-window-content">
+                    <div class="info-window-header">
+                      <q-icon name="store" color="primary" size="sm" class="q-mr-xs" />
+                      <span class="text-weight-bold">{{ localStore.name || 'Store Location' }}</span>
+                    </div>
+                    <div class="info-window-body">
+                      <p class="text-caption text-grey-7 q-ma-none">Drag the marker to update the store location</p>
+                      <div class="text-caption q-mt-xs">
+                        <strong>Lat:</strong> {{ localStore.latitude?.toFixed(6) || 'N/A' }}<br>
+                        <strong>Lng:</strong> {{ localStore.longitude?.toFixed(6) || 'N/A' }}
                       </div>
                     </div>
-                  </InfoWindow>
-                </AdvancedMarker>
-              </GoogleMap>
-            </div>
+                  </div>
+                </InfoWindow>
+              </AdvancedMarker>
+            </GoogleMap>
           </div>
+        </div>
+      </div>
 
-          <!-- Action Buttons -->
-          <div class="form-actions q-mt-xl">
-            <q-btn 
-              unelevated 
-              color="primary" 
-              type="submit" 
-              label="Update Store"
-              icon="save"
-              class="submit-btn"
-              :loading="isSubmitting"
-            />
-            <q-btn 
-              flat 
-              color="grey-8" 
-              label="Cancel"
-              icon="cancel"
-              @click="handleCancel"
-              class="cancel-btn"
-            />
-          </div>
-        </q-form>
-      </q-card-section>
-    </q-card>
+      <!-- Action Buttons -->
+      <div class="form-actions">
+        <q-btn unelevated type="submit" icon="save" label="Update Store" class="submit-btn" :loading="isSubmitting" />
+        <q-btn flat icon="cancel" label="Cancel" @click="handleCancel" class="cancel-btn" />
+      </div>
+
+    </q-form>
+  </q-card>
 </template>
 
 <script lang="ts" setup>
@@ -448,7 +413,7 @@ onMounted(async () => {
   await nextTick();
   await waitForGoogleMaps();
   await waitForMapReady();
-  
+
   // Initialize editor content
   if (editorRef.value && localStore.value.desc) {
     editorRef.value.innerHTML = localStore.value.desc;
@@ -457,57 +422,354 @@ onMounted(async () => {
 </script>
 
 <style scoped lang="scss">
-@import 'src/css/dashboard/all-stores/edit.scss';
+// ── Dark theme tokens ──────────────────────────────────────────────────────
+$dark-base: #0f172a;
+$dark-card: #1e293b;
+$dark-elevated: #273549;
+$border: rgba(255, 255, 255, 0.08);
+$accent: #6366f1;
+$accent-2: #7c3aed;
+$green: #10b981;
+$green-2: #059669;
+$white: #ffffff;
+$muted: rgba(255, 255, 255, 0.5);
 
-.field-label {
-  display: block;
-  font-weight: 600;
-  color: #333;
-  margin-bottom: 8px;
-  font-size: 14px;
+// ── Card wrapper ────────────────────────────────────────────────────────────
+.form-card {
+  background: transparent !important;
 }
 
-.field-error {
-  color: #c10015;
-  font-size: 12px;
-  margin-top: 4px;
+// ── Section cards ───────────────────────────────────────────────────────────
+.form-section-card {
+  background: $dark-card;
+  border: 1px solid $border;
+  border-radius: 20px;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.25);
+  overflow: hidden;
 }
 
-.description-full-width {
-  .form-col {
-    width: 100%;
-    flex: 1 1 100%;
+.form-section-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 20px 24px;
+  background: $dark-elevated;
+}
+
+.form-section-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 11px;
+  background: linear-gradient(135deg, $accent 0%, $accent-2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 3px 12px rgba(99, 102, 241, 0.35);
+  flex-shrink: 0;
+
+  &--green {
+    background: linear-gradient(135deg, $green 0%, $green-2 100%);
+    box-shadow: 0 3px 12px rgba(16, 185, 129, 0.35);
   }
 }
 
+.form-section-title {
+  font-size: 15px;
+  font-weight: 800;
+  color: $white;
+  line-height: 1.2;
+}
+
+.form-section-sub {
+  font-size: 12px;
+  color: $muted;
+  margin-top: 2px;
+}
+
+.card-divider {
+  height: 1px;
+  background: $border;
+}
+
+.form-section-body {
+  padding: 24px;
+}
+
+// ── Form layout ─────────────────────────────────────────────────────────────
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.form-col {
+  display: flex;
+  flex-direction: column;
+}
+
+// ── Dark inputs ─────────────────────────────────────────────────────────────
+.dark-input {
+  :deep(.q-field__control) {
+    background: $dark-elevated !important;
+    border-radius: 12px !important;
+  }
+
+  :deep(.q-field__native),
+  :deep(.q-field__input) {
+    color: $white !important;
+  }
+
+  :deep(.q-field__label) {
+    color: $muted !important;
+  }
+
+  :deep(.q-field__prepend .q-icon),
+  :deep(.q-field__append .q-icon) {
+    color: $muted !important;
+  }
+
+  :deep(.q-field--outlined .q-field__control:before) {
+    border-color: $border !important;
+  }
+
+  :deep(.q-field--outlined:hover .q-field__control:before) {
+    border-color: rgba(99, 102, 241, 0.4) !important;
+  }
+
+  :deep(.q-field--focused .q-field__control:before) {
+    border-color: $accent !important;
+  }
+}
+
+// ── Field label / error ──────────────────────────────────────────────────────
+.field-label {
+  display: block;
+  font-weight: 700;
+  color: $muted;
+  margin-bottom: 10px;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.field-error {
+  color: #f87171;
+  font-size: 12px;
+  margin-top: 6px;
+}
+
+// ── WYSIWYG editor ──────────────────────────────────────────────────────────
 .wysiwyg-editor {
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
+  border: 1px solid $border;
+  border-radius: 14px;
   overflow: hidden;
-  background: white;
+  background: $dark-elevated;
+  transition: border-color 0.2s;
 
   &:focus-within {
-    border-color: #1976d2;
+    border-color: $accent;
+    box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.15);
   }
 }
 
 .editor-toolbar {
   display: flex;
-  gap: 4px;
-  padding: 8px;
-  background: #f5f5f5;
-  border-bottom: 1px solid #e0e0e0;
+  align-items: center;
+  gap: 2px;
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border-bottom: 1px solid $border;
+}
+
+.toolbar-btn {
+  color: $muted !important;
+  border-radius: 8px !important;
+
+  &:hover {
+    color: $white !important;
+    background: rgba(255, 255, 255, 0.08) !important;
+  }
+}
+
+.toolbar-divider {
+  width: 1px;
+  height: 20px;
+  background: $border;
+  margin: 0 4px;
 }
 
 .editor-content {
   min-height: 150px;
   padding: 16px;
   outline: none;
-  line-height: 1.6;
+  line-height: 1.7;
+  color: $white;
+  font-size: 14px;
 
   &[contenteditable]:empty::before {
     content: attr(data-placeholder);
-    color: #999;
+    color: $muted;
   }
+}
+
+// ── Location hint ────────────────────────────────────────────────────────────
+.location-hint {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  background: rgba(16, 185, 129, 0.08);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  color: #6ee7b7;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 12px 16px;
+  border-radius: 12px;
+  line-height: 1.5;
+
+  .q-icon {
+    color: #6ee7b7 !important;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+}
+
+// ── Coordinates display ───────────────────────────────────────────────────────
+.coordinates-display {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.coordinate-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: $dark-elevated;
+  border: 1px solid $border;
+  border-radius: 12px;
+  padding: 14px 16px;
+}
+
+.coordinate-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 9px;
+  background: linear-gradient(135deg, $green 0%, $green-2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 3px 10px rgba(16, 185, 129, 0.3);
+}
+
+.coordinate-label {
+  font-size: 11px;
+  color: $muted;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 3px;
+}
+
+.coordinate-value {
+  font-size: 14px;
+  font-weight: 700;
+  color: $white;
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+}
+
+// ── Map ────────────────────────────────────────────────────────────────────
+.map-container {
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid $border;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
+}
+
+.google-map {
+  width: 100%;
+  height: 400px;
+}
+
+// ── Action buttons ───────────────────────────────────────────────────────────
+.form-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-top: 8px;
+}
+
+.submit-btn {
+  background: linear-gradient(135deg, $accent 0%, $accent-2 100%) !important;
+  color: $white !important;
+  border-radius: 12px !important;
+  font-weight: 700 !important;
+  font-size: 14px !important;
+  text-transform: none !important;
+  letter-spacing: 0 !important;
+  height: 44px !important;
+  padding: 0 28px !important;
+  box-shadow: 0 4px 16px rgba(99, 102, 241, 0.4) !important;
+  transition: opacity 0.2s !important;
+
+  &:hover {
+    opacity: 0.88;
+  }
+}
+
+.cancel-btn {
+  color: $muted !important;
+  border: 1px solid $border !important;
+  border-radius: 12px !important;
+  text-transform: none !important;
+  font-weight: 600 !important;
+  letter-spacing: 0 !important;
+  height: 44px !important;
+  padding: 0 20px !important;
+
+  &:hover {
+    color: $white !important;
+    background: rgba(255, 255, 255, 0.06) !important;
+  }
+}
+
+// ── Responsive ─────────────────────────────────────────────────────────────
+@media (max-width: 768px) {
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .coordinates-display {
+    grid-template-columns: 1fr;
+  }
+
+  .form-section-body {
+    padding: 16px;
+  }
+
+  .form-section-header {
+    padding: 16px 18px;
+  }
+
+  .google-map {
+    height: 300px;
+  }
+
+  .form-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .submit-btn,
+  .cancel-btn {
+    width: 100%;
+  }
+}
+</style>
+
+<style>
+.form-section-card .q-card__section {
+  background: transparent !important;
+  color: #ffffff !important;
 }
 </style>

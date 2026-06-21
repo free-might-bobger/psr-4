@@ -14,6 +14,7 @@ use App\Http\Controllers\ {
     ListingApiController,
     MobileActivationCodeController,
     MyStoreController,
+    MyStoreTransactionController,
     MyTransactionController,
     PaymentMethodController,
     ProfileController,

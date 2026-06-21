@@ -78,11 +78,28 @@ class BaseRepository implements BaseInterface
      */
     public function findOrFail(int $id, array $relations = []): Model
     {
-        $query = $this->model;
+        // If model is a Builder (after filterQuery), use it directly
+        if ($this->model instanceof Builder) {
+            $query = $this->model;
+        } else {
+            $query = $this->getFreshQuery();
+            $this->applyStoredFiltersToQuery($query);
+        }
+        
         if (!empty($relations)) {
             $query = $query->with($relations);
         }
         return $query->findOrFail($this->optimus()->decode($id));
+    }
+
+    /**
+     * Get a fresh query builder instance
+     * @return Builder
+     */
+    private function getFreshQuery(): Builder
+    {
+        $modelClass = get_class($this->model instanceof Model ? $this->model : $this->model->getModel());
+        return $modelClass::query();
     }
 
     /**
@@ -126,10 +143,60 @@ class BaseRepository implements BaseInterface
         $limit = Arr::get($this->params, 'limit', 12);
         $type  = Arr::get($this->params, 'type', false);
         
-        if ($type) {
-            return $this->model->take($limit)->get();
+        // If model is a Builder (after filterQuery), use it directly
+        if ($this->model instanceof Builder) {
+            if ($type) {
+                $result = $this->model->take($limit)->get();
+                // Debug: Log the type if it's still wrong
+                if ($result instanceof Builder) {
+                    // Force execution
+                    return $result->get();
+                }
+                return $result;
+            }
+            $result = $this->model->paginate($limit);
+            // Debug: Log the type if it's still wrong  
+            if ($result instanceof Builder) {
+                // Force execution
+                return $result->paginate($limit);
+            }
+            return $result;
         }
-        return $this->model->paginate($limit);
+        
+        // Otherwise, get fresh query and apply filters
+        $query = $this->getFreshQuery();
+        $this->applyStoredFiltersToQuery($query);
+        
+        if ($type) {
+            return $query->take($limit)->get();
+        }
+        return $query->paginate($limit);
+    }
+
+    /**
+     * Apply stored filters to a fresh query
+     * @param Builder $query
+     */
+    private function applyStoredFiltersToQuery(Builder $query): void
+    {
+        // Re-apply the filters that were applied during filterQuery
+        $filters = $this->pregSplit('@,@', Arr::get($this->params, 'filters', ''));
+        foreach ($filters as $filterKeys => $filterValues) {
+            [$column, $value] = $this->pregSplit('@:@', $filterValues);
+            if (method_exists($this, $column)) {
+                // Create a temporary repository with the fresh query
+                $tempRepo = clone $this;
+                $tempRepo->model = $query;
+                call_user_func([$tempRepo, $column], $value);
+                // Update the query with any modifications
+                $query = $tempRepo->model;
+            }
+        }
+        
+        // Apply other filters
+        $this->applyWithToQuery($query);
+        $this->applyOrderByToQuery($query, Arr::get($this->params, 'orderBy', 'created_at:desc'));
+        $this->applyDeletedToQuery($query, Arr::get($this->params, 'deleted', null));
     }
 
     /**
@@ -412,7 +479,43 @@ class BaseRepository implements BaseInterface
         return $this->model->where($field, $this->optimus()->decode($value));
     }
 
-    
+    /**
+     * Apply with relations to query
+     * @param Builder $query
+     */
+    private function applyWithToQuery(Builder $query): void
+    {
+        $with = Arr::get($this->params, 'with', []);
+        if (!empty($with)) {
+            $withRelations = $this->pregSplit('@,@', $with);
+            $query->with($withRelations);
+        }
+    }
+
+    /**
+     * Apply order by to query
+     * @param Builder $query
+     * @param string $orderBy
+     */
+    private function applyOrderByToQuery(Builder $query, string $orderBy): void
+    {
+        [$column, $value] = $this->pregSplit('@:@', $orderBy);
+        $query->orderBy($column, $value);
+    }
+
+    /**
+     * Apply deleted filter to query
+     * @param Builder $query
+     * @param string|null $deleted
+     */
+    private function applyDeletedToQuery(Builder $query, ?string $deleted): void
+    {
+        if ($deleted === 'true') {
+            $query->onlyTrashed();
+        } elseif ($deleted === 'false') {
+            $query->whereNull('deleted_at');
+        }
+    }
 
     protected function updatePrimaryImageFromRequest(Request $request): void
     {

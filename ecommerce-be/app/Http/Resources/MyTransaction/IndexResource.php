@@ -6,7 +6,7 @@ use App\Http\Resources\BaseResource;
 
 class IndexResource extends BaseResource
 {
-   public function __construct(Collection $resource) {
+   public function __construct(Collection|LengthAwarePaginator $resource){
         $this->fields = [];
         parent::__construct($resource);
     }
