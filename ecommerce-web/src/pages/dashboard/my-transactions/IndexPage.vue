@@ -1,11 +1,17 @@
 <template>
   <div class="stores-page-container">
     <!-- Header Section -->
-    <div class="page-header q-mb-md">
+    <div class="page-header q-mb-lg">
+      <div class="header-bg-accent"></div>
       <div class="header-content">
         <div class="header-title-section">
-          <q-icon name="receipt_long" size="32px" color="primary" class="q-mr-sm" />
-          <h2 class="page-title">My Transactions</h2>
+          <div class="header-icon-wrap">
+            <q-icon name="receipt_long" size="26px" color="white" />
+          </div>
+          <div>
+            <h2 class="page-title">My Transactions</h2>
+            <div class="page-subtitle">Track and manage your orders</div>
+          </div>
         </div>
         <div class="header-actions">
           <q-input v-model="search" placeholder="Search transactions..." outlined dense clearable debounce="1000"
@@ -21,12 +27,14 @@
     <!-- Desktop Table View -->
     <div class="desktop-only">
       <div v-if="typedResult.length === 0" class="empty-state-desktop">
-        <q-icon name="receipt_long" size="80px" color="grey-4" />
-        <div class="text-h5 q-mt-md text-grey-6">No transactions found</div>
-        <div class="text-body2 text-grey-5 q-mt-sm">Your transaction history will appear here</div>
+        <div class="empty-icon-wrap">
+          <q-icon name="receipt_long" size="48px" color="white" />
+        </div>
+        <div class="empty-title q-mt-md">No transactions found</div>
+        <div class="empty-subtitle q-mt-sm">Your transaction history will appear here</div>
       </div>
-      <q-table v-else flat bordered :rows="typedResult" :columns="columns" row-key="optimus_id"
-        class="transactions-table" :rows-per-page-options="[0]" hide-pagination>
+      <q-table v-else flat :rows="typedResult" :columns="columns" row-key="optimus_id" class="transactions-table"
+        :rows-per-page-options="[0]" hide-pagination>
         <template v-slot:body-cell-reference="props">
           <q-td :props="props">
             <router-link :to="`${$route.path}/${props.row.optimus_id}`" class="transaction-reference-link">
@@ -109,9 +117,11 @@
     <!-- Mobile Card View -->
     <div class="mobile-only">
       <div v-if="typedResult.length === 0" class="empty-state">
-        <q-icon name="receipt_long" size="64px" color="grey-4" />
-        <div class="text-h6 q-mt-md text-grey-6">No transactions found</div>
-        <div class="text-body2 text-grey-5 q-mt-sm">Your transaction history will appear here</div>
+        <div class="empty-icon-wrap">
+          <q-icon name="receipt_long" size="40px" color="white" />
+        </div>
+        <div class="empty-title q-mt-md">No transactions found</div>
+        <div class="empty-subtitle q-mt-sm">Your transaction history will appear here</div>
       </div>
       <div v-else class="stores-cards">
         <q-card v-for="transaction in typedResult" :key="transaction.optimus_id" flat bordered
@@ -127,7 +137,8 @@
               </div>
             </div>
             <div class="store-card-info">
-              <span class="text-body2 text-grey-7">{{ formatDate(transaction.created_at) }}</span>
+              <q-icon name="calendar_today" size="13px" class="q-mr-xs" />
+              <span class="card-date">{{ formatDate(transaction.created_at) }}</span>
             </div>
             <div class="transaction-mobile-details">
               <div class="transaction-detail-row">
@@ -213,7 +224,7 @@ const columns = [
     name: 'actions',
     required: true,
     label: 'Actions',
-    align: 'center',
+    align: 'right',
     field: ''
   }
 ];
@@ -297,185 +308,539 @@ const markedAsReceived = async (transactionId: string) => {
 <style scoped lang="scss">
 @import 'src/css/dashboard/all-stores/index.scss';
 
+// ── Dark theme token overrides ──────────────────────────────────────────────
+$dark-base: #0f172a;
+$dark-card: #1e293b;
+$dark-elevated: #273549;
+$border: rgba(255, 255, 255, 0.08);
+$accent: #6366f1;
+$accent-2: #7c3aed;
+$white: #ffffff;
+$muted: rgba(255, 255, 255, 0.5);
+
+// ── Layout overrides ───────────────────────────────────────────────────────
+.stores-page-container {
+  padding: 28px 24px;
+  max-width: 1400px;
+  margin: 0 auto;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: #0f172a !important;
+  color: #ffffff !important;
+}
+
+// ── Header ──────────────────────────────────────────────────────────────────
+.page-header {
+  position: relative;
+  background: $dark-card !important;
+  border-radius: 20px !important;
+  padding: 28px 32px !important;
+  border: 1px solid $border !important;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.3) !important;
+  overflow: hidden;
+}
+
+.header-bg-accent {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.18) 0%, rgba(124, 58, 237, 0.10) 60%, transparent 100%);
+  pointer-events: none;
+}
+
+.header-content {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.header-title-section {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.header-icon-wrap {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, $accent 0%, $accent-2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 16px rgba(99, 102, 241, 0.4);
+  flex-shrink: 0;
+}
+
+.page-title {
+  font-size: 24px !important;
+  font-weight: 800 !important;
+  color: $white !important;
+  margin: 0 0 4px !important;
+  letter-spacing: -0.3px;
+  line-height: 1.2;
+}
+
+.page-subtitle {
+  font-size: 13px;
+  color: $muted;
+  font-weight: 500;
+}
+
+.header-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.search-input {
+  min-width: 280px;
+  max-width: 380px;
+
+  :deep(.q-field__control) {
+    background: $dark-elevated;
+    border-radius: 12px;
+    border-color: $border;
+  }
+
+  :deep(.q-field__native),
+  :deep(.q-field__input) {
+    color: $white;
+  }
+
+  :deep(.q-field__label),
+  :deep(.q-field__prepend .q-icon) {
+    color: $muted;
+  }
+}
+
+// ── Desktop table ──────────────────────────────────────────────────────────
+.empty-state-desktop {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 20px;
+  text-align: center;
+  background: $dark-card !important;
+  border-radius: 20px !important;
+  border: 1px solid $border !important;
+}
+
+.empty-icon-wrap {
+  width: 80px;
+  height: 80px;
+  border-radius: 24px;
+  background: linear-gradient(135deg, $accent 0%, $accent-2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 24px rgba(99, 102, 241, 0.35);
+}
+
+.empty-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: $white;
+}
+
+.empty-subtitle {
+  font-size: 14px;
+  color: $muted;
+}
+
 .transactions-table {
   width: 100%;
+  border-radius: 20px;
+  overflow: hidden;
 
-  :deep(.q-table) {
-    border-radius: 12px;
-    overflow: hidden;
+  :deep(.q-table__container) {
+    background: $dark-card;
+    border: 1px solid $border;
+    border-radius: 20px;
   }
 
   :deep(.q-table th) {
-    font-weight: 600;
-    font-size: 14px;
+    font-weight: 700;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
     padding: 16px 24px;
-    background: linear-gradient(135deg, #f5f7fa 0%, #ffffff 100%);
-    color: #1a1a1a;
+    background: $dark-elevated;
+    color: rgba(255, 255, 255, 0.6);
+    border-bottom: 1px solid $border;
   }
 
   :deep(.q-table td) {
     padding: 20px 24px;
-    font-size: 15px;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+    font-size: 14px;
+    color: $white;
+    border-bottom: 1px solid $border;
+    background: transparent;
   }
 
   :deep(.q-table tbody tr) {
-    transition: all 0.3s ease;
+    transition: background 0.2s ease;
 
-    &:hover {
-      background: rgba(25, 118, 210, 0.04);
+    &:hover td {
+      background: rgba(255, 255, 255, 0.04);
     }
   }
 
   :deep(.q-table tbody tr:last-child td) {
     border-bottom: none;
   }
+
+  :deep(.q-table__bottom) {
+    background: $dark-elevated;
+    border-top: 1px solid $border;
+    color: $white;
+  }
 }
 
 .transaction-reference-link {
   text-decoration: none;
   color: inherit;
-  transition: all 0.3s ease;
+  transition: color 0.2s ease;
 
   &:hover {
-    color: #1976d2;
+    color: #a5b4fc;
   }
 }
 
 .transaction-reference-id {
   font-size: 15px;
-  font-weight: 600;
-  color: #1a1a1a;
+  font-weight: 700;
+  color: $white;
 }
 
 .transaction-date {
-  font-size: 13px;
-  color: #666;
+  font-size: 12px;
+  color: $muted;
   display: flex;
   align-items: center;
   margin-top: 4px;
+  gap: 4px;
 }
 
 .status-badge {
-  font-size: 13px;
-  font-weight: 600;
-  padding: 6px 12px;
-  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 5px 12px;
+  border-radius: 20px;
+  letter-spacing: 0.3px;
 }
 
 .transaction-summary {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
 }
 
 .transaction-total {
-  font-size: 15px;
-  color: #1a1a1a;
+  font-size: 14px;
+  color: $white;
   font-weight: 600;
 
   span {
-    font-weight: 700;
+    font-weight: 800;
+    color: #a5b4fc;
   }
 }
 
 .transaction-meta {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  color: #666;
-  font-size: 13px;
+  gap: 4px;
+  color: $muted;
+  font-size: 12px;
 }
 
 .transaction-meta-item {
   display: flex;
   align-items: center;
+  gap: 4px;
 }
 
 .action-buttons {
   display: flex;
   gap: 8px;
-  justify-content: center;
+  justify-content: flex-end;
 }
 
 .table-pagination {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px 16px;
+  padding: 14px 20px;
+  color: $white;
 }
 
 .pagination-info {
   font-size: 13px;
-  color: #666;
+  color: $muted;
 }
 
 .pagination-controls {
   display: flex;
   align-items: center;
   gap: 8px;
+
+  :deep(.q-btn .q-icon) {
+    color: rgba(255, 255, 255, 0.7);
+  }
 }
 
 .page-number {
   font-size: 13px;
-  color: #1a1a1a;
+  color: $white;
   font-weight: 600;
-  min-width: 50px;
+  min-width: 60px;
   text-align: center;
 }
 
-/* Mobile card styles */
+// ── Mobile cards ───────────────────────────────────────────────────────────
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  text-align: center;
+}
+
+.stores-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.store-card {
+  background: $dark-card !important;
+  border: 1px solid $border !important;
+  border-radius: 16px !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+  transition: all 0.2s ease;
+  overflow: hidden;
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 3px;
+    height: 100%;
+    background: linear-gradient(180deg, $accent 0%, $accent-2 100%);
+  }
+
+  &:hover {
+    border-color: rgba(99, 102, 241, 0.3) !important;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+  }
+}
+
+.store-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+
 .store-card-header.transaction-store-card-header {
   flex-wrap: wrap;
   align-items: flex-start;
   gap: 8px 12px;
 }
 
-.store-card-header.transaction-store-card-header .store-card-title {
+.store-card-title {
   flex: 1 1 auto;
   min-width: 0;
-  max-width: 100%;
 }
 
-.store-card-header.transaction-store-card-header .transaction-reference-id {
-  word-break: break-word;
-}
-
-.store-card-header.transaction-store-card-header .transaction-header-badge {
+.transaction-header-badge {
   flex: 0 1 auto;
-  min-width: 0;
-  max-width: 100%;
-  display: flex;
-  justify-content: flex-end;
 }
 
-.store-card-header.transaction-store-card-header .transaction-header-badge :deep(.q-badge) {
-  white-space: normal;
-  text-align: center;
+.transaction-reference-id {
+  font-size: 15px;
+  font-weight: 700;
+  color: $white;
   word-break: break-word;
-  max-width: 100%;
+}
+
+.store-card-info {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 !important;
+  margin-bottom: 14px;
+  background: transparent !important;
+}
+
+.card-date {
+  font-size: 12px;
+  color: $muted;
 }
 
 .transaction-mobile-details {
-  margin-top: 12px;
+  background: $dark-elevated !important;
+  border-radius: 12px !important;
+  padding: 14px 16px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
+  margin-top: 4px;
 }
 
 .transaction-detail-row {
   display: flex;
   justify-content: space-between;
-  font-size: 14px;
-  color: #1a1a1a;
+  align-items: center;
+  font-size: 13px;
 }
 
 .transaction-detail-label {
-  color: #666;
+  color: $muted !important;
   font-weight: 500;
 }
 
 .transaction-detail-value {
-  font-weight: 600;
+  font-weight: 700;
+  color: $white !important;
+}
+
+.store-card-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.action-btn-mobile {
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 13px;
+  height: 40px;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.mobile-pagination {
+  display: flex;
+  justify-content: center;
+  padding: 20px 0 4px;
+  background: transparent !important;
+}
+
+// ── Responsive ────────────────────────────────────────────────────────────
+@media (max-width: 768px) {
+  .stores-page-container {
+    padding: 16px 12px;
+  }
+
+  .page-header {
+    padding: 20px;
+    border-radius: 16px;
+  }
+
+  .header-content {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .search-input {
+    min-width: 0;
+    max-width: 100%;
+    width: 100%;
+  }
+}
+
+@media (max-width: 600px) {
+  .stores-page-container {
+    padding: 12px 8px;
+  }
+
+  .page-title {
+    font-size: 20px;
+  }
+}
+</style>
+
+<style>
+.stores-page-container .page-header {
+  background: #1e293b !important;
+}
+
+.stores-page-container .page-title {
+  color: #ffffff !important;
+}
+
+/* Table container — styled like ProfilePage dark card */
+.stores-page-container .transactions-table .q-table__container {
+  background: #1e293b !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 20px !important;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.25) !important;
+  overflow: hidden !important;
+}
+
+/* Strip ALL Quasar table borders */
+.stores-page-container .transactions-table .q-table,
+.stores-page-container .transactions-table .q-table td,
+.stores-page-container .transactions-table .q-table th,
+.stores-page-container .transactions-table .q-table tr {
+  border: none !important;
+  outline: none !important;
+}
+
+/* Header row */
+.stores-page-container .transactions-table thead tr th {
+  background: #273549 !important;
+  color: rgba(255, 255, 255, 0.55) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+/* Body rows — no hover */
+.stores-page-container .transactions-table tbody tr,
+.stores-page-container .transactions-table tbody tr:hover {
+  background: #1e293b !important;
+  cursor: default;
+}
+
+.stores-page-container .transactions-table tbody tr td {
+  background: transparent !important;
+  color: #ffffff !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+}
+
+.stores-page-container .transactions-table tbody tr:last-child td {
+  border-bottom: none !important;
+}
+
+/* Pagination footer */
+.stores-page-container .transactions-table .q-table__bottom {
+  background: #273549 !important;
+  color: #ffffff !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+/* Mobile cards */
+.stores-page-container .store-card {
+  background: #1e293b !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+.stores-page-container .store-card .q-card__section {
+  background: transparent !important;
+  color: #ffffff !important;
+}
+
+/* Empty states */
+.stores-page-container .empty-state-desktop,
+.stores-page-container .empty-state {
+  background: #1e293b !important;
 }
 </style>

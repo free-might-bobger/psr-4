@@ -324,9 +324,10 @@ const { countTotalItems } = storeToRefs(useUserCartStore());
 // ── Dropdown Menu ─────────────────────────────────────────────────────────────
 .user-menu {
   border-radius: 16px !important;
-  box-shadow: 0 16px 48px rgba(30, 27, 75, 0.16), 0 2px 8px rgba(0, 0, 0, 0.06) !important;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.4), 0 2px 8px rgba(0, 0, 0, 0.2) !important;
   overflow: hidden;
-  border: 1px solid rgba(99, 102, 241, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: #1e293b !important;
 }
 
 .user-menu-profile {
@@ -375,15 +376,15 @@ const { countTotalItems } = storeToRefs(useUserCartStore());
   min-height: 46px;
 
   &:hover {
-    background: rgba(99, 102, 241, 0.07);
+    background: rgba(255, 255, 255, 0.08);
 
     .menu-icon-pill {
-      background: linear-gradient(135deg, #312e81 0%, #6d28d9 100%);
+      background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
       color: white;
     }
 
     .menu-item-label {
-      color: #312e81;
+      color: #ffffff;
     }
   }
 }
@@ -396,18 +397,18 @@ const { countTotalItems } = storeToRefs(useUserCartStore());
   width: 32px;
   height: 32px;
   border-radius: 8px;
-  background: #f3f4f6;
+  background: rgba(255, 255, 255, 0.1);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #6b7280;
+  color: #ffffff;
   transition: all 0.2s ease;
 }
 
 .menu-item-label {
   font-size: 14px;
   font-weight: 600;
-  color: #374151;
+  color: #ffffff;
   transition: color 0.2s ease;
 }
 
@@ -422,7 +423,7 @@ const { countTotalItems } = storeToRefs(useUserCartStore());
   min-height: 46px;
 
   &:hover {
-    background: rgba(239, 68, 68, 0.07);
+    background: rgba(239, 68, 68, 0.15);
 
     .logout-pill {
       background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
@@ -430,19 +431,19 @@ const { countTotalItems } = storeToRefs(useUserCartStore());
     }
 
     .logout-label {
-      color: #dc2626;
+      color: #ffffff;
     }
   }
 }
 
 .logout-pill {
-  color: #ef4444;
+  color: #ffffff;
 }
 
 .logout-label {
   font-size: 14px;
   font-weight: 600;
-  color: #ef4444;
+  color: #ffffff;
   transition: color 0.2s ease;
 }
 
@@ -507,5 +508,32 @@ const { countTotalItems } = storeToRefs(useUserCartStore());
 <style>
 .footer_menu a {
   color: white;
+}
+
+.user-menu {
+  background: #1e293b !important;
+}
+
+.user-menu .q-item {
+  color: #ffffff !important;
+}
+
+.user-menu .q-item:hover {
+  background: rgba(255, 255, 255, 0.08) !important;
+}
+
+.user-menu .menu-item-label,
+.user-menu .logout-label {
+  color: #ffffff !important;
+}
+
+.user-menu .menu-icon-pill,
+.user-menu .logout-pill {
+  color: #ffffff !important;
+  background: rgba(255, 255, 255, 0.1) !important;
+}
+
+.user-menu .q-separator {
+  background: rgba(255, 255, 255, 0.08);
 }
 </style>

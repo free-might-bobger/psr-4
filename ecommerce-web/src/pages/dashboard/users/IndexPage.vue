@@ -1,17 +1,23 @@
 <template>
   <div class="stores-page-container">
     <!-- Header Section -->
-    <div class="page-header q-mb-md">
+    <div class="page-header q-mb-lg">
+      <div class="header-bg-accent"></div>
       <div class="header-content">
         <div class="header-title-section">
-          <q-icon name="person" size="32px" color="primary" class="q-mr-sm" />
-          <h2 class="page-title">Users</h2>
+          <div class="header-icon-wrap">
+            <q-icon name="group" size="26px" color="white" />
+          </div>
+          <div>
+            <h2 class="page-title">Users</h2>
+            <div class="page-subtitle">Manage registered users</div>
+          </div>
         </div>
         <div class="header-actions">
           <q-input v-model="search" placeholder="Search users..." outlined dense clearable debounce="1000"
             class="search-input">
             <template v-slot:prepend>
-              <q-icon name="search" />
+              <q-icon name="search" color="grey-5" />
             </template>
           </q-input>
         </div>
@@ -21,11 +27,13 @@
     <!-- Desktop Table View -->
     <div class="desktop-only">
       <div v-if="typedResult.length === 0" class="empty-state-desktop">
-        <q-icon name="person_off" size="80px" color="grey-4" />
-        <div class="text-h5 q-mt-md text-grey-6">No users found</div>
-        <div class="text-body2 text-grey-5 q-mt-sm">Try adjusting your search criteria</div>
+        <div class="empty-icon-wrap">
+          <q-icon name="person_off" size="48px" color="white" />
+        </div>
+        <div class="empty-title q-mt-md">No users found</div>
+        <div class="empty-subtitle q-mt-sm">Try adjusting your search criteria</div>
       </div>
-      <q-table v-else flat bordered :rows="typedResult" :columns="columns" row-key="optimus_id" class="users-table"
+      <q-table v-else flat :rows="typedResult" :columns="columns" row-key="optimus_id" class="users-table"
         :rows-per-page-options="[0]" hide-pagination>
         <template v-slot:body-cell-name="props">
           <q-td :props="props">
@@ -84,29 +92,33 @@
     <!-- Mobile Card View -->
     <div class="mobile-only">
       <div v-if="typedResult.length === 0" class="empty-state">
-        <q-icon name="person_off" size="64px" color="grey-4" />
-        <div class="text-h6 q-mt-md text-grey-6">No users found</div>
+        <div class="empty-icon-wrap">
+          <q-icon name="person_off" size="40px" color="white" />
+        </div>
+        <div class="empty-title q-mt-md">No users found</div>
       </div>
       <div v-else class="stores-cards">
-        <q-card v-for="user in typedResult" :key="user.id" flat bordered class="store-card q-mb-md">
+        <q-card v-for="user in typedResult" :key="user.id" flat class="store-card q-mb-md">
           <q-card-section>
             <div class="store-card-header">
               <div class="store-card-title">
-                <q-icon name="person" color="primary" size="24px" class="q-mr-sm" />
+                <div class="card-user-icon">
+                  <q-icon name="person" size="18px" color="white" />
+                </div>
                 <router-link :to="`${$route.path}/${user.optimus_id}`" class="store-name-link">
                   {{ user.name || user.label || 'N/A' }}
                 </router-link>
               </div>
             </div>
             <div v-if="user.mobile" class="store-card-info q-mt-sm">
-              <q-icon name="phone" size="16px" color="grey-6" class="q-mr-xs" />
-              <span class="text-body2 text-grey-7">{{ user.mobile }}</span>
+              <q-icon name="phone" size="15px" class="q-mr-xs card-info-icon" />
+              <span class="card-info-text">{{ user.mobile }}</span>
             </div>
             <div class="store-card-actions q-mt-md">
               <q-btn unelevated dense color="primary" icon="edit_note" label="Edit"
-                :to="`${$route.path}/${user.optimus_id}`" class="action-btn-mobile action-btn-edit-mobile" />
+                :to="`${$route.path}/${user.optimus_id}`" class="action-btn-mobile" />
               <q-btn unelevated dense color="negative" icon="delete_forever" label="Delete"
-                @click="handleDeleteUser(user)" class="action-btn-mobile action-btn-delete-mobile" />
+                @click="handleDeleteUser(user)" class="action-btn-mobile" />
             </div>
           </q-card-section>
         </q-card>
@@ -173,7 +185,7 @@ const columns = [
     name: 'actions',
     required: true,
     label: 'Actions',
-    align: 'center' as const,
+    align: 'right' as const,
     field: ''
   }
 ];
@@ -221,117 +233,228 @@ watch(search, (newValue) => {
 </script>
 
 <style scoped lang="scss">
-@import 'src/css/dashboard/all-stores/index.scss';
+// ── Dark theme tokens ──────────────────────────────────────────────────────
+$dark-base: #0f172a;
+$dark-card: #1e293b;
+$dark-elevated: #273549;
+$border: rgba(255, 255, 255, 0.08);
+$accent: #6366f1;
+$accent-2: #7c3aed;
+$white: #ffffff;
+$muted: rgba(255, 255, 255, 0.5);
 
+// ── Container ──────────────────────────────────────────────────────────────
 .stores-page-container {
-  padding: 24px;
+  padding: 28px 24px;
   max-width: 1400px;
   margin: 0 auto;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: $dark-base !important;
+  color: $white !important;
 }
 
+// ── Header ─────────────────────────────────────────────────────────────────
 .page-header {
-  background: #ffffff;
-  border-radius: 16px;
-  padding: 24px 32px;
-  margin-bottom: 24px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  position: relative;
+  background: $dark-card !important;
+  border-radius: 20px !important;
+  border: 1px solid $border !important;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.3) !important;
+  overflow: hidden;
+}
+
+.header-bg-accent {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.18) 0%, rgba(124, 58, 237, 0.10) 60%, transparent 100%);
+  pointer-events: none;
 }
 
 .header-content {
+  position: relative;
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 24px;
+  padding: 28px 32px;
 }
 
 .header-title-section {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 18px;
+}
+
+.header-icon-wrap {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, $accent 0%, $accent-2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 16px rgba(99, 102, 241, 0.4);
+  flex-shrink: 0;
 }
 
 .page-title {
-  font-size: 28px;
-  font-weight: 700;
-  color: #1a1a1a;
-  margin: 0;
+  font-size: 24px !important;
+  font-weight: 800 !important;
+  color: $white !important;
+  margin: 0 0 4px !important;
+  letter-spacing: -0.3px;
+  line-height: 1.2;
+}
+
+.page-subtitle {
+  font-size: 13px;
+  color: $muted;
+  font-weight: 500;
 }
 
 .search-input {
-  min-width: 300px;
-  max-width: 400px;
+  min-width: 280px;
+  max-width: 380px;
 
   :deep(.q-field__control) {
-    border-radius: 10px;
+    background: $dark-elevated !important;
+    border-radius: 12px !important;
+    border: 1px solid $border !important;
+  }
+
+  :deep(.q-field__native),
+  :deep(.q-field__input) {
+    color: $white !important;
+  }
+
+  :deep(.q-field__label) {
+    color: $muted !important;
+  }
+
+  :deep(.q-field__prepend .q-icon),
+  :deep(.q-field__append .q-icon) {
+    color: $muted !important;
+  }
+
+  :deep(.q-field--outlined .q-field__control:before) {
+    border-color: $border !important;
+  }
+
+  :deep(.q-field--outlined:hover .q-field__control:before) {
+    border-color: rgba(99, 102, 241, 0.4) !important;
+  }
+
+  :deep(.q-field--focused .q-field__control:before) {
+    border-color: $accent !important;
   }
 }
 
-.empty-state-desktop {
+// ── Empty states ───────────────────────────────────────────────────────────
+.empty-state-desktop,
+.empty-state {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 80px 24px;
-  background: #ffffff;
-  border-radius: 16px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  padding: 80px 20px;
+  text-align: center;
+  background: $dark-card !important;
+  border-radius: 20px !important;
+  border: 1px solid $border !important;
 }
 
+.empty-icon-wrap {
+  width: 80px;
+  height: 80px;
+  border-radius: 24px;
+  background: linear-gradient(135deg, $accent 0%, $accent-2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 24px rgba(99, 102, 241, 0.35);
+}
+
+.empty-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: $white;
+}
+
+.empty-subtitle {
+  font-size: 14px;
+  color: $muted;
+}
+
+// ── Desktop table ──────────────────────────────────────────────────────────
 .users-table {
   width: 100%;
 
+  :deep(.q-table__container) {
+    background: $dark-card !important;
+    border: 1px solid $border !important;
+    border-radius: 20px !important;
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.25) !important;
+    overflow: hidden !important;
+  }
+
   :deep(.q-table) {
-    border-radius: 16px;
-    overflow: hidden;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    border: none !important;
   }
 
-  :deep(.q-table thead tr) {
-    background: #f8f9fa;
-  }
-
+  :deep(.q-table td),
   :deep(.q-table th) {
-    font-weight: 600;
-    font-size: 13px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    padding: 18px 24px;
-    color: #6b7280;
-    border-bottom: 2px solid #e5e7eb;
+    border-right: none !important;
   }
 
-  :deep(.q-table td) {
-    padding: 18px 24px;
-    font-size: 14px;
-    border-bottom: 1px solid #f3f4f6;
-    color: #374151;
+  :deep(.q-table thead tr th) {
+    background: $dark-elevated !important;
+    color: $muted !important;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    padding: 16px 24px;
+    border-bottom: 1px solid $border !important;
   }
 
   :deep(.q-table tbody tr) {
-    transition: all 0.2s ease;
+    background: $dark-card !important;
+  }
 
-    &:hover {
-      background: #f9fafb;
-    }
+  :deep(.q-table tbody tr td) {
+    background: transparent !important;
+    color: $white !important;
+    font-size: 14px;
+    padding: 16px 24px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04) !important;
   }
 
   :deep(.q-table tbody tr:last-child td) {
-    border-bottom: none;
+    border-bottom: none !important;
+  }
+
+  :deep(.q-table tbody tr:hover) {
+    background: $dark-card !important;
+  }
+
+  :deep(.q-table__bottom) {
+    background: $dark-elevated !important;
+    border-top: 1px solid $border !important;
   }
 }
 
 .user-name-link {
   text-decoration: none;
-  color: #1a1a1a;
+  color: $white;
   display: flex;
   align-items: center;
   gap: 8px;
-  font-weight: 500;
+  font-weight: 600;
   font-size: 14px;
-  transition: all 0.2s ease;
+  transition: color 0.2s;
 
   &:hover {
-    color: #3b82f6;
+    color: #a5b4fc;
   }
 }
 
@@ -340,27 +463,27 @@ watch(search, (newValue) => {
   align-items: center;
   gap: 8px;
   font-size: 14px;
-  color: #374151;
+  color: $muted;
 }
 
 .action-buttons {
   display: flex;
   gap: 6px;
-  justify-content: center;
+  justify-content: flex-end;
 }
 
+// ── Pagination footer ──────────────────────────────────────────────────────
 .table-pagination {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 16px 24px;
-  background: #f8f9fa;
-  border-top: 1px solid #e5e7eb;
+  padding: 14px 24px;
+  color: $white;
 }
 
 .pagination-info {
   font-size: 13px;
-  color: #6b7280;
+  color: $muted;
   font-weight: 500;
 }
 
@@ -368,18 +491,27 @@ watch(search, (newValue) => {
   display: flex;
   align-items: center;
   gap: 4px;
+
+  :deep(.q-btn) {
+    color: $muted !important;
+
+    &:hover {
+      color: $white !important;
+      background: rgba(255, 255, 255, 0.06) !important;
+    }
+  }
 }
 
 .page-number {
   font-size: 14px;
-  color: #1a1a1a;
-  font-weight: 600;
+  color: $white;
+  font-weight: 700;
   min-width: 60px;
   text-align: center;
   padding: 0 8px;
 }
 
-// Mobile styles
+// ── Mobile cards ───────────────────────────────────────────────────────────
 .stores-cards {
   display: flex;
   flex-direction: column;
@@ -387,13 +519,33 @@ watch(search, (newValue) => {
 }
 
 .store-card {
-  border-radius: 16px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  background: $dark-card !important;
+  border: 1px solid $border !important;
+  border-radius: 16px !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25) !important;
   overflow: hidden;
-  transition: all 0.2s ease;
+  position: relative;
+  transition: transform 0.2s, box-shadow 0.2s;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 3px;
+    height: 100%;
+    background: linear-gradient(180deg, $accent 0%, $accent-2 100%);
+  }
 
   &:hover {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3) !important;
+    border-color: rgba(99, 102, 241, 0.3) !important;
+  }
+
+  :deep(.q-card__section) {
+    background: transparent !important;
+    color: $white !important;
   }
 }
 
@@ -406,103 +558,166 @@ watch(search, (newValue) => {
 .store-card-title {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   flex: 1;
+}
+
+.card-user-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, $accent 0%, $accent-2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 3px 10px rgba(99, 102, 241, 0.35);
 }
 
 .store-name-link {
   text-decoration: none;
-  color: #1a1a1a;
-  font-weight: 600;
-  font-size: 16px;
-  transition: all 0.2s ease;
+  color: $white;
+  font-weight: 700;
+  font-size: 15px;
+  transition: color 0.2s;
 
   &:hover {
-    color: #3b82f6;
+    color: #a5b4fc;
   }
 }
 
 .store-card-info {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 8px 0;
+  gap: 6px;
+  padding: 6px 0;
+}
+
+.card-info-icon {
+  color: $muted;
+}
+
+.card-info-text {
+  font-size: 13px;
+  color: $muted;
 }
 
 .store-card-actions {
-  display: flex;
-  gap: 8px;
-  padding-top: 16px;
-  border-top: 1px solid #f3f4f6;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  padding-top: 14px;
+  border-top: 1px solid $border;
+  margin-top: 4px;
 }
 
 .action-btn-mobile {
-  flex: 1;
-  border-radius: 10px;
-  font-weight: 600;
-  text-transform: none;
-}
-
-.action-btn-edit-mobile {
-  background: #3b82f6;
-}
-
-.action-btn-delete-mobile {
-  background: #ef4444;
-}
-
-.empty-state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 60px 24px;
-  background: #ffffff;
-  border-radius: 16px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  border-radius: 10px !important;
+  font-weight: 700 !important;
+  font-size: 13px !important;
+  height: 38px !important;
+  text-transform: none !important;
+  letter-spacing: 0 !important;
 }
 
 .mobile-pagination {
   display: flex;
   justify-content: center;
-  padding: 20px;
-  background: #ffffff;
-  border-radius: 16px;
-  margin-top: 16px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  padding: 20px 0 4px;
+  background: transparent !important;
 }
 
+// ── Responsive ─────────────────────────────────────────────────────────────
 @media (max-width: 768px) {
   .stores-page-container {
-    padding: 16px;
-  }
-
-  .page-header {
-    padding: 20px;
-    border-radius: 12px;
+    padding: 16px 12px;
   }
 
   .header-content {
     flex-direction: column;
     align-items: stretch;
-    gap: 16px;
+    padding: 20px;
   }
 
   .header-title-section {
-    justify-content: center;
+    justify-content: flex-start;
   }
 
   .page-title {
-    font-size: 24px;
+    font-size: 20px !important;
   }
 
   .search-input {
+    min-width: 0;
     max-width: 100%;
   }
+}
+</style>
 
-  .empty-state-desktop,
-  .empty-state {
-    padding: 48px 20px;
-  }
+<style>
+/* Table container */
+.stores-page-container .users-table .q-table__container {
+  background: #1e293b !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 20px !important;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.25) !important;
+  overflow: hidden !important;
+}
+
+/* Strip all table borders */
+.stores-page-container .users-table .q-table,
+.stores-page-container .users-table .q-table td,
+.stores-page-container .users-table .q-table th,
+.stores-page-container .users-table .q-table tr {
+  border: none !important;
+  outline: none !important;
+}
+
+/* Header row */
+.stores-page-container .users-table thead tr th {
+  background: #273549 !important;
+  color: rgba(255, 255, 255, 0.55) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+/* Body rows — no hover flash */
+.stores-page-container .users-table tbody tr,
+.stores-page-container .users-table tbody tr:hover {
+  background: #1e293b !important;
+  cursor: default;
+}
+
+.stores-page-container .users-table tbody tr td {
+  background: transparent !important;
+  color: #ffffff !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+}
+
+.stores-page-container .users-table tbody tr:last-child td {
+  border-bottom: none !important;
+}
+
+/* Pagination footer */
+.stores-page-container .users-table .q-table__bottom {
+  background: #273549 !important;
+  color: #ffffff !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+/* Mobile cards */
+.stores-page-container .store-card {
+  background: #1e293b !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+.stores-page-container .store-card .q-card__section {
+  background: transparent !important;
+  color: #ffffff !important;
+}
+
+/* Empty states */
+.stores-page-container .empty-state-desktop,
+.stores-page-container .empty-state {
+  background: #1e293b !important;
 }
 </style>
