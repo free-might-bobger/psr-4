@@ -536,4 +536,35 @@ const { countTotalItems } = storeToRefs(useUserCartStore());
 .user-menu .q-separator {
   background: rgba(255, 255, 255, 0.08);
 }
+
+.user-menu .menu-logout-area {
+  padding: 4px 0 8px;
+  display: block;
+}
+
+.user-menu .user-menu-logout {
+  margin: 2px 8px;
+  border-radius: 10px;
+  transition: all 0.2s ease;
+  min-height: 46px;
+}
+
+.user-menu .user-menu-logout:hover {
+  background: rgba(239, 68, 68, 0.15) !important;
+}
+
+.user-menu .user-menu-logout:hover .logout-pill {
+  background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%) !important;
+  color: white !important;
+}
+
+.user-menu .user-menu-logout:hover .logout-label {
+  color: #ffffff !important;
+}
+
+.user-menu .logout-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #ffffff !important;
+}
 </style>

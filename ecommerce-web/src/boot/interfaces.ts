@@ -191,6 +191,7 @@ export interface ItemInterface {
 export interface StoreInterface {
   id: number
   name: string
+  mobile: string
   latitude: number
   longitude: number
   distance: number

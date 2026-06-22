@@ -63,70 +63,69 @@
             <!-- Users Table -->
             <div v-else class="users-table-section">
                 <div class="table-card">
-                    <q-table flat :rows="typedResult" :columns="columns" row-key="id" :pagination="{ rowsPerPage: 0 }"
-                        class="users-table" hide-bottom>
-
+                    <table class="users-table">
                         <!-- Header -->
-                        <template v-slot:header="props">
-                            <q-tr :props="props" class="table-header">
-                                <q-th v-for="col in props.cols" :key="col.name" :props="props"
-                                    class="table-header-cell">
-                                    {{ col.label }}
-                                </q-th>
-                            </q-tr>
-                        </template>
+                        <thead>
+                            <tr class="table-header">
+                                <th class="table-header-cell">User Information</th>
+                                <th class="table-header-cell">Store Mobile</th>
+                                <th class="table-header-cell">Status</th>
+                                <th class="table-header-cell">Actions</th>
+                            </tr>
+                        </thead>
 
-                        <!-- User Row -->
-                        <template v-slot:body="props">
-                            <q-tr :props="props" class="table-row">
-                                <q-td :props="props" class="table-cell">
+                        <!-- Body -->
+                        <tbody>
+                            <tr v-for="user in typedResult" :key="user.id" class="table-row">
+                                <!-- User Info -->
+                                <td class="table-cell">
                                     <div class="user-info-cell">
                                         <div class="user-avatar">
                                             <q-icon name="person" size="20px" color="white" />
                                         </div>
                                         <div class="user-details">
-                                            <router-link :to="`${$route.path}/${props.row.optimus_id}`"
-                                                class="user-name">
-                                                {{ props.row.email || `User #${props.row.id}` }}
-                                            </router-link>
-                                            <div class="user-email">{{ props.row.store?.name || 'No Store' }}</div>
+                                                {{ user.email || `User #${user.id}` }}
+                                            <div class="user-email">{{ user.store?.name || 'No Store' }}</div>
                                         </div>
                                     </div>
-                                </q-td>
+                                </td>
 
-                                <q-td :props="props" class="table-cell">
+                                <!-- Store Mobile -->
+                                <td class="table-cell">
                                     <div class="store-badge">
                                         <q-icon name="phone" size="14px" class="q-mr-xs" />
-                                        {{ props.row.store?.mobile || 'No Mobile' }}
+                                        {{ user.store?.mobile || 'No Mobile' }}
                                     </div>
-                                </q-td>
+                                </td>
 
-                                <q-td :props="props" class="table-cell">
+                                <!-- Status -->
+                                <td class="table-cell">
                                     <div class="verification-status">
-                                        <q-icon v-if="props.row.is_verified" name="verified_user" size="18px"
+                                        <q-icon v-if="user.is_verified" name="verified_user" size="18px"
                                             class="verified-icon" />
                                         <q-icon v-else name="pending" size="18px" class="pending-icon" />
-                                        <span :class="props.row.is_verified ? 'verified-text' : 'pending-text'">
-                                            {{ props.row.is_verified ? 'Verified' : 'Pending' }}
+                                        <span :class="user.is_verified ? 'verified-text' : 'pending-text'">
+                                            {{ user.is_verified ? 'Verified' : 'Pending' }}
                                         </span>
                                     </div>
-                                </q-td>
+                                </td>
 
-                                <q-td :props="props" class="table-cell">
+                                <!-- Actions -->
+                                <td class="table-cell">
                                     <div class="actions-cell">
-                                        <q-btn v-if="props.row.is_verified" unelevated dense icon="manage_accounts"
+                                        <q-btn v-if="user.is_verified" unelevated dense icon="manage_accounts"
                                             :to="`${$route.path}/access`" class="action-btn access-btn">
                                             <q-tooltip>Manage access permissions</q-tooltip>
                                         </q-btn>
-                                        <q-btn unelevated dense icon="delete_forever"
-                                            @click="handleDeleteUser(props.row)" class="action-btn delete-btn">
+                                        <q-btn unelevated dense icon="delete_forever" @click="handleDeleteUser(user)"
+                                            class="action-btn delete-btn">
                                             <q-tooltip>Remove user from store</q-tooltip>
                                         </q-btn>
                                     </div>
-                                </q-td>
-                            </q-tr>
-                        </template>
-                    </q-table>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
 
                 <!-- Pagination -->
@@ -275,29 +274,6 @@ const columns = [
         align: 'left' as const,
         field: 'email',
         sortable: true
-    },
-    {
-        name: 'storeMobile',
-        required: true,
-        label: 'Store Mobile',
-        align: 'left' as const,
-        field: (row: StoreUser) => row.store?.mobile || 'N/A',
-        sortable: true
-    },
-    {
-        name: 'status',
-        required: true,
-        label: 'Status',
-        align: 'left' as const,
-        field: (row: StoreUser) => row.is_verified ? 'Verified' : 'Pending',
-        sortable: true
-    },
-    {
-        name: 'actions',
-        required: true,
-        label: 'Actions',
-        align: 'center' as const,
-        field: ''
     }
 ];
 
@@ -551,16 +527,38 @@ $muted-2: rgba(255, 255, 255, 0.3);
 }
 
 .users-table {
+    width: 100%;
     background: transparent;
+    border-collapse: collapse;
 
-    :deep(.q-table__top) {
-        background: transparent;
-        border: none;
-        padding: 0;
+    thead {
+        background: $dark-elevated;
     }
 
-    :deep(.q-table__middle) {
-        background: transparent;
+    th {
+        font-size: 12px;
+        font-weight: 700;
+        color: $muted;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        padding: 16px 20px;
+        text-align: left;
+        border: none;
+    }
+
+    tbody tr {
+        transition: background-color 0.2s ease;
+        border-bottom: 1px solid $border;
+
+        &:hover {
+            background: rgba($accent, 0.04);
+        }
+    }
+
+    td {
+        padding: 20px;
+        border: none;
+        vertical-align: middle;
     }
 }
 

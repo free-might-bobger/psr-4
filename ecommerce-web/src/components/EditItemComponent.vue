@@ -1,107 +1,125 @@
 <template>
   <div class="edit-page">
     <div class="edit-container">
-      <!-- Header -->
-      <div class="page-header">
-        <q-btn flat round icon="arrow_back" @click="handleBack" class="back-btn" />
-        <h1 class="page-title">Edit Item</h1>
+
+      <!-- Hero Header -->
+      <div class="page-hero">
+        <div class="hero-accent-overlay"></div>
+        <div class="hero-inner">
+          <q-btn flat round dense icon="arrow_back" @click="handleBack" class="back-btn">
+            <q-tooltip>Go Back</q-tooltip>
+          </q-btn>
+          <div class="hero-icon-wrap">
+            <q-icon name="edit_note" size="28px" color="white" />
+          </div>
+          <div>
+            <h1 class="page-title">Edit Item</h1>
+            <div class="page-subtitle">Update item details, images, and category</div>
+          </div>
+        </div>
       </div>
 
-      <!-- Form -->
+      <!-- Form Card -->
       <div class="form-card">
         <q-form @submit.prevent="onSubmit" @reset="onReset" ref="myForm">
+
           <!-- Item Details Section -->
           <div class="form-section">
-            <div class="section-title">Item Details</div>
+            <div class="section-header">
+              <div class="section-icon-wrap details-icon">
+                <q-icon name="description" size="20px" color="white" />
+              </div>
+              <div class="section-title">Item Details</div>
+            </div>
 
             <div class="form-row">
               <div class="form-field">
-                <label class="field-label">Item Name</label>
-                <q-input
-                  v-model="item.name"
-                  outlined
-                  dense
-                  :rules="[(val) => (val && val.length > 0) || 'Name is required.']"
-                  hide-bottom-space
-                />
+                <label class="field-label">
+                  <q-icon name="label" size="16px" class="label-icon" />
+                  Item Name
+                </label>
+                <q-input v-model="item.name" outlined dense
+                  :rules="[(val) => (val && val.length > 0) || 'Name is required.']" hide-bottom-space
+                  class="dark-input" />
               </div>
               <div class="form-field">
-                <label class="field-label">Category</label>
-                <q-select
-                  dense
-                  v-model="item.category"
-                  :options="categories"
-                  hide-bottom-space
-                  use-input
-                  outlined
-                  clearable
-                />
+                <label class="field-label">
+                  <q-icon name="category" size="16px" class="label-icon" />
+                  Category
+                </label>
+                <q-select dense v-model="item.category" :options="categories" hide-bottom-space use-input outlined
+                  clearable class="dark-input" />
               </div>
             </div>
 
             <div class="form-field">
-              <label class="field-label">Description</label>
+              <label class="field-label">
+                <q-icon name="notes" size="16px" class="label-icon" />
+                Description
+              </label>
               <div class="wysiwyg-editor">
                 <div class="editor-toolbar">
-                  <q-btn flat dense size="sm" @click="execCommand('bold')" icon="format_bold">
+                  <q-btn flat dense size="sm" @click="execCommand('bold')" icon="format_bold" class="toolbar-btn">
                     <q-tooltip>Bold</q-tooltip>
                   </q-btn>
-                  <q-btn flat dense size="sm" @click="execCommand('italic')" icon="format_italic">
+                  <q-btn flat dense size="sm" @click="execCommand('italic')" icon="format_italic" class="toolbar-btn">
                     <q-tooltip>Italic</q-tooltip>
                   </q-btn>
-                  <q-btn flat dense size="sm" @click="execCommand('underline')" icon="format_underlined">
+                  <q-btn flat dense size="sm" @click="execCommand('underline')" icon="format_underlined"
+                    class="toolbar-btn">
                     <q-tooltip>Underline</q-tooltip>
                   </q-btn>
-                  <q-btn flat dense size="sm" @click="execCommand('insertUnorderedList')" icon="format_list_bulleted">
+                  <div class="toolbar-divider"></div>
+                  <q-btn flat dense size="sm" @click="execCommand('insertUnorderedList')" icon="format_list_bulleted"
+                    class="toolbar-btn">
                     <q-tooltip>Bullet List</q-tooltip>
                   </q-btn>
-                  <q-btn flat dense size="sm" @click="execCommand('insertOrderedList')" icon="format_list_numbered">
+                  <q-btn flat dense size="sm" @click="execCommand('insertOrderedList')" icon="format_list_numbered"
+                    class="toolbar-btn">
                     <q-tooltip>Numbered List</q-tooltip>
                   </q-btn>
                 </div>
-                <div
-                  class="editor-content"
-                  contenteditable="true"
-                  @input="onEditorInput"
-                  ref="editorRef"
-                  data-placeholder="Enter item description..."
-                ></div>
+                <div class="editor-content" contenteditable="true" @input="onEditorInput" ref="editorRef"
+                  data-placeholder="Enter item description..."></div>
               </div>
-              <div v-if="!item.description" class="field-error">Description is required.</div>
+              <div v-if="!item.description" class="field-error">
+                <q-icon name="error_outline" size="14px" class="q-mr-xs" />
+                Description is required.
+              </div>
             </div>
           </div>
 
           <!-- Images Section -->
           <div class="form-section">
-            <div class="section-title">Item Images</div>
+            <div class="section-header">
+              <div class="section-icon-wrap images-icon">
+                <q-icon name="photo_library" size="20px" color="white" />
+              </div>
+              <div class="section-title">Item Images</div>
+              <div v-if="item.images && item.images.length > 0" class="image-count-badge">
+                {{ item.images.length }} image{{ item.images.length !== 1 ? 's' : '' }}
+              </div>
+            </div>
 
             <!-- Existing Images -->
             <div v-if="item.images && item.images.length > 0" class="images-grid">
               <div v-for="image in item.images" :key="image.id" class="image-item">
                 <div class="image-wrapper">
                   <img :src="image.path_thumbnail || image.path_url" class="image-preview" />
-                  <q-badge v-if="image.is_primary" color="primary" class="primary-badge">Primary</q-badge>
+                  <div class="image-overlay">
+                    <q-badge v-if="image.is_primary" class="primary-badge">
+                      <q-icon name="star" size="12px" class="q-mr-xs" />
+                      Primary
+                    </q-badge>
+                  </div>
                 </div>
                 <div class="image-actions">
-                  <q-btn
-                    v-if="!image.is_primary"
-                    flat
-                    dense
-                    color="primary"
-                    icon="star"
-                    size="sm"
-                    @click="setPrimaryImage(image)"
-                  >
+                  <q-btn v-if="!image.is_primary" flat dense icon="star_outline" size="sm"
+                    @click="setPrimaryImage(image)" class="img-action-btn primary-action">
                     <q-tooltip>Set as Primary</q-tooltip>
                   </q-btn>
-                  <q-btn
-                    flat
-                    dense
-                    color="negative"
-                    icon="delete"
-                    size="sm"
-                    @click="deleteImage(image)"
-                  >
+                  <q-btn flat dense icon="delete_outline" size="sm" @click="deleteImage(image)"
+                    class="img-action-btn delete-action">
                     <q-tooltip>Delete</q-tooltip>
                   </q-btn>
                 </div>
@@ -110,33 +128,21 @@
 
             <!-- Upload New Images -->
             <div class="upload-area">
-              <q-file
-                v-model="newImages"
-                label="Add new images"
-                outlined
-                dense
-                multiple
-                accept="image/*"
-                class="full-width"
-              >
+              <div class="upload-icon-wrap">
+                <q-icon name="cloud_upload" size="32px" color="white" />
+              </div>
+              <div class="upload-text">Drop images here or click to upload</div>
+              <q-file v-model="newImages" label="Browse files" outlined dense multiple accept="image/*"
+                class="upload-input">
                 <template v-slot:prepend>
-                  <q-icon name="cloud_upload" />
+                  <q-icon name="attach_file" />
                 </template>
               </q-file>
 
               <div v-if="previewNewImages.length > 0" class="preview-grid">
                 <div v-for="(file, index) in previewNewImages" :key="index" class="preview-item">
                   <img :src="previewUrl(file)" class="preview-image" />
-                  <q-btn
-                    flat
-                    dense
-                    round
-                    color="negative"
-                    icon="close"
-                    size="xs"
-                    class="remove-btn"
-                    @click="removeNewImage(index)"
-                  />
+                  <q-btn flat dense round icon="close" size="xs" class="remove-btn" @click="removeNewImage(index)" />
                 </div>
               </div>
             </div>
@@ -144,15 +150,12 @@
 
           <!-- Actions -->
           <div class="form-actions">
-            <q-btn
-              label="Update"
-              type="submit"
-              color="primary"
-              unelevated
-              :loading="isSubmitting"
-              class="submit-btn"
-            />
-            <q-btn label="Cancel" outline color="grey-7" @click="handleBack" class="cancel-btn" />
+            <q-btn label="Cancel" flat @click="handleBack" class="cancel-btn">
+              <q-icon name="close" size="18px" class="q-mr-xs" />
+            </q-btn>
+            <q-btn label="Update Item" type="submit" unelevated :loading="isSubmitting" class="submit-btn">
+              <q-icon name="check" size="18px" class="q-mr-xs" />
+            </q-btn>
           </div>
         </q-form>
       </div>
@@ -396,65 +399,171 @@ const handleBack = () => {
 </script>
 
 <style scoped lang="scss">
+// ── Dark theme tokens (matching DashboardLayout and ProfilePage) ─────────────
+$dark-base: #0f172a;
+$dark-card: #1e293b;
+$dark-elevated: #273549;
+$border: rgba(255, 255, 255, 0.08);
+$border-strong: rgba(255, 255, 255, 0.12);
+$accent: #6366f1;
+$accent-2: #7c3aed;
+$green: #10b981;
+$green-2: #059669;
+$blue: #3b82f6;
+$red: #ef4444;
+$yellow: #fbbf24;
+$white: #ffffff;
+$muted: rgba(255, 255, 255, 0.5);
+$muted-2: rgba(255, 255, 255, 0.3);
+
+// ── Page ─────────────────────────────────────────────────────────────────────
 .edit-page {
-  background: #f8f9fa;
   min-height: 100vh;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  color: $white;
 }
 
 .edit-container {
-  max-width: 1000px;
+  max-width: 960px;
   margin: 0 auto;
-  padding: 24px;
+  padding: 28px 24px 60px;
 }
 
-.page-header {
-  display: flex;
-  align-items: center;
-  gap: 16px;
+// ── Hero Header ──────────────────────────────────────────────────────────────
+.page-hero {
+  position: relative;
+  background: $dark-card;
+  border-radius: 20px;
+  border: 1px solid $border;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
   margin-bottom: 32px;
 }
 
+.hero-accent-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.18) 0%, rgba(124, 58, 237, 0.10) 60%, transparent 100%);
+  pointer-events: none;
+}
+
+.hero-inner {
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding: 32px 36px;
+  gap: 16px;
+}
+
 .back-btn {
-  background: #ffffff;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s ease;
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.08) !important;
+  color: $white !important;
+  transition: all 0.25s ease;
+  flex-shrink: 0;
 
   &:hover {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    background: rgba(255, 255, 255, 0.14) !important;
+    transform: translateX(-3px);
   }
 }
 
-.page-title {
-  font-size: 28px;
-  font-weight: 700;
-  color: #1a1a1a;
-  margin: 0;
-}
-
-.form-card {
-  background: #ffffff;
+.hero-icon-wrap {
+  width: 56px;
+  height: 56px;
   border-radius: 16px;
-  padding: 32px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  background: linear-gradient(135deg, $accent 0%, $accent-2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 24px rgba(99, 102, 241, 0.4);
+  flex-shrink: 0;
 }
 
+.page-title {
+  font-size: 26px;
+  font-weight: 800;
+  color: $white !important;
+  margin: 0 0 4px;
+  letter-spacing: -0.3px;
+  line-height: 1.2;
+}
+
+.page-subtitle {
+  font-size: 14px;
+  color: $muted;
+  font-weight: 500;
+}
+
+// ── Form Card ────────────────────────────────────────────────────────────────
+.form-card {
+  background: $dark-card;
+  border: 1px solid $border;
+  border-radius: 20px;
+  padding: 40px;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.25);
+}
+
+// ── Form Sections ────────────────────────────────────────────────────────────
 .form-section {
   margin-bottom: 40px;
+  padding-bottom: 40px;
+  border-bottom: 1px solid $border;
 
-  &:last-child {
+  &:last-of-type {
+    border-bottom: none;
     margin-bottom: 0;
+    padding-bottom: 0;
+  }
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 28px;
+}
+
+.section-icon-wrap {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  &.details-icon {
+    background: linear-gradient(135deg, $accent 0%, $accent-2 100%);
+    box-shadow: 0 4px 16px rgba(99, 102, 241, 0.3);
+  }
+
+  &.images-icon {
+    background: linear-gradient(135deg, $green 0%, $green-2 100%);
+    box-shadow: 0 4px 16px rgba(16, 185, 129, 0.3);
   }
 }
 
 .section-title {
   font-size: 18px;
-  font-weight: 600;
-  color: #1a1a1a;
-  margin-bottom: 24px;
-  padding-bottom: 12px;
-  border-bottom: 2px solid #f0f0f0;
+  font-weight: 700;
+  color: $white;
+  flex: 1;
 }
 
+.image-count-badge {
+  background: rgba($accent, 0.15);
+  color: #a5b4fc;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: 1px solid rgba($accent, 0.2);
+}
+
+// ── Form Fields ──────────────────────────────────────────────────────────────
 .form-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -471,50 +580,121 @@ const handleBack = () => {
 }
 
 .field-label {
-  display: block;
-  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
   font-weight: 600;
-  color: #333;
-  margin-bottom: 8px;
+  color: $muted;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
 }
 
+.label-icon {
+  color: $muted-2;
+}
+
+.dark-input {
+  :deep(.q-field__control) {
+    background: $dark-elevated !important;
+    border-color: $border !important;
+    border-radius: 12px !important;
+    color: $white !important;
+    transition: all 0.2s ease;
+  }
+
+  :deep(.q-field__control:hover) {
+    border-color: $border-strong !important;
+  }
+
+  :deep(.q-field--focused .q-field__control) {
+    border-color: rgba($accent, 0.5) !important;
+    box-shadow: 0 0 0 3px rgba($accent, 0.1);
+  }
+
+  :deep(.q-field__native) {
+    color: $white !important;
+    font-size: 14px;
+  }
+
+  :deep(.q-field__native::placeholder) {
+    color: $muted-2 !important;
+  }
+
+  :deep(.q-field__label) {
+    color: $muted !important;
+  }
+
+  :deep(.q-field__marginal) {
+    color: $muted !important;
+  }
+}
+
+// ── WYSIWYG Editor ───────────────────────────────────────────────────────────
 .wysiwyg-editor {
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
+  border: 1px solid $border;
+  border-radius: 14px;
   overflow: hidden;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
+  background: $dark-elevated;
 
   &:focus-within {
-    border-color: var(--q-primary);
-    box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.1);
+    border-color: rgba($accent, 0.5);
+    box-shadow: 0 0 0 3px rgba($accent, 0.1);
   }
 }
 
 .editor-toolbar {
   display: flex;
-  gap: 4px;
-  padding: 8px;
-  background: #f5f5f5;
-  border-bottom: 1px solid #e0e0e0;
+  align-items: center;
+  gap: 2px;
+  padding: 10px 12px;
+  background: rgba(0, 0, 0, 0.2);
+  border-bottom: 1px solid $border;
+}
+
+.toolbar-btn {
+  color: $muted !important;
+  border-radius: 8px !important;
+  width: 34px;
+  height: 34px;
+  transition: all 0.15s ease;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.08) !important;
+    color: $white !important;
+  }
+}
+
+.toolbar-divider {
+  width: 1px;
+  height: 20px;
+  background: $border;
+  margin: 0 6px;
 }
 
 .editor-content {
-  min-height: 150px;
-  padding: 16px;
+  min-height: 160px;
+  padding: 18px 20px;
   outline: none;
-  line-height: 1.6;
+  line-height: 1.7;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 14px;
 
   &:empty:before {
     content: attr(data-placeholder);
-    color: #999;
+    color: $muted-2;
   }
 
-  ul, ol {
+  ul,
+  ol {
     padding-left: 20px;
   }
 
   strong {
     font-weight: 700;
+    color: $white;
   }
 
   em {
@@ -527,26 +707,33 @@ const handleBack = () => {
 }
 
 .field-error {
-  color: #c10015;
+  display: flex;
+  align-items: center;
+  color: $red;
   font-size: 12px;
-  margin-top: 4px;
+  font-weight: 500;
+  margin-top: 8px;
 }
 
+// ── Images Grid ──────────────────────────────────────────────────────────────
 .images-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 16px;
   margin-bottom: 24px;
 }
 
 .image-item {
-  background: #f5f5f5;
-  border-radius: 12px;
+  background: $dark-elevated;
+  border: 1px solid $border;
+  border-radius: 14px;
   overflow: hidden;
-  transition: all 0.3s ease;
+  transition: all 0.25s ease;
 
   &:hover {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border-color: rgba($accent, 0.3);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    transform: translateY(-2px);
   }
 }
 
@@ -560,49 +747,138 @@ const handleBack = () => {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  transition: transform 0.3s ease;
+
+  .image-item:hover & {
+    transform: scale(1.05);
+  }
+}
+
+.image-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 50%, rgba(0, 0, 0, 0.6) 100%);
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-start;
+  padding: 10px;
 }
 
 .primary-badge {
-  position: absolute;
-  top: 8px;
-  right: 8px;
+  background: linear-gradient(135deg, $yellow 0%, #f59e0b 100%) !important;
+  color: #1a1a1a !important;
+  font-weight: 700;
+  font-size: 11px;
+  padding: 4px 10px;
+  border-radius: 8px;
 }
 
 .image-actions {
   display: flex;
   justify-content: center;
-  gap: 8px;
-  padding: 12px;
-  background: #ffffff;
-  border-top: 1px solid #e0e0e0;
+  gap: 4px;
+  padding: 10px;
+  background: rgba(0, 0, 0, 0.15);
+  border-top: 1px solid $border;
 }
 
+.img-action-btn {
+  border-radius: 8px !important;
+  transition: all 0.2s ease;
+
+  &.primary-action {
+    color: $yellow !important;
+
+    &:hover {
+      background: rgba($yellow, 0.12) !important;
+    }
+  }
+
+  &.delete-action {
+    color: $red !important;
+
+    &:hover {
+      background: rgba($red, 0.12) !important;
+    }
+  }
+}
+
+// ── Upload Area ──────────────────────────────────────────────────────────────
 .upload-area {
-  border: 2px dashed #e0e0e0;
-  border-radius: 12px;
-  padding: 24px;
-  background: #fafafa;
-  transition: all 0.3s ease;
+  border: 2px dashed rgba($accent, 0.25);
+  border-radius: 16px;
+  padding: 32px 24px;
+  background: rgba($accent, 0.04);
+  text-align: center;
+  transition: all 0.25s ease;
 
   &:hover {
-    border-color: #bdbdbd;
-    background: #f5f5f5;
+    border-color: rgba($accent, 0.45);
+    background: rgba($accent, 0.08);
+  }
+}
+
+.upload-icon-wrap {
+  width: 64px;
+  height: 64px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, rgba($accent, 0.2) 0%, rgba($accent-2, 0.12) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 16px;
+}
+
+.upload-text {
+  font-size: 14px;
+  color: $muted;
+  margin-bottom: 16px;
+  font-weight: 500;
+}
+
+.upload-input {
+  max-width: 280px;
+  margin: 0 auto;
+
+  :deep(.q-field__control) {
+    background: $dark-elevated !important;
+    border-color: $border !important;
+    border-radius: 12px !important;
+    color: $white !important;
+  }
+
+  :deep(.q-field__native) {
+    color: $white !important;
+    font-size: 13px;
+  }
+
+  :deep(.q-field__label) {
+    color: $muted !important;
+  }
+
+  :deep(.q-field__marginal) {
+    color: $muted !important;
   }
 }
 
 .preview-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
   gap: 12px;
-  margin-top: 16px;
+  margin-top: 20px;
 }
 
 .preview-item {
   position: relative;
   aspect-ratio: 1;
-  border-radius: 8px;
+  border-radius: 12px;
   overflow: hidden;
-  border: 1px solid #e0e0e0;
+  border: 1px solid $border;
+  transition: all 0.2s ease;
+
+  &:hover {
+    border-color: rgba($accent, 0.3);
+  }
 }
 
 .preview-image {
@@ -613,84 +889,114 @@ const handleBack = () => {
 
 .remove-btn {
   position: absolute;
-  top: 4px;
-  right: 4px;
-  background: rgba(255, 255, 255, 0.95);
+  top: 6px;
+  right: 6px;
+  width: 24px !important;
+  height: 24px !important;
+  background: rgba($red, 0.85) !important;
+  color: $white !important;
+  border-radius: 8px !important;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: $red !important;
+    transform: scale(1.1);
+  }
 }
 
+// ── Form Actions ─────────────────────────────────────────────────────────────
 .form-actions {
   display: flex;
   gap: 12px;
   justify-content: flex-end;
-  padding-top: 24px;
-  border-top: 1px solid #f0f0f0;
+  padding-top: 32px;
+  margin-top: 8px;
+  border-top: 1px solid $border;
 }
 
 .submit-btn {
   height: 48px;
   padding: 0 32px;
-  font-size: 16px;
-  font-weight: 600;
-  border-radius: 10px;
-  transition: all 0.3s ease;
+  font-size: 14px;
+  font-weight: 700;
+  border-radius: 14px;
+  background: linear-gradient(135deg, $accent 0%, $accent-2 100%) !important;
+  color: $white !important;
+  letter-spacing: 0.3px;
+  transition: all 0.25s ease;
+  box-shadow: 0 4px 16px rgba(99, 102, 241, 0.3);
 
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(25, 118, 210, 0.3);
+    box-shadow: 0 8px 24px rgba(99, 102, 241, 0.45);
+  }
+
+  &:active {
+    transform: translateY(0);
   }
 }
 
 .cancel-btn {
   height: 48px;
-  padding: 0 32px;
-  font-size: 16px;
+  padding: 0 28px;
+  font-size: 14px;
   font-weight: 600;
-  border-radius: 10px;
-  transition: all 0.3s ease;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.06) !important;
+  color: $muted !important;
+  border: 1px solid $border !important;
+  transition: all 0.25s ease;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.1) !important;
+    color: $white !important;
+    border-color: $border-strong !important;
+  }
 }
 
+// ── Responsive ───────────────────────────────────────────────────────────────
 @media (max-width: 768px) {
   .edit-container {
-    padding: 16px;
+    padding: 16px 12px 48px;
   }
 
-  .page-header {
-    margin-bottom: 24px;
+  .hero-inner {
+    flex-wrap: wrap;
+    padding: 24px 20px;
+    gap: 12px;
   }
 
   .page-title {
-    font-size: 24px;
+    font-size: 22px;
   }
 
   .form-card {
-    padding: 24px;
+    padding: 24px 20px;
+    border-radius: 16px;
   }
 
   .form-row {
     grid-template-columns: 1fr;
-    gap: 16px;
-  }
-
-  .form-field {
-    margin-bottom: 16px;
+    gap: 0;
   }
 
   .images-grid {
-    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-    gap: 16px;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 12px;
   }
 
   .upload-area {
-    padding: 16px;
+    padding: 24px 16px;
   }
 
   .form-actions {
-    flex-direction: column;
+    flex-direction: column-reverse;
   }
 
   .submit-btn,
   .cancel-btn {
     width: 100%;
+    justify-content: center;
   }
 }
 </style>
