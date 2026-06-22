@@ -8,7 +8,7 @@ use OwenIt\Auditing\Contracts\Auditable;
 
 class StoreUserMenu extends Model  implements Auditable
 {
-    use HasFactory;
+    use HasFactory, \App\Traits\Obfuscate\OptimusId;
     use \OwenIt\Auditing\Auditable;
 
     protected $table = 'store_user_menu';
@@ -18,7 +18,12 @@ class StoreUserMenu extends Model  implements Auditable
         'store_menu_id'
     ];
 
+     
+    protected $appends = ['optimus_id'];
+
     public function storeMenu(){
         return $this->hasOne(StoreMenu::class, 'id', 'store_menu_id');
     }
+
+    
 }

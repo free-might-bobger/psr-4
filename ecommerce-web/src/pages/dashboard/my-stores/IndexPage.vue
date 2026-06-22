@@ -53,7 +53,7 @@
           <q-td :props="props">
             <div class="action-buttons">
               <q-btn unelevated dense color="secondary" icon="people"
-                :to="`${$route.path}/${props.row.optimus_id}/users`" size="md" class="q-mr-xs">
+                :to="`${$route.path}/${props.row.optimus_id}/store-users`" size="md" class="q-mr-xs">
                 <q-tooltip>User Management</q-tooltip>
               </q-btn>
               <q-btn unelevated dense color="primary" icon="edit_note" :to="`${$route.path}/${props.row.optimus_id}`"

@@ -84,7 +84,7 @@
                                             <q-icon name="person" size="20px" color="white" />
                                         </div>
                                         <div class="user-details">
-                                                {{ user.email || `User #${user.id}` }}
+                                            {{ user.email || `User #${user.id}` }}
                                             <div class="user-email">{{ user.store?.name || 'No Store' }}</div>
                                         </div>
                                     </div>
@@ -114,7 +114,7 @@
                                 <td class="table-cell">
                                     <div class="actions-cell">
                                         <q-btn v-if="user.is_verified" unelevated dense icon="manage_accounts"
-                                            :to="`${$route.path}/access`" class="action-btn access-btn">
+                                            :to="`${$route.path}/menus`" class="action-btn access-btn">
                                             <q-tooltip>Manage access permissions</q-tooltip>
                                         </q-btn>
                                         <q-btn unelevated dense icon="delete_forever" @click="handleDeleteUser(user)"
@@ -258,10 +258,10 @@ entityQuery.value = {
     },
 };
 
-const typedResult = computed(() => {
+const typedResult = computed<StoreUser[]>(() => {
     // Based on the store structure, result.value should directly be the array
     if (result.value && Array.isArray(result.value)) {
-        return result.value;
+        return result.value as StoreUser[];
     }
     return [];
 });

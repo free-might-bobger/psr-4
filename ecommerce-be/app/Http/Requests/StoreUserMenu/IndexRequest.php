@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Requests\StoreUser;
+namespace App\Http\Requests\StoreUserMenu;
 
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -24,7 +24,7 @@ class IndexRequest extends FormRequest
     public function rules()
     {
         return [
-            'with' => 'sometimes|string'
+          
         ];
     }
 }

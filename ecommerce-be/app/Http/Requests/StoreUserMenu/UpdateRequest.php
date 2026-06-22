@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests\StoreUser;
+namespace App\Http\Requests\StoreUserMenu;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class IndexRequest extends FormRequest
+class UpdateRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,7 +24,8 @@ class IndexRequest extends FormRequest
     public function rules()
     {
         return [
-            'with' => 'sometimes|string'
+            'store_user_id' => 'sometimes|integer',
+            'store_menu_id' => 'sometimes|integer',
         ];
     }
 }

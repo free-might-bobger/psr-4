@@ -277,5 +277,24 @@ export interface StoreUser {
   store_id: number;
   store?: StoreInterface;
   optimus_id: number;
+  is_verified: boolean;
+  user?: {
+    optimus_id: number;
+    email: string;
+  };
+}
+
+export interface StoreUserMenu {
+  id: number;
+  optimus_id: number;
+  store_user_id: number;
+  store_menu_id: number;
+  storeMenu?: {
+    id: number;
+    name: string;
+    icon: string;
+    value: number;
+    label: string;
+  };
 }
 

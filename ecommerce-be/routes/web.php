@@ -59,6 +59,7 @@ Route::group(['middleware' => 'auth:api', 'myTransactionMiddleware'], function (
 Route::group(['middleware' => 'auth:api'], function () {
   Route::post('invite-user', [StoreUserController::class, 'inviteUser']);
   Route::resource('store-users', StoreUserController::class);
+  Route::resource('store-user-menus', StoreUserMenuController::class);
   Route::resource('store-menu-access', StoreMenuAccessController::class);
   Route::resource('my-stores', MyStoreController::class)->middleware(['storeAdminMiddleware', 'myStoreMiddleware']);
   Route::resource('shared-store-access', SharedStoreAccessController::class);

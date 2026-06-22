@@ -63,8 +63,9 @@ export default [
           children: [
             { path: '', component: () => import('src/pages/dashboard/my-stores/IndexPage.vue') },
             { path: ':id', component: () => import('src/pages/dashboard/my-stores/EditPage.vue') },
-            { path: ':id/users', component: () => import('src/pages/dashboard/my-stores/users/IndexPage.vue') },
-            { path: ':id/users/invite-users', component: () => import('src/pages/dashboard/my-stores/users/InvitePage.vue') },
+            { path: ':id/store-users', component: () => import('src/pages/dashboard/my-stores/store-users/IndexPage.vue') },
+            { path: ':id/store-users/invite-users', component: () => import('src/pages/dashboard/my-stores/store-users/InvitePage.vue') },
+            { path: ':id/store-users/menus', component: () => import('src/pages/dashboard/my-stores/store-users/MenusPage.vue') },
             { path: ':id/items', component: () => import('src/pages/dashboard/my-stores/items/IndexPage.vue') },
             { path: ':id/items/:itemId', component: () => import('src/pages/dashboard/my-stores/items/EditPage.vue') },
             { path: ':id/items/:itemId/item-prices', component: () => import('src/pages/dashboard/my-stores/items/ItemPrice.vue') },
