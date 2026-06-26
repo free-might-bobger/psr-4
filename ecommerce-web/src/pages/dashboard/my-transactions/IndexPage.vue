@@ -173,7 +173,7 @@
 <script setup lang="ts">
 import { onRequest, firstPage, previousPage, nextPage, lastPage, update } from 'boot/axios-call';
 import { useCommonStore } from 'src/stores/common';
-import { onMounted, ref, watch } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import { storeToRefs } from 'pinia';
 import { CustomerTransactionRow } from 'src/boot/interfaces';
 import { TRANSACTION_STATUS } from 'src/boot/constant';
@@ -194,7 +194,11 @@ entityQuery.value = {
   },
 };
 
-const typedResult = result as unknown as CustomerTransactionRow[];
+const typedResult = computed<CustomerTransactionRow[]>(() => {
+  const data = result.value;
+  if (!Array.isArray(data)) return [];
+  return data.filter((item): item is CustomerTransactionRow => item != null);
+});
 
 const columns = [
   {

@@ -60,25 +60,31 @@
         </q-form>
 
         <div class="users-section q-mt-lg">
-            <div class="section-title">Store Users</div>
-            <div v-if="typedResult.length === 0" class="empty-state">
-                <q-icon name="group_off" size="48px" color="white" />
-                <div class="empty-title">No users found</div>
+            <div class="section-title">Store User Menus</div>
+            <div v-if="storeUserMenus.length === 0" class="empty-state">
+                <q-icon name="menu_off" size="48px" color="white" />
+                <div class="empty-title">No assigned menus found</div>
             </div>
             <div v-else class="users-grid">
-                <q-card v-for="user in typedResult" :key="user.optimus_id" flat class="user-card"
-                    :class="{ selected: selectedStoreUser?.optimus_id === user.optimus_id }"
-                    @click="selectedStoreUser = user">
+                <q-card v-for="group in groupedStoreUserMenus"
+                    :key="group.storeUser?.id || group.items[0]?.store_user_id" flat class="user-card">
                     <q-card-section class="user-card-section">
                         <div class="user-avatar">
                             <q-icon name="person" size="24px" color="white" />
                         </div>
                         <div class="user-info">
-                            <div class="user-name">{{ user.email || `User #${user.id}` }}</div>
-                            <div class="user-meta" v-if="user.store?.name">{{ user.store.name }}</div>
+                            <div class="user-name">{{ group.storeUser?.user?.email || 'Unknown User' }}</div>
+                            <div class="menu-tags">
+                                <div v-for="item in group.items" :key="item.optimus_id" class="menu-tag">
+                                    <q-icon :name="item.storeMenu?.icon || 'tag'" size="14px" class="menu-tag-icon" />
+                                    <span>{{ item.storeMenu?.name || 'Unknown Menu' }}</span>
+                                    <q-btn flat dense icon="close" @click="handleDeleteStoreUserMenu(item)"
+                                        class="menu-tag-delete" size="10px">
+                                        <q-tooltip>Remove this menu</q-tooltip>
+                                    </q-btn>
+                                </div>
+                            </div>
                         </div>
-                        <q-icon v-if="selectedStoreUser?.optimus_id === user.optimus_id" name="check_circle"
-                            class="selected-icon" size="24px" />
                     </q-card-section>
                 </q-card>
             </div>
@@ -88,12 +94,13 @@
 
 <script setup lang="ts">
 import { onMounted, ref, computed } from 'vue';
-import { onRequest, get, create } from 'src/boot/axios-call';
+import { onRequest, get, create, deleteEntity } from 'src/boot/axios-call';
 import { storeToRefs } from 'pinia';
 import { useCommonStore } from 'src/stores/common';
 import { validateRequired } from 'src/boot/validators';
+import { Notify, Loading } from 'quasar';
 import type { QForm } from 'quasar';
-import type { StoreUser } from 'src/boot/interfaces';
+import type { StoreUser, StoreUserMenu } from 'src/boot/interfaces';
 
 const useCommon = useCommonStore();
 const { pagination, result, entityQuery } = storeToRefs(useCommon);
@@ -117,10 +124,23 @@ const typedResult = computed<StoreUser[]>(() => {
 });
 
 const storeMenus = ref<{ id: number; optimus_id: number; name: string; icon: string; label: string; value: number }[]>([]);
+const storeUserMenus = ref<StoreUserMenu[]>([]);
 const selectedStoreUser = ref<StoreUser | null>(null);
 const selectedStoreMenu = ref<{ id: number; optimus_id: number; name: string; icon: string; label: string; value: number } | null>(null);
 const submitting = ref(false);
 const myForm = ref<QForm | null>(null);
+
+const groupedStoreUserMenus = computed(() => {
+    const groups: Record<number, { storeUser: StoreUserMenu['storeUser']; items: StoreUserMenu[] }> = {};
+    for (const item of storeUserMenus.value) {
+        const userId = item.store_user_id;
+        if (!groups[userId]) {
+            groups[userId] = { storeUser: item.storeUser, items: [] };
+        }
+        groups[userId].items.push(item);
+    }
+    return Object.values(groups);
+});
 
 const getStoreMenus = async () => {
     const response = await get(
@@ -134,6 +154,24 @@ const getStoreMenus = async () => {
     );
     if (response && typeof response === 'object' && 'data' in response) {
         storeMenus.value = (response as { data: { data: { storeMenus: { id: number; optimus_id: number; name: string; icon: string; label: string; value: number }[] } } }).data.data.storeMenus;
+    }
+};
+
+const getStoreUserMenus = async () => {
+    const response = await get(
+        {
+            entity: 'store-user-menus',
+            query: {
+                orderBy: 'created_at:desc',
+                page: 1,
+                limit: 100,
+                with: 'storeMenu,storeUser.user,storeUser.store'
+            },
+        },
+        false
+    );
+    if (response && typeof response === 'object' && 'data' in response) {
+        storeUserMenus.value = (response as { data: { data: StoreUserMenu[] } }).data.data;
     }
 };
 
@@ -158,6 +196,40 @@ const onSubmit = async () => {
     selectedStoreUser.value = null;
     selectedStoreMenu.value = null;
     myForm.value?.resetValidation();
+    getStoreUserMenus();
+};
+
+const handleDeleteStoreUserMenu = (item: StoreUserMenu) => {
+    const label = item.storeMenu?.name || 'Unknown Menu';
+    Notify.create({
+        message: `Delete ${label}?`,
+        type: 'negative',
+        actions: [
+            {
+                label: 'No',
+                color: 'white',
+                handler: () => {
+                    /* ... */
+                },
+            },
+            {
+                label: 'Yes',
+                color: 'yellow',
+                handler: async () => {
+                    Loading.show();
+                    const result = await deleteEntity({
+                        entity: 'store-user-menus',
+                        optimus_id: item.optimus_id,
+                        label: label,
+                    });
+                    if (result === true) {
+                        getStoreUserMenus();
+                    }
+                    Loading.hide();
+                },
+            },
+        ],
+    });
 };
 
 onMounted(() => {
@@ -165,6 +237,7 @@ onMounted(() => {
     entityQuery.value.query.page = 1;
     onRequest(entityQuery.value, true);
     getStoreMenus();
+    getStoreUserMenus();
 });
 </script>
 
@@ -429,6 +502,55 @@ $muted: rgba(255, 255, 255, 0.5);
 .selected-icon {
     color: $green;
     flex-shrink: 0;
+}
+
+.delete-btn {
+    background: rgba(239, 68, 68, 0.15) !important;
+    color: #f87171 !important;
+    border-radius: 8px !important;
+    width: 32px !important;
+    height: 32px !important;
+    flex-shrink: 0;
+
+    &:hover {
+        background: rgba(239, 68, 68, 0.3) !important;
+    }
+}
+
+.menu-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.menu-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid $border;
+    border-radius: 20px;
+    padding: 4px 10px 4px 12px;
+    font-size: 12px;
+    color: $white;
+    font-weight: 500;
+}
+
+.menu-tag-icon {
+    color: $muted;
+}
+
+.menu-tag-delete {
+    color: $muted !important;
+    width: 18px !important;
+    height: 18px !important;
+    padding: 0 !important;
+    margin-left: 2px;
+
+    &:hover {
+        color: #f87171 !important;
+    }
 }
 
 @media (max-width: 768px) {

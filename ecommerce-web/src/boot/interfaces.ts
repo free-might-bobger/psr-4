@@ -282,6 +282,20 @@ export interface StoreUser {
     optimus_id: number;
     email: string;
   };
+  storeUserMenu?: {
+    id: number;
+    optimus_id: number;
+    store_user_id: number;
+    store_menu_id: number;
+    store_menu?: {
+      id: number;
+      optimus_id: number;
+      name: string;
+      icon: string;
+      label: string;
+      value: number;
+    };
+  }[];
 }
 
 export interface StoreUserMenu {
@@ -291,10 +305,21 @@ export interface StoreUserMenu {
   store_menu_id: number;
   storeMenu?: {
     id: number;
+    optimus_id: number;
     name: string;
     icon: string;
     value: number;
     label: string;
+  };
+  storeUser?: {
+    id: number;
+    optimus_id: number;
+    email: string;
+    user?: {
+      id: number;
+      optimus_id: number;
+      email: string;
+    };
   };
 }
 

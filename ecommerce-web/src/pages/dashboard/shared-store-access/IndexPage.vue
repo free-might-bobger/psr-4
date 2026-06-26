@@ -80,8 +80,7 @@
               <tr class="table-header">
                 <th class="table-header-cell">Store Information</th>
                 <th class="table-header-cell">Contact</th>
-                <th class="table-header-cell">Access Level</th>
-                <th class="table-header-cell">Actions</th>
+                <th class="table-header-cell" style="text-align: right;">Actions</th>
               </tr>
             </thead>
 
@@ -95,9 +94,7 @@
                       <q-icon name="store" size="20px" color="white" />
                     </div>
                     <div class="store-details">
-                      <router-link :to="`${$route.path}/${store.optimus_id}`" class="store-name">
-                        {{ store.store?.name || 'Unknown Store' }}
-                      </router-link>
+                      {{ store.store?.name || 'Unknown Store' }}
                       <div class="store-meta">Store ID: {{ store.store?.optimus_id || store.id }}</div>
                     </div>
                   </div>
@@ -113,21 +110,14 @@
                   </div>
                 </td>
 
-                <!-- Access Level -->
-                <td class="table-cell">
-                  <div class="access-badge">
-                    <q-icon name="admin_panel_settings" size="14px" class="access-icon" />
-                    <span>Item Management</span>
-                  </div>
-                </td>
-
                 <!-- Actions -->
-                <td class="table-cell">
-                  <div class="actions-cell">
-                    <q-btn unelevated dense icon="shopping_bag" :to="`${$route.path}/${store.store?.optimus_id}/items`"
-                      class="action-btn items-btn">
-                      <q-tooltip>Manage items</q-tooltip>
+                <td class="table-cell" style="text-align: right;">
+                  <div class="actions-cell" style="justify-content: flex-end;">
+                    <q-btn v-for="menu in store.storeUserMenu" :key="menu.store_menu?.id || menu.id" unelevated dense
+                      :icon="menu.store_menu?.icon || 'menu'" class="action-btn menu-btn"  :to="`${$route.path}/${store.store?.optimus_id}/${menu.store_menu?.name}`">
+                      <q-tooltip>{{ menu.store_menu?.name || 'Menu' }}</q-tooltip>
                     </q-btn>
+                    <span v-if="!store.storeUserMenu?.length" class="no-menu-text">No menus</span>
                   </div>
                 </td>
               </tr>
@@ -636,6 +626,24 @@ $muted-2: rgba(255, 255, 255, 0.3);
       transform: translateY(-1px);
     }
   }
+
+  &.menu-btn {
+    background: rgba($blue, 0.15) !important;
+    color: $blue !important;
+    border: 1px solid rgba($blue, 0.2) !important;
+
+    &:hover {
+      background: rgba($blue, 0.25) !important;
+      border-color: rgba($blue, 0.4) !important;
+      transform: translateY(-1px);
+    }
+  }
+}
+
+.no-menu-text {
+  font-size: 12px;
+  color: $muted;
+  font-style: italic;
 }
 
 // ── Pagination ───────────────────────────────────────────────────────────────
@@ -907,7 +915,7 @@ import { onRequest, firstPage, previousPage, nextPage, lastPage } from 'src/boot
 import { storeToRefs } from 'pinia';
 import { useCommonStore } from 'src/stores/common';
 import { onDeleteEntity } from 'src/boot/services';
-import { StoreRow } from 'src/boot/interfaces';
+import { StoreUser } from 'src/boot/interfaces';
 
 const useCommon = useCommonStore();
 const { pagination, result, entityQuery } = storeToRefs(useCommon);
@@ -921,11 +929,11 @@ entityQuery.value = {
     orderBy: 'created_at:desc',
     page: pagination.value.page,
     limit: 10,
-    with: 'store'
+    with: 'store,storeUserMenu.storeMenu'
   },
 };
 
-const typedResult = result as unknown as StoreRow[];
+const typedResult = result as unknown as StoreUser[];
 
 const columns = [
   {
@@ -933,7 +941,7 @@ const columns = [
     required: true,
     label: 'Name',
     align: 'left' as const,
-    field: (v: StoreRow) => v.name,
+    field: (v: StoreUser) => v.store?.name,
     sortable: true
   },
   {
@@ -941,7 +949,7 @@ const columns = [
     required: true,
     label: 'Mobile',
     align: 'left' as const,
-    field: (v: StoreRow) => v.mobile,
+    field: (v: StoreUser) => v.store?.mobile,
     sortable: true
   },
   {
@@ -953,8 +961,8 @@ const columns = [
   }
 ];
 
-const handleDeleteStore = (store: StoreRow) => {
-  onDeleteEntity('stores', store.optimus_id, store.name);
+const handleDeleteStore = (store: StoreUser) => {
+  onDeleteEntity('stores', store.optimus_id, store.email);
 };
 
 const handlePageChange = (page: number) => {

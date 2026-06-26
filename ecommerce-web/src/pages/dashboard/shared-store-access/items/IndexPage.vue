@@ -1,212 +1,139 @@
 <template>
   <div class="items-page-container">
-
-    <!-- Hero Header -->
-    <div class="page-hero q-mb-xl">
-      <div class="hero-accent-overlay"></div>
-      <div class="hero-inner">
-        <div class="hero-left">
-          <q-btn flat round dense icon="arrow_back" @click="router.back()" class="back-btn">
+    <!-- Header Section -->
+    <div class="page-header q-mb-lg">
+      <div class="header-bg-accent"></div>
+      <div class="header-content">
+        <div class="header-left">
+          <q-btn flat round dense icon="arrow_back" @click="router.back()" class="header-back-btn">
             <q-tooltip>Back to Store</q-tooltip>
           </q-btn>
-          <div class="hero-icon-wrap">
-            <q-icon name="inventory_2" size="28px" color="white" />
+          <div class="header-icon-wrap">
+            <q-icon name="inventory_2" size="26px" color="white" />
           </div>
           <div>
-            <h1 class="page-title">{{ store.name || 'Store Items' }}</h1>
+            <h2 class="page-title">{{ store.name || 'Store Items' }}</h2>
             <div class="page-subtitle">Manage store items and inventory</div>
           </div>
         </div>
-        <div class="hero-right">
-          <div class="search-input-wrap">
-            <q-icon name="search" size="20px" class="search-icon" />
-            <q-input v-model="search" placeholder="Search items..." outlined dense clearable debounce="1000"
-              class="search-field" hide-bottom-space />
-          </div>
-          <div class="category-select-wrap">
-            <q-icon name="category" size="20px" class="search-icon" />
-            <q-select outlined v-model="selectedCategory" :options="categories" label="Category" hide-bottom-space
-              use-input dense clearable class="category-field" @update:model-value="handleCategoryChange">
-              <template v-slot:append>
-                <q-icon v-if="selectedCategory" name="close" @click.stop.prevent="handleCategoryChange('')"
-                  class="cursor-pointer" />
-              </template>
-            </q-select>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Statistics Cards -->
-    <div class="stats-section q-mb-lg">
-      <div class="stats-grid">
-        <div class="stat-card">
-          <div class="stat-icon-wrap items-icon">
-            <q-icon name="inventory_2" size="24px" color="white" />
-          </div>
-          <div class="stat-content">
-            <div class="stat-number">{{ typedResult.length }}</div>
-            <div class="stat-label">Total Items</div>
-          </div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-icon-wrap store-icon">
-            <q-icon name="store" size="24px" color="white" />
-          </div>
-          <div class="stat-content">
-            <div class="stat-number">{{ store.name ? 1 : 0 }}</div>
-            <div class="stat-label">Active Store</div>
-          </div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-icon-wrap category-icon">
-            <q-icon name="category" size="24px" color="white" />
-          </div>
-          <div class="stat-content">
-            <div class="stat-number">{{ categories.length }}</div>
-            <div class="stat-label">Categories</div>
-          </div>
+        <div class="header-actions">
+          <q-input v-model="search" placeholder="Search items..." outlined dense clearable debounce="1000"
+            class="search-input">
+            <template v-slot:prepend>
+              <q-icon name="search" color="grey-5" />
+            </template>
+          </q-input>
+          <q-select outlined v-model="selectedCategory" :options="categories" label="Category" hide-bottom-space
+            use-input dense clearable class="category-select" @update:model-value="handleCategoryChange">
+            <template v-slot:prepend>
+              <q-icon name="category" color="grey-5" />
+            </template>
+            <template v-slot:append>
+              <q-icon v-if="selectedCategory" name="close" @click.stop.prevent="handleCategoryChange('')"
+                class="cursor-pointer" color="grey-5" />
+            </template>
+          </q-select>
         </div>
       </div>
     </div>
 
     <!-- Desktop Table View -->
     <div class="desktop-only">
-      <!-- Empty State -->
-      <div v-if="typedResult.length === 0" class="empty-state-section">
-        <div class="empty-card">
-          <div class="empty-icon-wrap">
-            <q-icon name="inventory_2" size="64px" color="white" />
-          </div>
-          <div class="empty-title">No items found</div>
-          <div class="empty-subtitle">Try adjusting your search criteria or add new items</div>
+      <div v-if="typedResult.length === 0" class="empty-state-desktop">
+        <div class="empty-icon-wrap">
+          <q-icon name="inventory_2" size="48px" color="white" />
         </div>
+        <div class="empty-title q-mt-md">No items found</div>
+        <div class="empty-subtitle q-mt-sm">Try adjusting your search criteria</div>
       </div>
+      <q-table v-else flat :rows="typedResult" :columns="columns" row-key="optimus_id" class="items-table"
+        :rows-per-page-options="[0]" hide-pagination>
+        <template v-slot:body-cell-name="props">
+          <q-td :props="props">
+            <router-link :to="`${$route.path}/${props.row.optimus_id}`" class="item-name-link">
+              {{ props.row.name }}
+            </router-link>
+          </q-td>
+        </template>
 
-      <!-- Items Table -->
-      <div v-else class="items-table-section">
-        <div class="table-card">
-          <table class="items-table">
-            <thead>
-              <tr class="table-header">
-                <th class="table-header-cell">Item Name</th>
-                <th class="table-header-cell actions-header">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="item in typedResult" :key="item.optimus_id" class="table-row">
-                <td class="table-cell">
-                  <div class="item-info-cell">
-                    <div class="item-avatar">
-                      <q-icon name="inventory_2" size="20px" color="white" />
-                    </div>
-                    <router-link :to="`${$route.path}/${item.optimus_id}`" class="item-name-link">
-                      {{ item.name }}
-                    </router-link>
-                  </div>
-                </td>
-                <td class="table-cell">
-                  <div class="actions-cell">
-                    <q-btn unelevated dense icon="attach_money"
-                      :to="`${$route.path}/${item.optimus_id}/item-prices?filters=store_id:${store.optimus_id}`"
-                      class="action-btn prices-btn">
-                      <q-tooltip>Item Prices</q-tooltip>
-                    </q-btn>
-                    <q-btn unelevated dense icon="edit_note"
-                      :to="`${$route.path}/${item.optimus_id}?filters=store_id:${store.optimus_id}`"
-                      class="action-btn edit-btn">
-                      <q-tooltip>Edit Item</q-tooltip>
-                    </q-btn>
-                    <q-btn unelevated dense icon="delete_forever" @click="handleDeleteItem(item)"
-                      class="action-btn delete-btn">
-                      <q-tooltip>Delete Item</q-tooltip>
-                    </q-btn>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+        <template v-slot:body-cell-actions="props">
+          <q-td :props="props">
+            <div class="action-buttons">
+              <q-btn unelevated dense icon="attach_money"
+                :to="`${$route.path}/${props.row.optimus_id}/item-prices?filters=store_id:${store.optimus_id}`"
+                size="md" class="tbl-btn tbl-btn--green">
+                <q-tooltip>Item Prices</q-tooltip>
+              </q-btn>
+              <q-btn unelevated dense icon="edit_note"
+                :to="`${$route.path}/${props.row.optimus_id}?filters=store_id:${store.optimus_id}`" size="md"
+                class="tbl-btn tbl-btn--indigo">
+                <q-tooltip>Edit Item</q-tooltip>
+              </q-btn>
+              <q-btn unelevated dense icon="delete_forever" @click="handleDeleteItem(props.row)" size="md"
+                class="tbl-btn tbl-btn--red">
+                <q-tooltip>Delete Item</q-tooltip>
+              </q-btn>
+            </div>
+          </q-td>
+        </template>
 
-        <!-- Pagination -->
-        <div class="pagination-section">
-          <div class="pagination-card">
+        <template v-slot:bottom>
+          <div class="table-pagination">
             <div class="pagination-info">
-              <span class="pagination-text">
-                Showing {{ pagination.from || 1 }}-{{ pagination.to || typedResult.length }}
-                of {{ pagination.rowsNumber || typedResult.length }} items
-              </span>
+              Showing {{ pagination.from }} &ndash; {{ pagination.to }} of {{ pagination.rowsNumber }} items
             </div>
             <div class="pagination-controls">
               <q-btn v-if="pagination.lastPage > 2" flat round dense icon="first_page" :disable="pagination.page === 1"
-                @click="goToFirstPage" class="pagination-btn">
-                <q-tooltip>First page</q-tooltip>
-              </q-btn>
-              <q-btn flat round dense icon="chevron_left" :disable="pagination.page === 1" @click="goToPreviousPage"
-                class="pagination-btn">
-                <q-tooltip>Previous page</q-tooltip>
-              </q-btn>
-              <div class="page-indicator">
-                <span class="current-page">{{ pagination.page }}</span>
-                <span class="page-separator">/</span>
-                <span class="total-pages">{{ pagination.lastPage }}</span>
-              </div>
+                @click="goToFirstPage" />
+              <q-btn flat round dense icon="chevron_left" :disable="pagination.page === 1" @click="goToPreviousPage" />
+              <span class="page-number">{{ pagination.page }} / {{ pagination.lastPage }}</span>
               <q-btn flat round dense icon="chevron_right" :disable="pagination.page === pagination.lastPage"
-                @click="goToNextPage" class="pagination-btn">
-                <q-tooltip>Next page</q-tooltip>
-              </q-btn>
+                @click="goToNextPage" />
               <q-btn v-if="pagination.lastPage > 2" flat round dense icon="last_page"
-                :disable="pagination.page === pagination.lastPage" @click="goToLastPage" class="pagination-btn">
-                <q-tooltip>Last page</q-tooltip>
-              </q-btn>
+                :disable="pagination.page === pagination.lastPage" @click="goToLastPage" />
             </div>
           </div>
-        </div>
-      </div>
+        </template>
+      </q-table>
     </div>
 
     <!-- Mobile Card View -->
     <div class="mobile-only">
-      <!-- Empty State -->
-      <div v-if="typedResult.length === 0" class="empty-state-mobile">
-        <div class="empty-icon-mobile">
-          <q-icon name="inventory_2" size="48px" color="white" />
+      <div v-if="typedResult.length === 0" class="empty-state">
+        <div class="empty-icon-wrap">
+          <q-icon name="inventory_2" size="40px" color="white" />
         </div>
-        <div class="empty-title-mobile">No items found</div>
-        <div class="empty-subtitle-mobile">Try adjusting your search criteria</div>
+        <div class="empty-title q-mt-md">No items found</div>
       </div>
-
-      <!-- Item Cards -->
-      <div v-else class="items-cards-mobile">
-        <q-card v-for="item in typedResult" :key="item.optimus_id" flat class="item-card-mobile q-mb-md">
-          <q-card-section class="item-card-header">
-            <div class="item-avatar-mobile">
-              <q-icon name="inventory_2" size="24px" color="white" />
+      <div v-else class="items-cards">
+        <div v-for="item in typedResult" :key="item.optimus_id" class="item-card q-mb-sm">
+          <div class="mobile-card-accent"></div>
+          <div class="mobile-card-body">
+            <div class="item-card-header">
+              <div class="item-card-title">
+                <div class="card-item-icon">
+                  <q-icon name="inventory_2" size="16px" color="white" />
+                </div>
+                <router-link :to="`${$route.path}/${item.optimus_id}`" class="item-name-link">
+                  {{ item.name }}
+                </router-link>
+              </div>
             </div>
-            <div class="item-info-mobile">
-              <router-link :to="`${$route.path}/${item.optimus_id}`" class="item-name-mobile">
-                {{ item.name }}
-              </router-link>
+            <div class="item-card-actions">
+              <q-btn unelevated dense icon="attach_money" label="Prices"
+                :to="`${$route.path}/${item.optimus_id}/item-prices?filters=store_id:${store.optimus_id}`"
+                class="action-btn-mobile action-btn-mobile--green" />
+              <q-btn unelevated dense icon="edit_note" label="Edit"
+                :to="`${$route.path}/${item.optimus_id}?filters=store_id:${store.optimus_id}`"
+                class="action-btn-mobile action-btn-mobile--indigo" />
+              <q-btn unelevated dense icon="delete_forever" label="Delete" @click="handleDeleteItem(item)"
+                class="action-btn-mobile action-btn-mobile--red" />
             </div>
-          </q-card-section>
-
-          <q-separator class="item-card-divider" />
-
-          <q-card-actions class="item-card-actions">
-            <q-btn unelevated icon="attach_money" label="Prices"
-              :to="`${$route.path}/${item.optimus_id}/item-prices?filters=store_id:${store.optimus_id}`"
-              class="mobile-action-btn prices-btn-mobile" />
-            <q-btn unelevated icon="edit_note" label="Edit"
-              :to="`${$route.path}/${item.optimus_id}?filters=store_id:${store.optimus_id}`"
-              class="mobile-action-btn edit-btn-mobile" />
-            <q-btn unelevated icon="delete_forever" label="Delete" @click="handleDeleteItem(item)"
-              class="mobile-action-btn delete-btn-mobile" />
-          </q-card-actions>
-        </q-card>
+          </div>
+        </div>
       </div>
-
       <!-- Mobile Pagination -->
-      <div v-if="typedResult.length > 0" class="mobile-pagination">
+      <div v-if="typedResult.length > 0" class="mobile-pagination q-mt-md">
         <q-pagination v-model="pagination.page" :max="pagination.lastPage" :max-pages="5" direction-links boundary-links
           color="primary" @update:model-value="handlePageChange" />
       </div>
@@ -359,7 +286,7 @@ const handleCategoryChange = (value: CategoryInterface | string | null) => {
 </script>
 
 <style scoped lang="scss">
-// ── Dark theme tokens (matching DashboardLayout and ProfilePage) ─────────────────
+// ── Dark theme tokens ──────────────────────────────────────────────────────
 $dark-base: #0f172a;
 $dark-card: #1e293b;
 $dark-elevated: #273549;
@@ -368,28 +295,21 @@ $accent: #6366f1;
 $accent-2: #7c3aed;
 $green: #10b981;
 $green-2: #059669;
-$blue: #3b82f6;
-$blue-2: #2563eb;
-$yellow: #fbbf24;
-$yellow-2: #f59e0b;
-$red: #ef4444;
-$red-2: #dc2626;
 $white: #ffffff;
 $muted: rgba(255, 255, 255, 0.5);
-$muted-2: rgba(255, 255, 255, 0.3);
 
-// ── Container ────────────────────────────────────────────────────────────────
+// ── Container ──────────────────────────────────────────────────────────────
 .items-page-container {
-  max-width: 1200px;
-  margin: 0 auto;
   padding: 28px 24px;
+  max-width: 1400px;
+  margin: 0 auto;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: $dark-base !important;
   color: $white;
-  position: relative;
 }
 
-// ── Hero Header ───────────────────────────────────────────────────────────────
-.page-hero {
+// ── Header ─────────────────────────────────────────────────────────────────
+.page-header {
   position: relative;
   background: $dark-card;
   border-radius: 20px;
@@ -398,412 +318,283 @@ $muted-2: rgba(255, 255, 255, 0.3);
   overflow: hidden;
 }
 
-.hero-accent-overlay {
+.header-bg-accent {
   position: absolute;
   inset: 0;
   background: linear-gradient(135deg, rgba(99, 102, 241, 0.18) 0%, rgba(124, 58, 237, 0.10) 60%, transparent 100%);
   pointer-events: none;
 }
 
-.hero-inner {
+.header-content {
   position: relative;
   display: flex;
-  align-items: center;
   justify-content: space-between;
-  padding: 32px 36px;
-  gap: 24px;
-}
-
-.hero-left {
-  display: flex;
   align-items: center;
-  gap: 16px;
-}
-
-.back-btn {
-  width: 44px;
-  height: 44px;
-  border-radius: 14px;
-  background: rgba(255, 255, 255, 0.08) !important;
-  color: $white !important;
-  transition: all 0.25s ease;
-  flex-shrink: 0;
-
-  &:hover {
-    background: rgba(255, 255, 255, 0.14) !important;
-    transform: translateX(-3px);
-  }
-}
-
-.hero-icon-wrap {
-  width: 56px;
-  height: 56px;
-  border-radius: 16px;
-  background: linear-gradient(135deg, $accent 0%, $accent-2 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 8px 24px rgba(99, 102, 241, 0.4);
-  flex-shrink: 0;
-}
-
-.page-title {
-  font-size: 26px;
-  font-weight: 800;
-  color: $white !important;
-  margin: 0 0 4px;
-  letter-spacing: -0.3px;
-  line-height: 1.2;
-}
-
-.page-subtitle {
-  font-size: 14px;
-  color: $muted;
-  font-weight: 500;
-}
-
-.hero-right {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  flex-shrink: 0;
-}
-
-.search-input-wrap,
-.category-select-wrap {
-  display: flex;
-  align-items: center;
-  background: $dark-elevated;
-  border: 1px solid $border;
-  border-radius: 14px;
-  padding: 4px 16px;
-  transition: all 0.2s ease;
-
-  &:focus-within {
-    border-color: rgba($accent, 0.4);
-    box-shadow: 0 0 0 3px rgba($accent, 0.1);
-  }
-}
-
-.search-input-wrap {
-  width: 240px;
-}
-
-.category-select-wrap {
-  width: 200px;
-}
-
-.search-icon {
-  color: $muted;
-  margin-right: 10px;
-  flex-shrink: 0;
-}
-
-.search-field,
-.category-field {
-  flex: 1;
-
-  :deep(.q-field__control) {
-    background: transparent !important;
-    border: none !important;
-    color: $white !important;
-  }
-
-  :deep(.q-field__native) {
-    color: $white !important;
-    font-size: 14px;
-    padding: 8px 0;
-  }
-
-  :deep(.q-field__native::placeholder) {
-    color: $muted !important;
-  }
-
-  :deep(.q-field__label) {
-    color: $muted !important;
-  }
-}
-
-// ── Statistics Section ─────────────────────────────────────────────────────────
-.stats-section {
-  margin-bottom: 32px;
-}
-
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
   gap: 20px;
+  padding: 24px 28px;
+  flex-wrap: wrap;
 }
 
-.stat-card {
-  background: $dark-card;
-  border: 1px solid $border;
-  border-radius: 16px;
-  padding: 24px;
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-  transition: all 0.2s ease;
-
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
-    border-color: rgba($accent, 0.2);
-  }
-}
-
-.stat-icon-wrap {
-  width: 48px;
-  height: 48px;
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-
-  &.items-icon {
-    background: linear-gradient(135deg, $accent 0%, $accent-2 100%);
-    box-shadow: 0 4px 16px rgba(99, 102, 241, 0.3);
-  }
-
-  &.store-icon {
-    background: linear-gradient(135deg, $green 0%, $green-2 100%);
-    box-shadow: 0 4px 16px rgba(16, 185, 129, 0.3);
-  }
-
-  &.category-icon {
-    background: linear-gradient(135deg, $blue 0%, $blue-2 100%);
-    box-shadow: 0 4px 16px rgba(59, 130, 246, 0.3);
-  }
-}
-
-.stat-content {
-  flex: 1;
-}
-
-.stat-number {
-  font-size: 28px;
-  font-weight: 800;
-  color: $white;
-  line-height: 1;
-  margin-bottom: 4px;
-}
-
-.stat-label {
-  font-size: 12px;
-  color: $muted;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-// ── Empty States ──────────────────────────────────────────────────────────────
-.empty-state-section {
-  display: flex;
-  justify-content: center;
-  padding: 80px 24px;
-}
-
-.empty-card {
-  background: $dark-card;
-  border: 1px solid $border;
-  border-radius: 24px;
-  padding: 60px 48px;
-  text-align: center;
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
-  max-width: 480px;
-}
-
-.empty-icon-wrap {
-  width: 120px;
-  height: 120px;
-  border-radius: 24px;
-  background: linear-gradient(135deg, rgba($accent, 0.2) 0%, rgba($accent-2, 0.1) 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto 24px;
-  box-shadow: 0 8px 32px rgba($accent, 0.2);
-}
-
-.empty-title {
-  font-size: 24px;
-  font-weight: 800;
-  color: $white;
-  margin-bottom: 8px;
-}
-
-.empty-subtitle {
-  font-size: 14px;
-  color: $muted;
-  line-height: 1.5;
-}
-
-// ── Table Section ────────────────────────────────────────────────────────────
-.items-table-section {
-  background: $dark-card;
-  border: 1px solid $border;
-  border-radius: 20px;
-  overflow: hidden;
-  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.25);
-}
-
-.table-card {
-  border-radius: 20px;
-  overflow: hidden;
-}
-
-.items-table {
-  width: 100%;
-  background: transparent;
-  border-collapse: collapse;
-
-  thead {
-    background: $dark-elevated;
-  }
-
-  th {
-    font-size: 12px;
-    font-weight: 700;
-    color: $muted;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    padding: 16px 20px;
-    text-align: left;
-    border: none;
-
-    &.actions-header {
-      text-align: center;
-    }
-  }
-
-  tbody tr {
-    transition: background-color 0.2s ease;
-    border-bottom: 1px solid $border;
-
-    &:hover {
-      background: rgba($accent, 0.04);
-    }
-
-    &:last-child {
-      border-bottom: none;
-    }
-  }
-
-  td {
-    padding: 20px;
-    border: none;
-    vertical-align: middle;
-  }
-}
-
-// ── Item Info Cell ────────────────────────────────────────────────────────────
-.item-info-cell {
+.header-left {
   display: flex;
   align-items: center;
   gap: 14px;
 }
 
-.item-avatar {
-  width: 40px;
-  height: 40px;
-  border-radius: 12px;
+.header-back-btn {
+  color: $muted !important;
+  border: 1px solid $border !important;
+  border-radius: 10px !important;
+  transition: color 0.2s, background 0.2s !important;
+
+  &:hover {
+    color: $white !important;
+    background: rgba(255, 255, 255, 0.07) !important;
+  }
+}
+
+.header-icon-wrap {
+  width: 50px;
+  height: 50px;
+  border-radius: 14px;
   background: linear-gradient(135deg, $accent 0%, $accent-2 100%);
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+  box-shadow: 0 4px 16px rgba(99, 102, 241, 0.4);
   flex-shrink: 0;
 }
 
-.item-name-link {
-  font-size: 14px;
-  font-weight: 700;
-  color: #a5b4fc;
-  text-decoration: none;
-  transition: color 0.2s ease;
-  display: block;
-  line-height: 1.3;
+.page-title {
+  font-size: 22px !important;
+  font-weight: 800 !important;
+  color: $white !important;
+  margin: 0 0 3px !important;
+  letter-spacing: -0.3px;
+  line-height: 1.2;
+}
 
-  &:hover {
-    color: $accent;
+.page-subtitle {
+  font-size: 13px;
+  color: $muted;
+  font-weight: 500;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+// ── Dark field mixin shared by search + category ───────────────────────────
+%dark-field {
+  :deep(.q-field__control) {
+    background: $dark-elevated !important;
+    border-radius: 12px !important;
+  }
+
+  :deep(.q-field__native),
+  :deep(.q-field__input) {
+    color: $white !important;
+  }
+
+  :deep(.q-field__label) {
+    color: $muted !important;
+  }
+
+  :deep(.q-field__prepend .q-icon),
+  :deep(.q-field__append .q-icon) {
+    color: $muted !important;
+  }
+
+  :deep(.q-field--outlined .q-field__control:before) {
+    border-color: $border !important;
+  }
+
+  :deep(.q-field--outlined:hover .q-field__control:before) {
+    border-color: rgba(99, 102, 241, 0.4) !important;
+  }
+
+  :deep(.q-field--focused .q-field__control:before) {
+    border-color: $accent !important;
   }
 }
 
-// ── Actions Cell ──────────────────────────────────────────────────────────────
-.actions-cell {
+.search-input {
+  @extend %dark-field;
+  min-width: 240px;
+  max-width: 340px;
+}
+
+.category-select {
+  @extend %dark-field;
+  min-width: 180px;
+  max-width: 260px;
+}
+
+// ── Empty states ───────────────────────────────────────────────────────────
+.empty-state-desktop,
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 20px;
+  text-align: center;
+  background: $dark-card;
+  border-radius: 20px;
+  border: 1px solid $border;
+}
+
+.empty-icon-wrap {
+  width: 80px;
+  height: 80px;
+  border-radius: 24px;
+  background: linear-gradient(135deg, $accent 0%, $accent-2 100%);
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  box-shadow: 0 8px 24px rgba(99, 102, 241, 0.35);
 }
 
-.action-btn {
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
-  font-size: 16px;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  transition: all 0.2s ease;
+.empty-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: $white;
+}
 
-  &.prices-btn {
-    background: rgba($green, 0.15) !important;
-    color: $green !important;
-    border: 1px solid rgba($green, 0.2) !important;
+.empty-subtitle {
+  font-size: 14px;
+  color: $muted;
+}
 
-    &:hover {
-      background: rgba($green, 0.25) !important;
-      border-color: rgba($green, 0.4) !important;
-      transform: translateY(-1px);
-    }
+// ── Desktop table ──────────────────────────────────────────────────────────
+.items-table {
+  width: 100%;
+
+  :deep(.q-table__container) {
+    background: $dark-card !important;
+    border: 1px solid $border !important;
+    border-radius: 20px !important;
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.25) !important;
+    overflow: hidden !important;
   }
 
-  &.edit-btn {
-    background: rgba($blue, 0.15) !important;
-    color: $blue !important;
-    border: 1px solid rgba($blue, 0.2) !important;
-
-    &:hover {
-      background: rgba($blue, 0.25) !important;
-      border-color: rgba($blue, 0.4) !important;
-      transform: translateY(-1px);
-    }
+  :deep(.q-table) {
+    border: none !important;
   }
 
-  &.delete-btn {
-    background: rgba($red, 0.15) !important;
-    color: $red !important;
-    border: 1px solid rgba($red, 0.2) !important;
+  :deep(.q-table td),
+  :deep(.q-table th) {
+    border-right: none !important;
+  }
 
-    &:hover {
-      background: rgba($red, 0.25) !important;
-      border-color: rgba($red, 0.4) !important;
-      transform: translateY(-1px);
-    }
+  :deep(.q-table thead tr th) {
+    background: $dark-elevated !important;
+    color: $muted !important;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    padding: 16px 24px;
+    border-bottom: 1px solid $border !important;
+  }
+
+  :deep(.q-table tbody tr) {
+    background: $dark-card !important;
+  }
+
+  :deep(.q-table tbody tr td) {
+    background: transparent !important;
+    color: $white !important;
+    font-size: 14px;
+    padding: 16px 24px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04) !important;
+  }
+
+  :deep(.q-table tbody tr:last-child td) {
+    border-bottom: none !important;
+  }
+
+  :deep(.q-table tbody tr:hover) {
+    background: $dark-card !important;
+  }
+
+  :deep(.q-table__bottom) {
+    background: $dark-elevated !important;
+    border-top: 1px solid $border !important;
   }
 }
 
-// ── Pagination ───────────────────────────────────────────────────────────────
-.pagination-section {
-  padding: 20px 24px;
-  background: $dark-elevated;
-  border-top: 1px solid $border;
+.item-name-link {
+  text-decoration: none;
+  color: $white;
+  font-weight: 600;
+  font-size: 14px;
+  transition: color 0.2s;
+
+  &:hover {
+    color: #a5b4fc;
+  }
 }
 
-.pagination-card {
+.action-buttons {
   display: flex;
-  align-items: center;
+  gap: 6px;
+  justify-content: flex-end;
+}
+
+// Compact icon-only buttons in the table
+.tbl-btn {
+  border-radius: 9px !important;
+  width: 34px !important;
+  height: 34px !important;
+
+  &--green {
+    background: rgba(16, 185, 129, 0.15) !important;
+    color: #6ee7b7 !important;
+    border: 1px solid rgba(16, 185, 129, 0.3) !important;
+
+    &:hover {
+      background: rgba(16, 185, 129, 0.28) !important;
+      color: $white !important;
+    }
+  }
+
+  &--indigo {
+    background: rgba(99, 102, 241, 0.15) !important;
+    color: #a5b4fc !important;
+    border: 1px solid rgba(99, 102, 241, 0.3) !important;
+
+    &:hover {
+      background: rgba(99, 102, 241, 0.28) !important;
+      color: $white !important;
+    }
+  }
+
+  &--red {
+    background: rgba(239, 68, 68, 0.12) !important;
+    color: #fca5a5 !important;
+    border: 1px solid rgba(239, 68, 68, 0.25) !important;
+
+    &:hover {
+      background: rgba(239, 68, 68, 0.25) !important;
+      color: $white !important;
+    }
+  }
+}
+
+// ── Pagination footer ──────────────────────────────────────────────────────
+.table-pagination {
+  display: flex;
   justify-content: space-between;
+  align-items: center;
+  padding: 14px 24px;
+  color: $white;
 }
 
 .pagination-info {
-  flex: 1;
-}
-
-.pagination-text {
   font-size: 13px;
   color: $muted;
   font-weight: 500;
@@ -812,185 +603,133 @@ $muted-2: rgba(255, 255, 255, 0.3);
 .pagination-controls {
   display: flex;
   align-items: center;
-  gap: 8px;
-}
-
-.pagination-btn {
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
-  background: rgba(255, 255, 255, 0.06) !important;
-  color: $muted !important;
-  border: 1px solid $border !important;
-  transition: all 0.2s ease;
-
-  &:hover:not(:disabled) {
-    background: rgba(255, 255, 255, 0.12) !important;
-    color: $white !important;
-    border-color: rgba(255, 255, 255, 0.14) !important;
-  }
-
-  &:disabled {
-    opacity: 0.4;
-  }
-}
-
-.page-indicator {
-  display: flex;
-  align-items: center;
   gap: 4px;
-  margin: 0 12px;
-  font-size: 13px;
-  font-weight: 600;
+
+  :deep(.q-btn) {
+    color: $muted !important;
+
+    &:hover {
+      color: $white !important;
+      background: rgba(255, 255, 255, 0.06) !important;
+    }
+  }
 }
 
-.current-page {
+.page-number {
+  font-size: 14px;
   color: $white;
-}
-
-.page-separator {
-  color: $muted;
-}
-
-.total-pages {
-  color: $muted;
-}
-
-// ── Mobile Styles ─────────────────────────────────────────────────────────────
-.empty-state-mobile {
+  font-weight: 700;
+  min-width: 60px;
   text-align: center;
-  padding: 60px 24px;
+  padding: 0 8px;
 }
 
-.empty-icon-mobile {
-  width: 80px;
-  height: 80px;
-  border-radius: 20px;
-  background: linear-gradient(135deg, rgba($accent, 0.2) 0%, rgba($accent-2, 0.1) 100%);
+// ── Mobile cards ───────────────────────────────────────────────────────────
+.items-cards {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto 20px;
-  box-shadow: 0 6px 24px rgba($accent, 0.2);
+  flex-direction: column;
+  gap: 10px;
 }
 
-.empty-title-mobile {
-  font-size: 20px;
-  font-weight: 800;
-  color: $white;
-  margin-bottom: 6px;
-}
-
-.empty-subtitle-mobile {
-  font-size: 13px;
-  color: $muted;
-  margin-bottom: 24px;
-}
-
-// ── Mobile Item Cards ─────────────────────────────────────────────────────────
-.items-cards-mobile {
-  padding: 0 4px;
-}
-
-.item-card-mobile {
-  background: $dark-card !important;
-  border: 1px solid $border !important;
-  border-radius: 16px !important;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2) !important;
+.item-card {
+  position: relative;
+  background: $dark-card;
+  border: 1px solid $border;
+  border-radius: 16px;
   overflow: hidden;
-  transition: all 0.2s ease;
+  display: flex;
+  transition: box-shadow 0.2s, border-color 0.2s;
 
   &:hover {
-    border-color: rgba($accent, 0.2) !important;
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3) !important;
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.3);
+    border-color: rgba(99, 102, 241, 0.3);
   }
+}
+
+.mobile-card-accent {
+  width: 3px;
+  flex-shrink: 0;
+  background: linear-gradient(180deg, $accent 0%, $accent-2 100%);
+}
+
+.mobile-card-body {
+  flex: 1;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .item-card-header {
   display: flex;
   align-items: center;
-  gap: 14px;
-  padding: 20px 20px 16px;
 }
 
-.item-avatar-mobile {
-  width: 48px;
-  height: 48px;
-  border-radius: 14px;
+.item-card-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+}
+
+.card-item-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 9px;
   background: linear-gradient(135deg, $accent 0%, $accent-2 100%);
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
   flex-shrink: 0;
-}
-
-.item-info-mobile {
-  flex: 1;
-}
-
-.item-name-mobile {
-  font-size: 16px;
-  font-weight: 700;
-  color: #a5b4fc;
-  text-decoration: none;
-  display: block;
-  line-height: 1.3;
-
-  &:hover {
-    color: $accent;
-  }
-}
-
-.item-card-divider {
-  background: $border !important;
-  margin: 0;
+  box-shadow: 0 3px 10px rgba(99, 102, 241, 0.3);
 }
 
 .item-card-actions {
-  padding: 16px 20px;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
   gap: 8px;
-  display: flex;
+  padding-top: 12px;
+  border-top: 1px solid $border;
 }
 
-.mobile-action-btn {
-  flex: 1;
-  height: 40px !important;
+.action-btn-mobile {
   border-radius: 10px !important;
-  font-weight: 600 !important;
-  font-size: 13px !important;
-  transition: all 0.2s ease;
+  font-weight: 700 !important;
+  font-size: 12px !important;
+  height: 34px !important;
+  text-transform: none !important;
+  letter-spacing: 0 !important;
 
-  &.prices-btn-mobile {
-    background: rgba($green, 0.15) !important;
-    color: $green !important;
-    border: 1px solid rgba($green, 0.2) !important;
+  &--green {
+    background: rgba(16, 185, 129, 0.15) !important;
+    color: #6ee7b7 !important;
+    border: 1px solid rgba(16, 185, 129, 0.3) !important;
 
     &:hover {
-      background: rgba($green, 0.25) !important;
-      border-color: rgba($green, 0.4) !important;
+      background: rgba(16, 185, 129, 0.28) !important;
+      color: $white !important;
     }
   }
 
-  &.edit-btn-mobile {
-    background: rgba($blue, 0.15) !important;
-    color: $blue !important;
-    border: 1px solid rgba($blue, 0.2) !important;
+  &--indigo {
+    background: rgba(99, 102, 241, 0.15) !important;
+    color: #a5b4fc !important;
+    border: 1px solid rgba(99, 102, 241, 0.3) !important;
 
     &:hover {
-      background: rgba($blue, 0.25) !important;
-      border-color: rgba($blue, 0.4) !important;
+      background: rgba(99, 102, 241, 0.28) !important;
+      color: $white !important;
     }
   }
 
-  &.delete-btn-mobile {
-    background: rgba($red, 0.15) !important;
-    color: $red !important;
-    border: 1px solid rgba($red, 0.2) !important;
+  &--red {
+    background: rgba(239, 68, 68, 0.12) !important;
+    color: #fca5a5 !important;
+    border: 1px solid rgba(239, 68, 68, 0.25) !important;
 
     &:hover {
-      background: rgba($red, 0.25) !important;
-      border-color: rgba($red, 0.4) !important;
+      background: rgba(239, 68, 68, 0.25) !important;
+      color: $white !important;
     }
   }
 }
@@ -998,47 +737,93 @@ $muted-2: rgba(255, 255, 255, 0.3);
 .mobile-pagination {
   display: flex;
   justify-content: center;
-  padding: 24px 0;
+  padding: 16px 0 4px;
 }
 
-// ── Responsive Design ─────────────────────────────────────────────────────────
+// ── Responsive ─────────────────────────────────────────────────────────────
 @media (max-width: 768px) {
   .items-page-container {
     padding: 16px 12px;
   }
 
-  .hero-inner {
+  .header-content {
     flex-direction: column;
-    gap: 20px;
-    padding: 24px 20px;
+    align-items: stretch;
+    padding: 18px;
+    gap: 14px;
   }
 
-  .hero-left {
+  .header-left {
     flex-wrap: wrap;
-    gap: 12px;
-  }
-
-  .hero-right {
-    flex-direction: column;
-    width: 100%;
   }
 
   .page-title {
-    font-size: 22px;
+    font-size: 18px !important;
   }
 
-  .search-input-wrap,
-  .category-select-wrap {
-    width: 100%;
+  .header-actions {
+    flex-direction: column;
+    align-items: stretch;
   }
 
-  .stats-grid {
-    grid-template-columns: 1fr;
-    gap: 16px;
+  .search-input,
+  .category-select {
+    min-width: 0;
+    max-width: 100%;
   }
+}
+</style>
 
-  .item-card-mobile {
-    margin: 0 0 16px 0;
-  }
+<style>
+.items-page-container .items-table .q-table__container {
+  background: #1e293b !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 20px !important;
+  overflow: hidden !important;
+}
+
+.items-page-container .items-table .q-table,
+.items-page-container .items-table .q-table td,
+.items-page-container .items-table .q-table th,
+.items-page-container .items-table .q-table tr {
+  border: none !important;
+  outline: none !important;
+}
+
+.items-page-container .items-table thead tr th {
+  background: #273549 !important;
+  color: rgba(255, 255, 255, 0.55) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+.items-page-container .items-table tbody tr,
+.items-page-container .items-table tbody tr:hover {
+  background: #1e293b !important;
+}
+
+.items-page-container .items-table tbody tr td {
+  background: transparent !important;
+  color: #ffffff !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+}
+
+.items-page-container .items-table tbody tr:last-child td {
+  border-bottom: none !important;
+}
+
+.items-page-container .items-table .q-table__bottom {
+  background: #273549 !important;
+  color: #ffffff !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+.items-page-container .item-card {
+  background: #1e293b !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+.items-page-container .empty-state-desktop,
+.items-page-container .empty-state {
+  background: #1e293b !important;
 }
 </style>

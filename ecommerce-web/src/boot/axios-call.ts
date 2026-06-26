@@ -261,12 +261,12 @@ export async function create(
 
       return response.data.data;
     })
-    .catch(() => {
+    .catch((err) => {
       Loading.hide();
       Notify.create({
         position: 'bottom',
         type: 'negative',
-        message: 'An error has occured in creating ' + params.entity,
+        message: err.response?.data?.message || 'An error has occured in creating ' + params.entity,
       });
     });
 }
