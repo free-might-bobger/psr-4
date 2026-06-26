@@ -227,56 +227,6 @@ const totalEarnings = computed(() => {
   return total.toFixed(2);
 });
 
-const columns = [
-  {
-    name: 'store_name',
-    required: true,
-    label: 'Store Name',
-    align: 'left' as const,
-    field: (row: CustomerTransactionRow) => row.store?.name || 'N/A',
-    sortable: true
-  },
-  {
-    name: 'distance',
-    required: true,
-    label: 'Distance (km)',
-    align: 'left' as const,
-    field: 'distance',
-    sortable: true
-  },
-  {
-    name: 'delivery_charge',
-    required: true,
-    label: 'Delivery Charge',
-    align: 'left' as const,
-    field: 'delivery_charge',
-    sortable: true
-  },
-  {
-    name: 'total',
-    required: true,
-    label: 'Total',
-    align: 'left' as const,
-    field: 'total',
-    sortable: true
-  },
-  {
-    name: 'grand_total',
-    required: true,
-    label: 'Grand Total',
-    align: 'left' as const,
-    field: 'grand_total',
-    sortable: true
-  },
-  {
-    name: 'actions',
-    required: true,
-    label: 'Actions',
-    align: 'center' as const,
-    field: ''
-  }
-];
-
 const handlePageChange = (page: number) => {
   entityQuery.value.query.page = page;
   onRequest(entityQuery.value);
@@ -356,26 +306,6 @@ const debouncedRefreshLocation = () => {
   }, 5000);
 };
 
-// Helper functions for UI
-const getStatusColor = (status: string | undefined): string => {
-  if (!status) return 'grey';
-  const statusLower = status.toLowerCase();
-  if (statusLower.includes('completed') || statusLower.includes('delivered')) return 'positive';
-  if (statusLower.includes('preparing') || statusLower.includes('processing')) return 'warning';
-  if (statusLower.includes('cancelled') || statusLower.includes('rejected')) return 'warning';
-  if (statusLower.includes('refund') || statusLower.includes('rejected')) return 'negative';
-  return 'primary';
-};
-
-const formatDate = (dateString: string | undefined): string => {
-  if (!dateString) return '';
-  const date = new Date(dateString);
-  return date.toLocaleDateString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric'
-  });
-};
 </script>
 
 <style scoped lang="scss">

@@ -85,6 +85,8 @@ export default [
             { path: ':id/items/:itemId/item-prices', component: () => import('src/pages/dashboard/shared-store-access/items/ItemPrice.vue') },
             { path: ':id/transactions', component: () => import('src/pages/dashboard/shared-store-access/transactions/IndexPage.vue') },
             { path: ':id/transactions/:transactionId', component: () => import('src/pages/dashboard/shared-store-access/transactions/ShowPage.vue') },
+            { path: ':id/deliveries', component: () => import('src/pages/dashboard/shared-store-access/deliveries/IndexPage.vue') },
+            { path: ':id/deliveries/:deliveryId', component: () => import('src/pages/dashboard/shared-store-access/deliveries/ShowPage.vue') },
           ]
         },
         {
