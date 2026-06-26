@@ -1,100 +1,144 @@
 <template>
   <div class="delivery-detail-container">
-    <div class="page-header q-mb-lg">
-      <q-btn flat color="primary" icon="arrow_back" label="Back" @click="$router.back()" class="q-mr-md" />
-      <div class="header-title">
-        <h2 class="text-h4 text-weight-bold">Delivery Navigation</h2>
-        <div class="text-body2 text-grey-7">Navigate to store with Google Maps</div>
+    <!-- Hero Header -->
+    <div class="page-hero q-mb-xl">
+      <div class="hero-accent-overlay"></div>
+      <div class="hero-inner">
+        <q-btn flat round icon="arrow_back" color="white" class="back-btn" @click="$router.back()">
+          <q-tooltip>Back</q-tooltip>
+        </q-btn>
+        <div class="hero-center">
+          <div class="hero-icon-wrap">
+            <q-icon name="route" size="28px" color="white" />
+          </div>
+          <div>
+            <h1 class="page-title">Delivery Navigation</h1>
+            <div class="page-subtitle">Navigate to store and delivery locations</div>
+          </div>
+        </div>
+        <div class="hero-right-spacer"></div>
       </div>
     </div>
 
+    <!-- Loading State -->
     <div v-if="loading" class="loading-container">
-      <q-spinner size="50px" color="primary" />
-      <div class="text-body1 q-mt-md">Loading delivery details...</div>
+      <div class="empty-icon-wrap">
+        <q-spinner size="36px" color="white" />
+      </div>
+      <div class="empty-title q-mt-md">Loading delivery details…</div>
+      <div class="empty-subtitle">Getting store and location information</div>
     </div>
 
+    <!-- Error State -->
     <div v-else-if="error" class="error-container">
-      <q-icon name="error" size="50px" color="negative" />
-      <div class="text-h6 q-mt-md text-negative">{{ error }}</div>
+      <div class="error-icon-wrap">
+        <q-icon name="error_outline" size="40px" color="white" />
+      </div>
+      <div class="error-title q-mt-md">{{ error }}</div>
+      <q-btn flat label="Go Back" icon="arrow_back" color="white" class="q-mt-md" @click="$router.back()" />
     </div>
 
+    <!-- Main Content -->
     <div v-else-if="transaction" class="delivery-content">
-      <q-card flat bordered class="delivery-card q-mb-md">
-        <q-card-section class="card-header">
-          <div class="row items-center">
-            <q-icon name="store" size="32px" color="primary" class="q-mr-sm" />
-            <div>
-              <div class="text-h6 text-weight-bold">{{ transaction.store?.name || 'Unknown Store' }}</div>
-              <div class="text-body2 text-grey-7">Reference: {{ transaction.reference_id }}</div>
+      <!-- Left: Delivery Card -->
+      <div class="main-card">
+        <div class="card-accent-strip"></div>
+        <div class="card-body">
+          <!-- Header -->
+          <div class="card-header">
+            <div class="store-icon-wrap">
+              <q-icon name="store" size="24px" color="white" />
+            </div>
+            <div class="header-text">
+              <div class="store-name">{{ transaction.store?.name || 'Unknown Store' }}</div>
+              <div class="reference">Ref: {{ transaction.reference_id }}</div>
             </div>
           </div>
-        </q-card-section>
 
-        <q-separator />
-
-        <q-card-section class="card-content">
-          <div class="info-row">
-            <q-icon name="location_on" color="primary" class="q-mr-sm" />
-            <span class="info-label">Store Location:</span>
-            <span class="info-value">{{ transaction.store?.latitude }}, {{ transaction.store?.longitude }}</span>
+          <!-- Info Grid -->
+          <div class="info-grid">
+            <div class="info-item">
+              <div class="info-icon-wrap">
+                <q-icon name="location_on" size="18px" color="white" />
+              </div>
+              <div class="info-text">
+                <div class="info-label">Store Location</div>
+                <div class="info-value">{{ transaction.store?.latitude ?? 'N/A' }}, {{ transaction.store?.longitude ??
+                  'N/A' }}</div>
+              </div>
+            </div>
+            <div class="info-item">
+              <div class="info-icon-wrap info-icon-wrap--violet">
+                <q-icon name="local_shipping" size="18px" color="white" />
+              </div>
+              <div class="info-text">
+                <div class="info-label">Delivery Location</div>
+                <div class="info-value">{{ transaction.lat ?? 'N/A' }}, {{ transaction.lng ?? 'N/A' }}</div>
+              </div>
+            </div>
+            <div class="info-item">
+              <div class="info-icon-wrap info-icon-wrap--green">
+                <q-icon name="attach_money" size="18px" color="white" />
+              </div>
+              <div class="info-text">
+                <div class="info-label">Delivery Charge</div>
+                <div class="info-value highlight-value">{{ transaction.delivery_charge }}</div>
+              </div>
+            </div>
+            <div class="info-item">
+              <div class="info-icon-wrap info-icon-wrap--amber">
+                <q-icon name="receipt_long" size="18px" color="white" />
+              </div>
+              <div class="info-text">
+                <div class="info-label">Grand Total</div>
+                <div class="info-value highlight-value">{{ transaction.grand_total }}</div>
+              </div>
+            </div>
           </div>
-          <div class="info-row">
-            <q-icon name="local_shipping" color="primary" class="q-mr-sm" />
-            <span class="info-label">Delivery Location:</span>
-            <span class="info-value">{{ transaction.lat }}, {{ transaction.lng }}</span>
-          </div>
-          <div class="info-row">
-            <q-icon name="attach_money" color="primary" class="q-mr-sm" />
-            <span class="info-label">Delivery Charge:</span>
-            <span class="info-value">{{ transaction.delivery_charge }}</span>
-          </div>
-          <div class="info-row">
-            <q-icon name="receipt_long" color="primary" class="q-mr-sm" />
-            <span class="info-label">Total:</span>
-            <span class="info-value">{{ transaction.grand_total }}</span>
-          </div>
-        </q-card-section>
 
-        <q-separator />
+          <!-- Actions -->
+          <div class="card-actions">
+            <q-btn unelevated icon="store" label="Navigate to Store" size="md"
+              class="navigate-btn navigate-btn--primary" @click="navigateToStore">
+              <q-tooltip>Open Google Maps directions to store</q-tooltip>
+            </q-btn>
+            <q-btn unelevated icon="local_shipping" label="Navigate to Delivery" size="md"
+              class="navigate-btn navigate-btn--secondary" @click="navigateToDelivery">
+              <q-tooltip>Open Google Maps directions to delivery</q-tooltip>
+            </q-btn>
+          </div>
+        </div>
+      </div>
 
-        <q-card-section class="card-actions">
-          <q-btn
-            color="primary"
-            icon="store"
-            label="Navigate to Store"
-            size="lg"
-            class="full-width navigate-btn q-mb-sm"
-            @click="navigateToStore"
-          >
-            <q-tooltip>Open Google Maps to navigate to store</q-tooltip>
-          </q-btn>
-          <q-btn
-            color="secondary"
-            icon="local_shipping"
-            label="Navigate to Delivery"
-            size="lg"
-            class="full-width navigate-btn"
-            @click="navigateToDelivery"
-          >
-            <q-tooltip>Open Google Maps to navigate to delivery location</q-tooltip>
-          </q-btn>
-        </q-card-section>
-      </q-card>
-
-      <q-card flat bordered class="info-card">
-        <q-card-section>
-          <div class="text-subtitle1 text-weight-bold q-mb-sm">
-            <q-icon name="info" color="primary" class="q-mr-xs" />
-            Navigation Instructions
+      <!-- Right: Instructions -->
+      <div class="side-card">
+        <div class="card-body">
+          <div class="side-header">
+            <div class="info-icon-wrap">
+              <q-icon name="info" size="18px" color="white" />
+            </div>
+            <div class="side-title">Navigation Instructions</div>
           </div>
           <ul class="instruction-list">
-            <li>Your location is automatically retrieved when the page loads</li>
-            <li>Click "Navigate to Store" to open Google Maps for store navigation</li>
-            <li>Click "Navigate to Delivery" to open Google Maps for delivery navigation</li>
-            <li>Follow the navigation to reach your destination</li>
+            <li>
+              <span class="instruction-bullet"></span>
+              Your location is automatically retrieved when the page loads.
+            </li>
+            <li>
+              <span class="instruction-bullet"></span>
+              Click <strong>Navigate to Store</strong> to open Google Maps for store navigation.
+            </li>
+            <li>
+              <span class="instruction-bullet"></span>
+              Click <strong>Navigate to Delivery</strong> to open Google Maps for delivery navigation.
+            </li>
+            <li>
+              <span class="instruction-bullet"></span>
+              Follow the directions to reach your destination safely.
+            </li>
           </ul>
-        </q-card-section>
-      </q-card>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -132,7 +176,7 @@ async function fetchTransactionData() {
     const result = await show<TransactionDetail>({
       message: 'Getting transaction...',
       entity: 'all-transactions',
-      optimus_id: Number(route.params.id),
+      optimus_id: Number(route.params.deliveryId),
       query: {
         with: 'store',
       },
@@ -201,19 +245,103 @@ onMounted(async () => {
 </script>
 
 <style scoped lang="scss">
+// ── Dark theme tokens (matching DashboardLayout and ProfilePage) ──────────────
+$dark-base: #0f172a;
+$dark-card: #1e293b;
+$dark-elevated: #273549;
+$border: rgba(255, 255, 255, 0.08);
+$accent: #6366f1;
+$accent-2: #7c3aed;
+$green: #10b981;
+$amber: #f59e0b;
+$red: #ef4444;
+$white: #ffffff;
+$muted: rgba(255, 255, 255, 0.55);
+
 .delivery-detail-container {
-  padding: 24px;
-  max-width: 800px;
+  padding: 28px 24px;
+  max-width: 1000px;
   margin: 0 auto;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  color: $white;
 }
 
-.page-header {
+.page-hero {
+  position: relative;
+  background: $dark-card;
+  border-radius: 20px;
+  border: 1px solid $border;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+  margin-bottom: 32px;
+}
+
+.hero-accent-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.18) 0%, rgba(124, 58, 237, 0.10) 60%, transparent 100%);
+  pointer-events: none;
+}
+
+.hero-inner {
+  position: relative;
   display: flex;
   align-items: center;
+  justify-content: space-between;
+  padding: 28px 32px;
+  gap: 16px;
 }
 
-.header-title {
+.hero-center {
+  display: flex;
+  align-items: center;
+  gap: 18px;
   flex: 1;
+  justify-content: center;
+}
+
+.hero-icon-wrap {
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, $accent 0%, $accent-2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 24px rgba(99, 102, 241, 0.4);
+  flex-shrink: 0;
+}
+
+.page-title {
+  font-size: 26px;
+  font-weight: 800;
+  color: $white !important;
+  margin: 0 0 4px;
+  letter-spacing: -0.3px;
+  line-height: 1.2;
+}
+
+.page-subtitle {
+  font-size: 14px;
+  color: $muted;
+  font-weight: 500;
+}
+
+.back-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.06) !important;
+  border: 1px solid $border !important;
+  color: $white !important;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.12) !important;
+  }
+}
+
+.hero-right-spacer {
+  width: 44px;
 }
 
 .loading-container,
@@ -222,86 +350,304 @@ onMounted(async () => {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 60px 24px;
+  padding: 80px 24px;
+  text-align: center;
+  background: $dark-card;
+  border: 1px solid $border;
+  border-radius: 20px;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.25);
+}
+
+.empty-icon-wrap,
+.error-icon-wrap {
+  width: 80px;
+  height: 80px;
+  border-radius: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.empty-icon-wrap {
+  background: linear-gradient(135deg, $accent 0%, $accent-2 100%);
+  box-shadow: 0 8px 24px rgba(99, 102, 241, 0.35);
+}
+
+.error-icon-wrap {
+  background: linear-gradient(135deg, $red 0%, #f87171 100%);
+  box-shadow: 0 8px 24px rgba(239, 68, 68, 0.35);
+}
+
+.empty-title,
+.error-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: $white;
+}
+
+.empty-subtitle {
+  font-size: 14px;
+  color: $muted;
+  margin-top: 4px;
 }
 
 .delivery-content {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 20px;
+  align-items: start;
 }
 
-.delivery-card,
-.info-card {
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+.main-card,
+.side-card {
+  background: $dark-card;
+  border: 1px solid $border;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.25);
+  display: flex;
+}
+
+.card-accent-strip {
+  width: 4px;
+  flex-shrink: 0;
+  background: linear-gradient(180deg, $accent 0%, $accent-2 100%);
+}
+
+.card-body {
+  flex: 1;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
 }
 
 .card-header {
-  background: linear-gradient(135deg, #f5f7fa 0%, #ffffff 100%);
-  padding: 20px;
-}
-
-.card-content {
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.info-row {
   display: flex;
   align-items: center;
-  padding: 8px 0;
+  gap: 14px;
+}
+
+.store-icon-wrap {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, $accent 0%, $accent-2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 18px rgba(99, 102, 241, 0.35);
+  flex-shrink: 0;
+}
+
+.store-name {
+  font-size: 18px;
+  font-weight: 800;
+  color: $white;
+  letter-spacing: -0.2px;
+}
+
+.reference {
+  font-size: 13px;
+  color: $muted;
+  margin-top: 2px;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.info-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid $border;
+  border-radius: 14px;
+  padding: 14px;
+  transition: background 0.18s ease;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.06);
+  }
+}
+
+.info-icon-wrap {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, $accent 0%, $accent-2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 3px 10px rgba(99, 102, 241, 0.3);
+
+  &--violet {
+    background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+  }
+
+  &--green {
+    background: linear-gradient(135deg, #34d399 0%, $green 100%);
+  }
+
+  &--amber {
+    background: linear-gradient(135deg, #fbbf24 0%, $amber 100%);
+  }
+}
+
+.info-text {
+  min-width: 0;
 }
 
 .info-label {
+  font-size: 12px;
   font-weight: 600;
-  color: #666;
-  margin-left: 8px;
-  margin-right: 8px;
+  color: $muted;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
 }
 
 .info-value {
-  color: #1a1a1a;
-  font-weight: 500;
+  font-size: 14px;
+  font-weight: 700;
+  color: $white;
+  word-break: break-word;
+}
+
+.highlight-value {
+  color: #6ee7b7;
 }
 
 .card-actions {
-  padding: 20px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
 }
 
 .navigate-btn {
-  font-weight: 600;
-  border-radius: 8px;
-  transition: all 0.3s ease;
+  border-radius: 12px !important;
+  font-weight: 700 !important;
+  font-size: 14px !important;
+  height: 48px !important;
+  text-transform: none !important;
+  letter-spacing: 0 !important;
+  transition: all 0.2s ease;
 
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(25, 118, 210, 0.3);
   }
+
+  &--primary {
+    background: linear-gradient(135deg, $accent 0%, $accent-2 100%) !important;
+    color: $white !important;
+    box-shadow: 0 6px 20px rgba(99, 102, 241, 0.35) !important;
+
+    &:hover {
+      box-shadow: 0 8px 24px rgba(99, 102, 241, 0.45) !important;
+    }
+  }
+
+  &--secondary {
+    background: rgba(255, 255, 255, 0.08) !important;
+    color: $white !important;
+    border: 1px solid $border !important;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.14) !important;
+    }
+  }
+}
+
+.side-card {
+  flex-direction: column;
+}
+
+.side-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 4px;
+}
+
+.side-title {
+  font-size: 16px;
+  font-weight: 800;
+  color: $white;
 }
 
 .instruction-list {
   margin: 0;
-  padding-left: 20px;
-  color: #666;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 
   li {
-    margin-bottom: 8px;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 14px;
+    color: $muted;
     line-height: 1.5;
+
+    strong {
+      color: $white;
+      font-weight: 700;
+    }
   }
+}
+
+.instruction-bullet {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: $accent;
+  margin-top: 7px;
+  flex-shrink: 0;
+  box-shadow: 0 0 8px rgba(99, 102, 241, 0.5);
 }
 
 @media (max-width: 768px) {
   .delivery-detail-container {
-    padding: 16px;
+    padding: 16px 12px;
   }
 
-  .page-header {
-    flex-direction: column;
-    align-items: flex-start;
+  .hero-inner {
+    padding: 20px 18px;
+  }
+
+  .hero-center {
     gap: 12px;
+  }
+
+  .hero-icon-wrap {
+    width: 44px;
+    height: 44px;
+  }
+
+  .page-title {
+    font-size: 20px;
+  }
+
+  .hero-right-spacer {
+    display: none;
+  }
+
+  .delivery-content {
+    grid-template-columns: 1fr;
+  }
+
+  .info-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .card-actions {
+    grid-template-columns: 1fr;
   }
 }
 </style>
