@@ -17,9 +17,9 @@
         <div class="hero-right">
           <div class="location-badge">
             <q-icon name="location_on" size="18px" class="location-badge-icon" />
-            <span v-if="entityQuery.query.latitude > 1 && entityQuery.query.longitude > 1">
-              {{ Number(entityQuery.query.latitude).toFixed(4) }}°,
-              {{ Number(entityQuery.query.longitude).toFixed(4) }}°
+            <span v-if="(entityQuery.query.latitude ?? 1) > 1 && (entityQuery.query.longitude ?? 1) > 1">
+              {{ Number(entityQuery.query.latitude ?? 1).toFixed(4) }}°,
+              {{ Number(entityQuery.query.longitude ?? 1).toFixed(4) }}°
             </span>
             <span v-else>Locating…</span>
           </div>
@@ -91,7 +91,7 @@
                   {{ Number(delivery.distance).toFixed(2) }} km
                 </div>
               </td>
-              <td>{{ formatMoney(delivery.delivery_charge) }}</td>
+              <td>{{ formatMoney(Number(delivery.delivery_charge)) }}</td>
               <td>{{ formatMoney(delivery.total) }}</td>
               <td>
                 <span class="grand-total">{{ formatMoney(delivery.grand_total) }}</span>
@@ -159,7 +159,7 @@
             <div class="delivery-card-details">
               <div class="detail-row">
                 <span class="detail-label">Delivery Charge</span>
-                <span class="detail-value">{{ formatMoney(delivery.delivery_charge) }}</span>
+                <span class="detail-value">{{ formatMoney(Number(delivery.delivery_charge)) }}</span>
               </div>
               <div class="detail-row">
                 <span class="detail-label">Order Total</span>

@@ -70,6 +70,17 @@ const routes: RouteRecordRaw[] = [
       { path: '', component: () => import('pages/ResetPasswordPage.vue') },
     ],
   },
+  {
+    path: '/apply-store',
+    component: () => import('layouts/MainLayout.vue'),
+    children: [
+      {
+        path: '',
+        component: () => import('pages/ApplyStorePage.vue'),
+        meta: { requiresAuth: true },
+      },
+    ],
+  },
 
   // Always leave this as last one,
   // but you can also remove it

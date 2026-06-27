@@ -28,6 +28,14 @@
             </q-badge>
           </q-btn>
 
+          <!-- Apply My Store Button -->
+          <q-btn to="/apply-store" unelevated no-caps class="apply-store-btn">
+            <div class="btn-inner">
+              <q-icon name="store" size="18px" />
+              <span class="btn-label gt-xs">Create A Store</span>
+            </div>
+          </q-btn>
+
           <!-- Login Button -->
           <q-btn v-if="!profile.token" to="/login" flat no-caps class="header-btn login-btn">
             <div class="btn-inner">
@@ -285,6 +293,27 @@ const { countTotalItems } = storeToRefs(useUserCartStore());
   &:hover {
     transform: translateY(-2px);
     box-shadow: 0 8px 20px rgba(79, 70, 229, 0.4);
+  }
+}
+
+.apply-store-btn {
+  height: 40px;
+  padding: 0 16px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+  color: white;
+  font-weight: 700;
+  font-size: 14px;
+  box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3);
+  transition: all 0.25s ease;
+
+  .btn-inner {
+    gap: 6px;
+  }
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(5, 150, 105, 0.4);
   }
 }
 
