@@ -16,7 +16,12 @@
             <div class="page-subtitle">Navigate to store and delivery locations</div>
           </div>
         </div>
-        <div class="hero-right-spacer"></div>
+        <div class="hero-right-actions">
+          <q-btn flat round dense :icon="locationLoading ? '' : (userLocation ? 'my_location' : 'location_disabled')"
+            class="location-refresh-btn" :loading="locationLoading" @click="getCurrentLocation">
+            <q-tooltip>{{ userLocation ? 'Refresh Location' : 'Get Location' }}</q-tooltip>
+          </q-btn>
+        </div>
       </div>
     </div>
 
@@ -154,6 +159,7 @@ const loading = ref(true);
 const error = ref('');
 const transaction = ref<any>(null);
 const userLocation = ref<{ latitude: number; longitude: number } | null>(null);
+const locationLoading = ref(false);
 
 interface TransactionDetail {
   id: number;
@@ -195,15 +201,19 @@ async function fetchTransactionData() {
 }
 
 async function getCurrentLocation() {
+  locationLoading.value = true;
   try {
     const position = await getLocation();
     userLocation.value = {
       latitude: position.coords.latitude,
       longitude: position.coords.longitude,
     };
+    error.value = '';
   } catch (err) {
-    error.value = 'Failed to get your location. Please enable location services.';
-    console.error(err);
+    console.error('Location error:', err);
+    userLocation.value = null;
+  } finally {
+    locationLoading.value = false;
   }
 }
 
@@ -340,8 +350,22 @@ $muted: rgba(255, 255, 255, 0.55);
   }
 }
 
-.hero-right-spacer {
-  width: 44px;
+.hero-right-actions {
+  display: flex;
+  align-items: center;
+}
+
+.location-refresh-btn {
+  color: rgba(255, 255, 255, 0.7);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  transition: all 0.2s;
+
+  &:hover {
+    color: white;
+    background: rgba($accent, 0.2);
+    border-color: rgba($accent, 0.4);
+  }
 }
 
 .loading-container,
@@ -634,8 +658,8 @@ $muted: rgba(255, 255, 255, 0.55);
     font-size: 20px;
   }
 
-  .hero-right-spacer {
-    display: none;
+  .hero-right-actions {
+    margin-top: 8px;
   }
 
   .delivery-content {

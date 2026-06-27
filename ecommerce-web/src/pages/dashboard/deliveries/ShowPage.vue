@@ -16,7 +16,12 @@
             <div class="page-subtitle">Navigate to store and delivery locations</div>
           </div>
         </div>
-        <div class="hero-right-spacer"></div>
+        <div class="hero-right-actions">
+          <q-btn flat round dense :icon="locationLoading ? '' : (userLocation ? 'my_location' : 'location_disabled')"
+            class="location-refresh-btn" :loading="locationLoading" @click="getCurrentLocation">
+            <q-tooltip>{{ userLocation ? 'Refresh Location' : 'Get Location' }}</q-tooltip>
+          </q-btn>
+        </div>
       </div>
     </div>
 
@@ -82,7 +87,7 @@
               </div>
               <div class="info-text">
                 <div class="info-label">Delivery Charge</div>
-                <div class="info-value highlight-value">{{ transaction.delivery_charge }}</div>
+                <div class="info-value highlight-value">{{ formatMoney(transaction.delivery_charge) }}</div>
               </div>
             </div>
             <div class="info-item">
@@ -91,7 +96,7 @@
               </div>
               <div class="info-text">
                 <div class="info-label">Grand Total</div>
-                <div class="info-value highlight-value">{{ transaction.grand_total }}</div>
+                <div class="info-value highlight-value">{{ formatMoney(transaction.grand_total) }}</div>
               </div>
             </div>
           </div>
@@ -147,13 +152,14 @@
 import { show } from 'src/boot/axios-call';
 import { onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
-import { getLocation } from 'src/boot/utilities';
+import { getLocation, formatMoney } from 'src/boot/utilities';
 
 const route = useRoute();
 const loading = ref(true);
 const error = ref('');
 const transaction = ref<any>(null);
 const userLocation = ref<{ latitude: number; longitude: number } | null>(null);
+const locationLoading = ref(false);
 
 interface TransactionDetail {
   id: number;
@@ -195,15 +201,19 @@ async function fetchTransactionData() {
 }
 
 async function getCurrentLocation() {
+  locationLoading.value = true;
   try {
     const position = await getLocation();
     userLocation.value = {
       latitude: position.coords.latitude,
       longitude: position.coords.longitude,
     };
+    error.value = '';
   } catch (err) {
-    error.value = 'Failed to get your location. Please enable location services.';
-    console.error(err);
+    console.error('Location error:', err);
+    userLocation.value = null;
+  } finally {
+    locationLoading.value = false;
   }
 }
 
@@ -341,8 +351,22 @@ $muted: rgba(255, 255, 255, 0.55);
   }
 }
 
-.hero-right-spacer {
-  width: 44px;
+.hero-right-actions {
+  display: flex;
+  align-items: center;
+}
+
+.location-refresh-btn {
+  color: rgba(255, 255, 255, 0.7);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  transition: all 0.2s;
+
+  &:hover {
+    color: white;
+    background: rgba($accent, 0.2);
+    border-color: rgba($accent, 0.4);
+  }
 }
 
 // ── Empty / Loading / Error states ──────────────────────────────────────────
@@ -642,8 +666,8 @@ $muted: rgba(255, 255, 255, 0.55);
     font-size: 20px;
   }
 
-  .hero-right-spacer {
-    display: none;
+  .hero-right-actions {
+    margin-top: 8px;
   }
 
   .delivery-content {

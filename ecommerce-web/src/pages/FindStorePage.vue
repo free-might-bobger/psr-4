@@ -29,7 +29,11 @@
           </div>
           <div class="hero-stat-divider"></div>
           <div class="hero-stat">
-            <div class="hero-stat-value">30<span style="font-size:16px">km</span></div>
+            <div class="hero-stat-value radius-value">
+              <q-select v-model="kmRadius" :options="[5, 10, 15]" dense borderless dropdown-icon="expand_more"
+                class="radius-select" options-class="radius-options" />
+              <span class="radius-unit">km</span>
+            </div>
             <div class="hero-stat-label">Search Radius</div>
           </div>
         </div>
@@ -324,7 +328,7 @@ const markerDrag = (e: { latLng: google.maps.LatLng }) => {
   lng.value = e.latLng.lng();
 };
 
-const kmRadius = ref(30);
+const kmRadius = ref(15);
 const nearestStores = ref<Array<StoreInterface>>([]);
 
 const getNearestStore = async () => {
@@ -821,6 +825,82 @@ watch(searchString, async () => {
   width: 1px;
   height: 40px;
   background: rgba(255, 255, 255, 0.15);
+}
+
+.radius-value {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 2px;
+}
+
+.radius-select {
+  width: 64px;
+  font-size: 32px;
+  font-weight: 900;
+  color: white;
+  line-height: 1;
+
+  :deep(.q-field__control) {
+    padding: 0;
+    min-height: auto;
+    height: auto;
+    color: white;
+    overflow: visible;
+  }
+
+  :deep(.q-field__native) {
+    color: white;
+    font-size: 32px;
+    font-weight: 900;
+    padding: 0;
+    min-height: auto;
+    height: auto;
+    line-height: 1.2;
+    text-align: center;
+    overflow: visible;
+  }
+
+  :deep(.q-field__append) {
+    padding: 0;
+    height: 24px;
+    width: 20px;
+    color: white;
+  }
+
+  :deep(.q-field__focusable-action) {
+    color: white;
+  }
+
+  :deep(.q-icon) {
+    font-size: 20px;
+  }
+}
+
+.radius-unit {
+  font-size: 16px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+:global(.radius-options) {
+  background: #1e293b !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35) !important;
+
+  .q-item {
+    color: white;
+    font-size: 16px;
+    font-weight: 700;
+    min-height: 40px;
+    padding: 8px 16px;
+
+    &:hover,
+    &--active {
+      background: rgba(99, 102, 241, 0.2) !important;
+    }
+  }
 }
 
 // ── Action Bar ───────────────────────────────────────────────────────────────
@@ -1504,6 +1584,31 @@ watch(searchString, async () => {
 
   .hero-stat-value {
     font-size: 24px;
+  }
+
+  .radius-select {
+    width: 50px;
+    line-height: 1;
+
+    :deep(.q-field__control) {
+      height: auto;
+      overflow: visible;
+    }
+
+    :deep(.q-field__native) {
+      font-size: 24px;
+      height: auto;
+      line-height: 1.2;
+      overflow: visible;
+    }
+
+    :deep(.q-icon) {
+      font-size: 16px;
+    }
+  }
+
+  .radius-unit {
+    font-size: 14px;
   }
 
   .action-bar {

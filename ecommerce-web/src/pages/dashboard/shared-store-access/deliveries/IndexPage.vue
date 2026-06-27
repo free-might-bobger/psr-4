@@ -17,12 +17,16 @@
         <div class="hero-right">
           <div class="location-badge">
             <q-icon name="location_on" size="18px" class="location-badge-icon" />
-            <span v-if="entityQuery.query.latitude && entityQuery.query.longitude">
+            <span v-if="entityQuery.query.latitude > 1 && entityQuery.query.longitude > 1">
               {{ Number(entityQuery.query.latitude).toFixed(4) }}°,
               {{ Number(entityQuery.query.longitude).toFixed(4) }}°
             </span>
             <span v-else>Locating…</span>
           </div>
+          <q-btn flat round dense :icon="locationLoading ? '' : 'my_location'" class="location-refresh-btn"
+            :loading="locationLoading" @click="refreshLocation">
+            <q-tooltip>Refresh Location</q-tooltip>
+          </q-btn>
         </div>
       </div>
     </div>
@@ -87,10 +91,10 @@
                   {{ Number(delivery.distance).toFixed(2) }} km
                 </div>
               </td>
-              <td>{{ delivery.delivery_charge }}</td>
-              <td>{{ delivery.total }}</td>
+              <td>{{ formatMoney(delivery.delivery_charge) }}</td>
+              <td>{{ formatMoney(delivery.total) }}</td>
               <td>
-                <span class="grand-total">{{ delivery.grand_total }}</span>
+                <span class="grand-total">{{ formatMoney(delivery.grand_total) }}</span>
               </td>
               <td>
                 <div class="action-buttons">
@@ -155,15 +159,15 @@
             <div class="delivery-card-details">
               <div class="detail-row">
                 <span class="detail-label">Delivery Charge</span>
-                <span class="detail-value">{{ delivery.delivery_charge }}</span>
+                <span class="detail-value">{{ formatMoney(delivery.delivery_charge) }}</span>
               </div>
               <div class="detail-row">
                 <span class="detail-label">Order Total</span>
-                <span class="detail-value">{{ delivery.total }}</span>
+                <span class="detail-value">{{ formatMoney(delivery.total) }}</span>
               </div>
               <div class="detail-row detail-row--highlight">
                 <span class="detail-label">Grand Total</span>
-                <span class="detail-value grand-total">{{ delivery.grand_total }}</span>
+                <span class="detail-value grand-total">{{ formatMoney(delivery.grand_total) }}</span>
               </div>
             </div>
 
@@ -190,10 +194,11 @@ import { useCommonStore } from 'src/stores/common';
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 import { storeToRefs } from 'pinia';
 import { CustomerTransactionRow } from 'src/boot/interfaces';
-import { getLocation, watchLocation, clearWatch } from 'src/boot/utilities';
+import { getLocation, watchLocation, clearWatch, formatMoney } from 'src/boot/utilities';
 
 const search = ref('');
 const watchId = ref<number>(-1);
+const locationLoading = ref(false);
 const useCommon = useCommonStore();
 const { entityQuery, pagination, result } = storeToRefs(useCommon);
 
@@ -289,10 +294,17 @@ const goToLastPage = () => {
 };
 
 const refreshLocation = async () => {
-  const position = await getLocation();
-  entityQuery.value.query.latitude = position.coords.latitude;
-  entityQuery.value.query.longitude = position.coords.longitude;
-  onRequest(entityQuery.value, true);
+  locationLoading.value = true;
+  try {
+    const position = await getLocation();
+    entityQuery.value.query.latitude = position.coords.latitude;
+    entityQuery.value.query.longitude = position.coords.longitude;
+    onRequest(entityQuery.value, true);
+  } catch (err) {
+    console.error('Location error:', err);
+  } finally {
+    locationLoading.value = false;
+  }
 };
 
 let refreshTimeout: ReturnType<typeof setTimeout> | null = null;
@@ -393,6 +405,22 @@ $muted: rgba(255, 255, 255, 0.55);
 
 .hero-right {
   flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.location-refresh-btn {
+  color: rgba(255, 255, 255, 0.7);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid $border;
+  transition: all 0.2s;
+
+  &:hover {
+    color: $white;
+    background: rgba($accent, 0.2);
+    border-color: rgba($accent, 0.4);
+  }
 }
 
 .location-badge {

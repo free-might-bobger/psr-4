@@ -59,7 +59,6 @@ export const currency = (): string =>  {
 
 export const formatMoney = (money: number) :string => {
   return (
-    '₱ ' +
     money?.toLocaleString('en-US', {
       maximumFractionDigits: 2,
       minimumFractionDigits: 2,

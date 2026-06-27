@@ -6,6 +6,9 @@
       <div class="hero-accent-overlay"></div>
       <div class="hero-inner">
         <div class="hero-left">
+          <q-btn flat round dense icon="arrow_back" @click="router.back()" class="header-back-btn">
+            <q-tooltip>Back to Store Access</q-tooltip>
+          </q-btn>
           <div class="hero-icon-wrap">
             <q-icon name="receipt_long" size="28px" color="white" />
           </div>
@@ -94,7 +97,7 @@
                 </span>
               </td>
               <td>
-                <span class="total-value">{{ transaction.grand_total }}</span>
+                <span class="total-value">{{ formatMoney(transaction.grand_total) }}</span>
               </td>
               <td>
                 <div class="meta-cell">
@@ -179,7 +182,7 @@
             <div class="txn-card-details">
               <div class="detail-row">
                 <span class="detail-label">Grand Total</span>
-                <span class="detail-value total-value">{{ transaction.grand_total }}</span>
+                <span class="detail-value total-value">{{ formatMoney(transaction.grand_total) }}</span>
               </div>
               <div class="detail-row">
                 <span class="detail-label">
@@ -216,9 +219,12 @@
 import { onRequest, firstPage, previousPage, nextPage, lastPage } from 'src/boot/axios-call';
 import { useCommonStore } from 'src/stores/common';
 import { onMounted, ref, watch } from 'vue';
+import { useRouter } from 'vue-router';
 import { storeToRefs } from 'pinia';
 import { CustomerTransactionRow } from 'src/boot/interfaces';
+import { formatMoney } from 'src/boot/utilities';
 
+const router = useRouter();
 const search = ref('');
 const useCommon = useCommonStore();
 const { entityQuery, pagination, result } = storeToRefs(useCommon);

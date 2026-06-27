@@ -6,7 +6,7 @@
       <div class="header-content">
         <div class="header-left">
           <q-btn flat round dense icon="arrow_back" @click="router.back()" class="header-back-btn">
-            <q-tooltip>Back to Store</q-tooltip>
+            <q-tooltip>Back to Store Access</q-tooltip>
           </q-btn>
           <div class="header-icon-wrap">
             <q-icon name="inventory_2" size="26px" color="white" />
