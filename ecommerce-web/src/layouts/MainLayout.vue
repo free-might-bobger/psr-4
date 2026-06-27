@@ -17,6 +17,15 @@
 
         <!-- Action Buttons -->
         <div class="header-actions">
+
+          <!-- Apply My Store Button -->
+          <q-btn to="/apply-store" flat class="header-btn create-store-btn" no-caps>
+            <div class="btn-inner">
+              <q-icon name="store" size="18px" color="green-7" />
+              <span class="btn-label gt-xs">Create A Store</span>
+            </div>
+          </q-btn>
+
           <!-- Cart Button -->
           <q-btn to="/cart" flat class="header-btn cart-btn" no-caps>
             <div class="btn-inner">
@@ -28,13 +37,7 @@
             </q-badge>
           </q-btn>
 
-          <!-- Apply My Store Button -->
-          <q-btn to="/apply-store" unelevated no-caps class="apply-store-btn">
-            <div class="btn-inner">
-              <q-icon name="store" size="18px" />
-              <span class="btn-label gt-xs">Create A Store</span>
-            </div>
-          </q-btn>
+
 
           <!-- Login Button -->
           <q-btn v-if="!profile.token" to="/login" flat no-caps class="header-btn login-btn">
@@ -245,6 +248,19 @@ const { countTotalItems } = storeToRefs(useUserCartStore());
   position: relative;
 }
 
+.create-store-btn {
+  color: #047857;
+  background: rgba(16, 185, 129, 0.08);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+
+  &:hover {
+    background: rgba(16, 185, 129, 0.15);
+    border-color: rgba(16, 185, 129, 0.35);
+    color: #065f46;
+    transform: translateY(-1px);
+  }
+}
+
 .cart-badge {
   font-size: 10px;
   font-weight: 700;
@@ -293,27 +309,6 @@ const { countTotalItems } = storeToRefs(useUserCartStore());
   &:hover {
     transform: translateY(-2px);
     box-shadow: 0 8px 20px rgba(79, 70, 229, 0.4);
-  }
-}
-
-.apply-store-btn {
-  height: 40px;
-  padding: 0 16px;
-  border-radius: 10px;
-  background: linear-gradient(135deg, #059669 0%, #047857 100%);
-  color: white;
-  font-weight: 700;
-  font-size: 14px;
-  box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3);
-  transition: all 0.25s ease;
-
-  .btn-inner {
-    gap: 6px;
-  }
-
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(5, 150, 105, 0.4);
   }
 }
 
