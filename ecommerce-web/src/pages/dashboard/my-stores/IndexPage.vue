@@ -52,18 +52,18 @@
         <template v-slot:body-cell-actions="props">
           <q-td :props="props">
             <div class="action-buttons">
-              <q-btn unelevated dense color="secondary" icon="people"
-                :to="`${$route.path}/${props.row.optimus_id}/store-users`" size="md" class="q-mr-xs">
-                <q-tooltip>User Management</q-tooltip>
-              </q-btn>
-              <q-btn unelevated dense color="primary" icon="edit_note" :to="`${$route.path}/${props.row.optimus_id}`"
-                size="md" class="q-mr-xs">
-                <q-tooltip>Edit Store</q-tooltip>
-              </q-btn>
-              <q-btn unelevated dense color="negative" icon="delete_forever" @click="handleDeleteStore(props.row)"
-                size="md">
-                <q-tooltip>Delete Store</q-tooltip>
-              </q-btn>
+              <router-link :to="`${$route.path}/${props.row.optimus_id}/store-users`" class="action-pill action-users">
+                <q-icon name="people" size="16px" />
+                Users
+              </router-link>
+              <router-link :to="`${$route.path}/${props.row.optimus_id}`" class="action-pill action-edit">
+                <q-icon name="edit_note" size="16px" />
+                Edit
+              </router-link>
+              <button class="action-pill action-delete" @click="handleDeleteStore(props.row)">
+                <q-icon name="delete_forever" size="16px" />
+                Delete
+              </button>
             </div>
           </q-td>
         </template>
@@ -448,6 +448,53 @@ $muted: rgba(255, 255, 255, 0.5);
   display: flex;
   gap: 6px;
   justify-content: flex-end;
+}
+
+.action-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 16px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.2s ease;
+
+  &.action-users {
+    background: rgba(#10b981, 0.1);
+    color: #6ee7b7;
+    border: 1px solid rgba(#10b981, 0.2);
+
+    &:hover {
+      background: rgba(#10b981, 0.2);
+      border-color: rgba(#10b981, 0.4);
+    }
+  }
+
+  &.action-edit {
+    background: rgba($accent, 0.12);
+    color: #a5b4fc;
+    border: 1px solid rgba($accent, 0.2);
+
+    &:hover {
+      background: rgba($accent, 0.2);
+      border-color: rgba($accent, 0.4);
+    }
+  }
+
+  &.action-delete {
+    background: rgba(#ef4444, 0.1);
+    color: #fca5a5;
+    border: 1px solid rgba(#ef4444, 0.2);
+
+    &:hover {
+      background: rgba(#ef4444, 0.2);
+      border-color: rgba(#ef4444, 0.4);
+    }
+  }
 }
 
 // ── Pagination footer ──────────────────────────────────────────────────────

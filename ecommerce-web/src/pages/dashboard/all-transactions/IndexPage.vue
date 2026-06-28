@@ -99,7 +99,7 @@
               </td>
               <td class="td-cell">
                 <div class="summary-cell">
-                  <div class="summary-total">{{ txn.grand_total }}</div>
+                  <div class="summary-total">{{ formatMoney(txn.grand_total) }}</div>
                   <div class="summary-meta">
                     <span class="meta-tag">
                       <q-icon name="payment" size="14px" class="q-mr-xs" />
@@ -114,10 +114,8 @@
               </td>
               <td class="td-cell">
                 <div class="actions-cell">
-                  <q-btn unelevated dense icon="visibility" :to="`${$route.path}/${txn.optimus_id}`"
-                    class="action-btn view-btn">
-                    <q-tooltip>View Details</q-tooltip>
-                  </q-btn>
+                  <q-btn unelevated dense no-caps icon="visibility" label="View"
+                    :to="`${$route.path}/${txn.optimus_id}`" class="action-btn view-btn" />
                 </div>
               </td>
             </tr>
@@ -220,6 +218,7 @@ import { useCommonStore } from 'src/stores/common';
 import { onMounted, ref, watch } from 'vue';
 import { storeToRefs } from 'pinia';
 import { CustomerTransactionRow } from 'src/boot/interfaces';
+import { formatMoney } from 'src/boot/utilities';
 
 const search = ref('');
 const useCommon = useCommonStore();
@@ -732,9 +731,13 @@ $muted-2: rgba(255, 255, 255, 0.3);
 }
 
 .action-btn {
-  width: 36px;
+  width: auto;
+  min-width: 36px;
   height: 36px;
+  padding: 0 12px;
   border-radius: 10px;
+  font-size: 12px;
+  font-weight: 600;
   transition: all 0.2s ease;
 
   &.view-btn {

@@ -91,10 +91,10 @@
                   {{ Number(delivery.distance).toFixed(2) }} km
                 </div>
               </td>
-              <td>{{ delivery.delivery_charge }}</td>
-              <td>{{ delivery.total }}</td>
+              <td>{{ formatMoney(Number(delivery.delivery_charge) || 0) }}</td>
+              <td>{{ formatMoney(Number(delivery.total) || 0) }}</td>
               <td>
-                <span class="grand-total">{{ delivery.grand_total }}</span>
+                <span class="grand-total">{{ formatMoney(Number(delivery.grand_total) || 0) }}</span>
               </td>
               <td>
                 <div class="action-buttons">
@@ -194,7 +194,7 @@ import { useCommonStore } from 'src/stores/common';
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 import { storeToRefs } from 'pinia';
 import { CustomerTransactionRow } from 'src/boot/interfaces';
-import { getLocation, watchLocation, clearWatch } from 'src/boot/utilities';
+import { getLocation, watchLocation, clearWatch, formatMoney } from 'src/boot/utilities';
 
 const search = ref('');
 const watchId = ref<number>(-1);
