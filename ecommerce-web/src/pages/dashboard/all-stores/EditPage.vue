@@ -5,6 +5,7 @@
     <div class="page-hero q-mb-xl">
       <div class="hero-accent-overlay"></div>
       <div class="hero-inner">
+        <q-btn flat round dense icon="arrow_back" color="white" class="hero-back-btn" @click="$router.back()" />
         <div class="hero-icon-wrap">
           <q-icon name="store" size="28px" color="white" />
         </div>
@@ -20,7 +21,7 @@
     </div>
 
     <!-- Form Section -->
-    <StoreEditForm :store="store" :is-submitting="isSubmitting" @submit="onSubmit" @cancel="$router.back()" />
+    <StoreEditForm :store="store" :is-submitting="isSubmitting" @submit="onSubmit" @cancel="$router.back()" :isActive="true"/>
   </div>
 </template>
 
@@ -30,6 +31,15 @@ import { update, show } from 'src/boot/axios-call';
 import { useRoute } from "vue-router";
 import StoreEditForm from 'src/components/StoreEditForm.vue';
 
+interface StoreImage {
+  id: number;
+  path_url: string;
+  path_thumbnail: string;
+  name: string;
+  is_primary: number;
+  optimus_id: number;
+}
+
 interface StoreData {
   name: string;
   desc: string;
@@ -37,6 +47,8 @@ interface StoreData {
   latitude: number;
   longitude: number;
   optimus_id: number;
+  is_active: boolean;
+  images?: StoreImage[];
 }
 
 const route = useRoute();
@@ -47,6 +59,8 @@ const store = ref<StoreData>({
   latitude: 14.5995,
   longitude: 120.9842,
   optimus_id: 0,
+  is_active: false,
+  images: [],
 });
 
 const isSubmitting = ref(false);
@@ -64,6 +78,7 @@ const onSubmit = async (data: StoreData) => {
           mobile: data.mobile,
           latitude: data.latitude,
           longitude: data.longitude,
+          is_active: data.is_active ? 1 : 0,
         },
       },
       true
@@ -80,7 +95,7 @@ onBeforeMount(async () => {
     entity: 'all_stores',
     optimus_id: Number(route.params.id),
     query: {
-      show_mobile: 1
+      with: 'images'
     },
   }) as StoreData;
 
@@ -90,6 +105,8 @@ onBeforeMount(async () => {
   store.value.latitude = result.latitude || 14.5995;
   store.value.longitude = result.longitude || 120.9842;
   store.value.optimus_id = result.optimus_id || 0;
+  store.value.is_active = Boolean(result.is_active);
+  store.value.images = result.images || [];
 });
 </script>
 
@@ -138,6 +155,15 @@ $muted: rgba(255, 255, 255, 0.5);
   padding: 32px 36px;
   gap: 16px;
   flex-wrap: wrap;
+}
+
+.hero-back-btn {
+  background: rgba(255, 255, 255, 0.1) !important;
+  flex-shrink: 0;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.2) !important;
+  }
 }
 
 .hero-icon-wrap {

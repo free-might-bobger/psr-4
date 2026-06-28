@@ -97,6 +97,11 @@
               </td>
               <td class="td-center">
                 <div class="action-btns">
+                  <router-link :to="`/dashboard/all-stores/${store.optimus_id}/store-users`"
+                    class="action-pill action-users">
+                    <q-icon name="people" size="16px" />
+                    Users
+                  </router-link>
                   <router-link :to="`/dashboard/all-stores/${store.optimus_id}`" class="action-pill action-edit">
                     <q-icon name="edit_note" size="16px" />
                     Edit
@@ -235,7 +240,7 @@ entityQuery.value = {
   message: 'Getting stores...',
   entity: 'all_stores',
   query: {
-    orderBy: 'name:asc',
+    orderBy: 'created_at:desc',
     columns: 'id,name,mobile',
     page: pagination.value.page,
     limit: 12,
@@ -726,6 +731,17 @@ $muted-2: rgba(255, 255, 255, 0.3);
   cursor: pointer;
   text-decoration: none;
   transition: all 0.2s ease;
+
+  &.action-users {
+    background: rgba($green, 0.1);
+    color: #6ee7b7;
+    border: 1px solid rgba($green, 0.2);
+
+    &:hover {
+      background: rgba($green, 0.2);
+      border-color: rgba($green, 0.4);
+    }
+  }
 
   &.action-edit {
     background: rgba($accent, 0.12);

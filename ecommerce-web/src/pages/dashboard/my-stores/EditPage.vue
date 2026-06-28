@@ -29,7 +29,7 @@
     </div>
 
     <!-- Form Section -->
-    <StoreEditForm :store="store" :is-submitting="isSubmitting" @submit="onSubmit" @cancel="$router.back()" />
+    <StoreEditForm :store="store" :is-submitting="isSubmitting" @submit="onSubmit" @cancel="$router.back()" :isActive="false"/>
 
   </div>
 </template>

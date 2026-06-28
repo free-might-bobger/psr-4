@@ -36,6 +36,17 @@
             </div>
           </div>
 
+          <div class="q-mt-md" v-if="props.isActive">
+            <div class="status-toggle-row">
+              <div>
+                <div class="field-label" style="margin-bottom: 2px;">Store Status</div>
+                <div class="status-toggle-hint">{{ localStore.is_active ? 'Store is visible to customers' : 'Store is hidden from customers' }}</div>
+                </div>
+              <q-toggle v-model="localStore.is_active" :color="localStore.is_active ? 'positive' : 'grey-6'"
+                keep-color />
+            </div>
+          </div>
+
           <div class="q-mt-lg">
             <label class="field-label">Description</label>
             <div class="wysiwyg-editor">
@@ -65,8 +76,36 @@
             </div>
             <div v-if="!store.desc" class="field-error">Description is required.</div>
           </div>
+
+          <div v-if="localStore.images && localStore.images.length > 0" class="q-mt-lg">
+            <label class="field-label">Verification Documents</label>
+            <div class="store-images-grid">
+              <div v-for="image in localStore.images" :key="image.id" class="store-image-item"
+                @click="openLightbox(image.path_url)">
+                <img :src="image.path_thumbnail" :alt="image.name" class="store-image" />
+                <div class="store-image-overlay"><q-icon name="zoom_in" size="22px" color="white" /></div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
+
+      <!-- Image Lightbox Modal -->
+      <q-dialog v-model="lightboxOpen" maximized transition-show="fade" transition-hide="fade">
+        <div class="lightbox-backdrop" @click.self="closeLightbox" @wheel.prevent="onWheel">
+          <q-btn round flat icon="close" color="white" class="lightbox-close" @click="closeLightbox" />
+          <div class="lightbox-actions">
+            <q-btn round flat icon="zoom_in" color="white" @click="lightboxZoomIn" />
+            <span class="lightbox-zoom-label">{{ Math.round(zoomScale * 100) }}%</span>
+            <q-btn round flat icon="zoom_out" color="white" @click="lightboxZoomOut" />
+            <q-btn round flat icon="zoom_out_map" color="white" @click="resetZoom" />
+          </div>
+          <div class="lightbox-img-wrap">
+            <img :src="lightboxSrc" class="lightbox-img" :style="{ transform: `scale(${zoomScale})` }"
+              draggable="false" />
+          </div>
+        </div>
+      </q-dialog>
 
       <!-- Location Section -->
       <div class="form-section-card q-mb-lg">
@@ -154,6 +193,15 @@ import { GoogleMap, AdvancedMarker, InfoWindow } from 'vue3-google-map';
 import { ref, watch, onMounted, nextTick } from 'vue';
 import type { QForm } from 'quasar';
 
+interface StoreImage {
+  id: number;
+  path_url: string;
+  path_thumbnail: string;
+  name: string;
+  is_primary: number;
+  optimus_id: number;
+}
+
 interface StoreData {
   name: string;
   desc: string;
@@ -161,11 +209,14 @@ interface StoreData {
   latitude: number;
   longitude: number;
   optimus_id: number;
+  is_active: boolean;
+  images?: StoreImage[];
 }
 
 interface Props {
   store: StoreData;
   isSubmitting: boolean;
+  isActive: boolean;
 }
 
 interface Emits {
@@ -185,6 +236,29 @@ watch(() => props.store, (newStore) => {
 const currentZoom = ref(15);
 const showInfoWindow = ref(true);
 const mapRef = ref<any>(null);
+
+const lightboxOpen = ref(false);
+const lightboxSrc = ref('');
+const zoomScale = ref(1);
+
+const openLightbox = (src: string) => {
+  lightboxSrc.value = src;
+  zoomScale.value = 1;
+  lightboxOpen.value = true;
+};
+
+const closeLightbox = () => {
+  lightboxOpen.value = false;
+};
+
+const lightboxZoomIn = () => { zoomScale.value = Math.min(zoomScale.value + 0.25, 5); };
+const lightboxZoomOut = () => { zoomScale.value = Math.max(zoomScale.value - 0.25, 0.25); };
+const resetZoom = () => { zoomScale.value = 1; };
+
+const onWheel = (e: WheelEvent) => {
+  const delta = e.deltaY > 0 ? -0.1 : 0.1;
+  zoomScale.value = Math.min(Math.max(zoomScale.value + delta, 0.25), 5);
+};
 const myForm = ref<QForm | null>(null);
 const editorRef = ref<HTMLElement | null>(null);
 
@@ -539,6 +613,136 @@ $muted: rgba(255, 255, 255, 0.5);
   :deep(.q-field--focused .q-field__control:before) {
     border-color: $accent !important;
   }
+}
+
+// ── Store images gallery ────────────────────────────────────────────────────
+.store-images-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  gap: 12px;
+}
+
+.store-image-item {
+  position: relative;
+  aspect-ratio: 1;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid $border;
+  background: $dark-elevated;
+  transition: border-color 0.2s;
+
+  &:hover {
+    border-color: rgba(99, 102, 241, 0.4);
+  }
+}
+
+.store-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.store-image-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+  pointer-events: none;
+}
+
+.store-image-item {
+  cursor: pointer;
+
+  &:hover .store-image-overlay {
+    background: rgba(0, 0, 0, 0.45);
+  }
+}
+
+// ── Lightbox ────────────────────────────────────────────────────────────────
+.lightbox-backdrop {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.92);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.lightbox-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 10;
+  background: rgba(255, 255, 255, 0.1) !important;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.2) !important;
+  }
+}
+
+.lightbox-actions {
+  position: absolute;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 40px;
+  padding: 6px 16px;
+  backdrop-filter: blur(8px);
+}
+
+.lightbox-zoom-label {
+  color: $white;
+  font-size: 13px;
+  font-weight: 700;
+  min-width: 44px;
+  text-align: center;
+}
+
+.lightbox-img-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.lightbox-img {
+  max-width: 90vw;
+  max-height: 85vh;
+  object-fit: contain;
+  border-radius: 8px;
+  transition: transform 0.15s ease;
+  user-select: none;
+}
+
+// ── Status toggle ────────────────────────────────────────────────────────────
+.status-toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  background: $dark-elevated;
+  border: 1px solid $border;
+  border-radius: 12px;
+  padding: 14px 16px;
+}
+
+.status-toggle-hint {
+  font-size: 12px;
+  color: $muted;
+  margin-top: 2px;
 }
 
 // ── Field label / error ──────────────────────────────────────────────────────
