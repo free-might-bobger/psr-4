@@ -61,28 +61,32 @@
 
         <div class="users-section q-mt-lg">
             <div class="section-title">Store User Menus</div>
-            <div v-if="storeUserMenus.length === 0" class="empty-state">
+            <div v-if="typedResult.length === 0" class="empty-state">
                 <q-icon name="menu_off" size="48px" color="white" />
                 <div class="empty-title">No assigned menus found</div>
             </div>
             <div v-else class="users-grid">
-                <q-card v-for="group in groupedStoreUserMenus"
-                    :key="group.storeUser?.id || group.items[0]?.store_user_id" flat class="user-card">
+                <q-card v-for="storeUser in typedResult" :key="storeUser.optimus_id" flat class="user-card">
                     <q-card-section class="user-card-section">
                         <div class="user-avatar">
                             <q-icon name="person" size="24px" color="white" />
                         </div>
                         <div class="user-info">
-                            <div class="user-name">{{ group.storeUser?.user?.email || 'Unknown User' }}</div>
+                            <div class="user-name">{{ storeUser.email || 'Unknown User' }}</div>
                             <div class="menu-tags">
-                                <div v-for="item in group.items" :key="item.optimus_id" class="menu-tag">
-                                    <q-icon :name="item.storeMenu?.icon || 'tag'" size="14px" class="menu-tag-icon" />
-                                    <span>{{ item.storeMenu?.name || 'Unknown Menu' }}</span>
-                                    <q-btn flat dense icon="close" @click="handleDeleteStoreUserMenu(item)"
-                                        class="menu-tag-delete" size="10px">
-                                        <q-tooltip>Remove this menu</q-tooltip>
-                                    </q-btn>
-                                </div>
+                                <template v-if="storeUser.storeUserMenu && storeUser.storeUserMenu.length > 0">
+                                    <div v-for="item in storeUser.storeUserMenu" :key="item.optimus_id"
+                                        class="menu-tag">
+                                        <q-icon :name="item.store_menu?.icon || 'tag'" size="14px"
+                                            class="menu-tag-icon" />
+                                        <span>{{ item.store_menu?.name || 'Unknown Menu' }}</span>
+                                        <q-btn flat dense icon="close" @click="handleDeleteStoreUserMenu(item)"
+                                            class="menu-tag-delete" size="10px">
+                                            <q-tooltip>Remove this menu</q-tooltip>
+                                        </q-btn>
+                                    </div>
+                                </template>
+                                <span v-else class="no-menus">No menus assigned</span>
                             </div>
                         </div>
                     </q-card-section>
@@ -100,8 +104,10 @@ import { useCommonStore } from 'src/stores/common';
 import { validateRequired } from 'src/boot/validators';
 import { Notify, Loading } from 'quasar';
 import type { QForm } from 'quasar';
-import type { StoreUser, StoreUserMenu } from 'src/boot/interfaces';
+import type { StoreUser } from 'src/boot/interfaces';
+import { useRoute } from 'vue-router';
 
+const route = useRoute();
 const useCommon = useCommonStore();
 const { pagination, result, entityQuery } = storeToRefs(useCommon);
 
@@ -112,7 +118,8 @@ entityQuery.value = {
         orderBy: 'created_at:desc',
         page: pagination.value.page,
         limit: 10,
-        with: 'store,user',
+        with: 'store,user,storeUserMenu.storeMenu',
+        filters: 'store_id:' + route.params.id
     },
 };
 
@@ -124,23 +131,10 @@ const typedResult = computed<StoreUser[]>(() => {
 });
 
 const storeMenus = ref<{ id: number; optimus_id: number; name: string; icon: string; label: string; value: number }[]>([]);
-const storeUserMenus = ref<StoreUserMenu[]>([]);
 const selectedStoreUser = ref<StoreUser | null>(null);
 const selectedStoreMenu = ref<{ id: number; optimus_id: number; name: string; icon: string; label: string; value: number } | null>(null);
 const submitting = ref(false);
 const myForm = ref<QForm | null>(null);
-
-const groupedStoreUserMenus = computed(() => {
-    const groups: Record<number, { storeUser: StoreUserMenu['storeUser']; items: StoreUserMenu[] }> = {};
-    for (const item of storeUserMenus.value) {
-        const userId = item.store_user_id;
-        if (!groups[userId]) {
-            groups[userId] = { storeUser: item.storeUser, items: [] };
-        }
-        groups[userId].items.push(item);
-    }
-    return Object.values(groups);
-});
 
 const getStoreMenus = async () => {
     const response = await get(
@@ -157,23 +151,6 @@ const getStoreMenus = async () => {
     }
 };
 
-const getStoreUserMenus = async () => {
-    const response = await get(
-        {
-            entity: 'store-user-menus',
-            query: {
-                orderBy: 'created_at:desc',
-                page: 1,
-                limit: 100,
-                with: 'storeMenu,storeUser.user,storeUser.store'
-            },
-        },
-        false
-    );
-    if (response && typeof response === 'object' && 'data' in response) {
-        storeUserMenus.value = (response as { data: { data: StoreUserMenu[] } }).data.data;
-    }
-};
 
 const onSubmit = async () => {
     const valid = await myForm.value?.validate();
@@ -196,11 +173,11 @@ const onSubmit = async () => {
     selectedStoreUser.value = null;
     selectedStoreMenu.value = null;
     myForm.value?.resetValidation();
-    getStoreUserMenus();
+    onRequest(entityQuery.value, true);
 };
 
-const handleDeleteStoreUserMenu = (item: StoreUserMenu) => {
-    const label = item.storeMenu?.name || 'Unknown Menu';
+const handleDeleteStoreUserMenu = (item: NonNullable<StoreUser['storeUserMenu']>[number]) => {
+    const label = item.store_menu?.name || 'Unknown Menu';
     Notify.create({
         message: `Delete ${label}?`,
         type: 'negative',
@@ -217,13 +194,13 @@ const handleDeleteStoreUserMenu = (item: StoreUserMenu) => {
                 color: 'yellow',
                 handler: async () => {
                     Loading.show();
-                    const result = await deleteEntity({
+                    const deleted = await deleteEntity({
                         entity: 'store-user-menus',
                         optimus_id: item.optimus_id,
                         label: label,
                     });
-                    if (result === true) {
-                        getStoreUserMenus();
+                    if (deleted === true) {
+                        onRequest(entityQuery.value, true);
                     }
                     Loading.hide();
                 },
@@ -237,7 +214,6 @@ onMounted(() => {
     entityQuery.value.query.page = 1;
     onRequest(entityQuery.value, true);
     getStoreMenus();
-    getStoreUserMenus();
 });
 </script>
 
@@ -539,6 +515,12 @@ $muted: rgba(255, 255, 255, 0.5);
 
 .menu-tag-icon {
     color: $muted;
+}
+
+.no-menus {
+    font-size: 12px;
+    color: $muted;
+    font-style: italic;
 }
 
 .menu-tag-delete {

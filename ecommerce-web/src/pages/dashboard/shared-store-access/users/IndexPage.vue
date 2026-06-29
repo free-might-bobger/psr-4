@@ -124,7 +124,6 @@ const useCommon = useCommonStore();
 const { pagination, result, entityQuery } = storeToRefs(useCommon);
 
 const search = ref('');
-
 entityQuery.value = {
     message: 'Getting users...',
     entity: 'store-users',

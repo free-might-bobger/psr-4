@@ -114,7 +114,9 @@
                 <td class="table-cell" style="text-align: right;">
                   <div class="actions-cell" style="justify-content: flex-end;">
                     <q-btn v-for="menu in store.storeUserMenu" :key="menu.store_menu?.id || menu.id" unelevated dense
-                      :icon="menu.store_menu?.icon || 'menu'" class="action-btn menu-btn"  :to="`${$route.path}/${store.store?.optimus_id}/${menu.store_menu?.name}`">
+                      :icon="menu.store_menu?.icon || 'menu'"
+                      :class="getMenuButtonClass(menu.store_menu?.color || 'blue')"
+                      :to="`${$route.path}/${store.store?.optimus_id}/${menu.store_menu?.name}`">
                       <q-tooltip>{{ menu.store_menu?.name || 'Menu' }}</q-tooltip>
                     </q-btn>
                     <span v-if="!store.storeUserMenu?.length" class="no-menu-text">No menus</span>
@@ -607,13 +609,17 @@ $muted-2: rgba(255, 255, 255, 0.3);
 }
 
 .action-btn {
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
-  font-size: 16px;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  font-size: 14px;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
+  margin-left: 6px;
+  padding: 8px !important;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
 
   &.items-btn {
     background: rgba($blue, 0.15) !important;
@@ -624,10 +630,11 @@ $muted-2: rgba(255, 255, 255, 0.3);
       background: rgba($blue, 0.25) !important;
       border-color: rgba($blue, 0.4) !important;
       transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba($blue, 0.3) !important;
     }
   }
 
-  &.menu-btn {
+  &.menu-btn-blue {
     background: rgba($blue, 0.15) !important;
     color: $blue !important;
     border: 1px solid rgba($blue, 0.2) !important;
@@ -636,6 +643,72 @@ $muted-2: rgba(255, 255, 255, 0.3);
       background: rgba($blue, 0.25) !important;
       border-color: rgba($blue, 0.4) !important;
       transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba($blue, 0.3) !important;
+    }
+  }
+
+  &.menu-btn-green {
+    background: rgba($green, 0.15) !important;
+    color: $green !important;
+    border: 1px solid rgba($green, 0.2) !important;
+
+    &:hover {
+      background: rgba($green, 0.25) !important;
+      border-color: rgba($green, 0.4) !important;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba($green, 0.3) !important;
+    }
+  }
+
+  &.menu-btn-yellow {
+    background: rgba($yellow, 0.15) !important;
+    color: $yellow !important;
+    border: 1px solid rgba($yellow, 0.2) !important;
+
+    &:hover {
+      background: rgba($yellow, 0.25) !important;
+      border-color: rgba($yellow, 0.4) !important;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba($yellow, 0.3) !important;
+    }
+  }
+
+  &.menu-btn-red {
+    background: rgba($red, 0.15) !important;
+    color: $red !important;
+    border: 1px solid rgba($red, 0.2) !important;
+
+    &:hover {
+      background: rgba($red, 0.25) !important;
+      border-color: rgba($red, 0.4) !important;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba($red, 0.3) !important;
+    }
+  }
+
+  &.menu-btn-purple {
+    background: rgba($accent-2, 0.15) !important;
+    color: $accent-2 !important;
+    border: 1px solid rgba($accent-2, 0.2) !important;
+
+    &:hover {
+      background: rgba($accent-2, 0.25) !important;
+      border-color: rgba($accent-2, 0.4) !important;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba($accent-2, 0.3) !important;
+    }
+  }
+
+  &.menu-btn-gray {
+    background: rgba($muted, 0.15) !important;
+    color: $muted !important;
+    border: 1px solid rgba($muted, 0.2) !important;
+
+    &:hover {
+      background: rgba($muted, 0.25) !important;
+      border-color: rgba($muted, 0.4) !important;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba($muted, 0.3) !important;
     }
   }
 }
@@ -984,6 +1057,18 @@ const goToNextPage = () => {
 
 const goToLastPage = () => {
   lastPage(entityQuery.value, pagination.value);
+};
+
+const getMenuButtonClass = (color: string) => {
+  const colorMap: { [key: string]: string } = {
+    blue: 'action-btn menu-btn-blue',
+    green: 'action-btn menu-btn-green',
+    yellow: 'action-btn menu-btn-yellow',
+    red: 'action-btn menu-btn-red',
+    purple: 'action-btn menu-btn-purple',
+    gray: 'action-btn menu-btn-gray'
+  };
+  return colorMap[color] || 'action-btn menu-btn-blue';
 };
 
 onMounted(() => {

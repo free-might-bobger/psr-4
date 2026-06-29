@@ -236,12 +236,14 @@
 
 <script setup lang="ts">
 import { onMounted, ref, watch, computed } from 'vue';
+import { useRoute } from 'vue-router';
 import { onRequest, firstPage, previousPage, nextPage, lastPage } from 'src/boot/axios-call';
 import { storeToRefs } from 'pinia';
 import { useCommonStore } from 'src/stores/common';
 import { onDeleteEntity } from 'src/boot/services';
 import { StoreUser } from 'src/boot/interfaces';
 
+const route = useRoute();
 const useCommon = useCommonStore();
 const { pagination, result, entityQuery } = storeToRefs(useCommon);
 
@@ -254,7 +256,8 @@ entityQuery.value = {
         orderBy: 'created_at:desc',
         page: pagination.value.page,
         limit: 10,
-        with: 'store,user'
+        with: 'store,user',
+        filters: 'store_id:' + route.params.id
     },
 };
 
