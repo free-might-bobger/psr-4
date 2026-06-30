@@ -3,6 +3,7 @@
 namespace App\Http\Requests\StoreUserMenu;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreRequest extends FormRequest
 {
@@ -25,7 +26,13 @@ class StoreRequest extends FormRequest
     {
         return [
             'store_user_id' => 'required|integer',
-            'store_menu_id' => 'required|integer',
+            'store_menu_id' => [
+                'required',
+                'integer',
+                Rule::unique('store_user_menus')->where(function ($query) {
+                    return $query->where('store_user_id', $this->store_user_id);
+                }),
+            ],
         ];
     }
 }

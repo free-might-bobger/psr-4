@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 use App\Http\Controllers\ {
+    ApplyStoreController,
     CategoryController,
     CustomerTransactionController,
     DeliveryController,
@@ -34,7 +35,8 @@ use App\Http\Controllers\ {
     StoreUserController,
     FindStoreController,
     SharedStoreAccessController,
-    SharedItemAccessController
+    SharedItemAccessController,
+    StoreUserMenuController
 };
 
 
@@ -57,6 +59,7 @@ Route::group(['middleware' => 'auth:api', 'myTransactionMiddleware'], function (
 });
 
 Route::group(['middleware' => 'auth:api'], function () {
+  Route::post('apply-store', [ApplyStoreController::class, 'create']);
   Route::post('invite-user', [StoreUserController::class, 'inviteUser']);
   Route::resource('store-users', StoreUserController::class);
   Route::resource('store-user-menus', StoreUserMenuController::class);
@@ -80,6 +83,7 @@ Route::group( [ 'middleware' => 'auth:api' ], function () {
   Route::resource('all_stores', StoreController::class);
   Route::post('/all_stores/{id}/restore', [StoreController::class, 'restore']);
   Route::resource('deliveries', DeliveryController::class)->middleware('deliveryMiddleware');
+  Route::resource('store-deliveries', StoreDeliveryController::class)->middleware('storeDeliveryMiddleware');
   Route::resource('all-transactions', TransactionController::class)->middleware(['superAdminMiddleware', 'allTransactionsMiddleware']);
   Route::resource('my-transactions', CustomerTransactionController::class)->middleware(['customerMiddleware', 'myTransactionsMiddleware']);
   Route::resource('my-store-transactions', MyStoreTransactionController::class)->middleware(['storeAdminMiddleware', 'myStoreMiddleware']);

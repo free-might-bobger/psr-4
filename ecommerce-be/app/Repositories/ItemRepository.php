@@ -8,8 +8,8 @@ use App\Traits\RoleTrait;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Arr;
 use App\Repositories\Support\ColumnValueCriteria;
-use Illuminate\Support\Facades\File;
 use App\Models\Image;
+use Intervention\Image\Facades\Image as ImageFacade;
 use App\Constants\Config;
 class ItemRepository extends BaseRepository
 {
@@ -111,23 +111,52 @@ class ItemRepository extends BaseRepository
 
             $originalName = $file->getClientOriginalName();
             $fileName = uniqid() . '-' . $originalName;
-            $fileContent = file_get_contents($file->getPathname());
             $filePath = 'images/uploads/' . $fileName;
 
-            File::put(public_path($filePath), $fileContent);
+            // Optimize image before saving
+            $optimizedImage = $this->optimizeImage($file);
+            $optimizedImage->save(public_path($filePath), 85); // 85% quality
 
             $image = new Image([
                 'thumbnail' => $filePath,
                 'path' => $filePath,
                 'name' => $originalName,
                 'is_primary' => $request->input('primaryImageName') === $originalName,
-                'size' => $file->getSize()
+                'size' => filesize(public_path($filePath))
             ]);
 
             $this->model->images()->save($image);
         }
 
         $this->updatePrimaryImageFromRequest($request);
+    }
+
+    private function optimizeImage($file)
+    {
+        $image = ImageFacade::make($file->getPathname());
+
+        // Get original dimensions
+        $width = $image->width();
+        $height = $image->height();
+
+        // Set maximum dimensions (adjust as needed)
+        $maxWidth = 1920;
+        $maxHeight = 1080;
+
+        // Only resize if image is larger than maximum dimensions
+        if ($width > $maxWidth || $height > $maxHeight) {
+            $image->resize($maxWidth, $maxHeight, function ($constraint) {
+                $constraint->aspectRatio();
+                $constraint->upsize();
+            });
+        }
+
+        // Convert to JPEG for better compression (if not already JPEG)
+        if ($file->getClientOriginalExtension() !== 'jpg' && $file->getClientOriginalExtension() !== 'jpeg') {
+            $image->encode('jpg', 85);
+        }
+
+        return $image;
     }
 
     /**

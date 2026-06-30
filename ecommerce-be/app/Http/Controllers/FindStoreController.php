@@ -6,7 +6,7 @@ use App\Repositories\StoreRepository;
 use App\Http\Requests\FindStoreRequest;
 use App\Http\Resources\BaseResource;
 use App\Http\Resources\FindStoreResource;
-
+use App\Http\Requests\BaseIndexRequest;
 class FindStoreController
 {
     private $repository;
@@ -15,6 +15,7 @@ class FindStoreController
     public function __construct(StoreRepository $storeRepository)
     {
         $this->repository = $storeRepository;
+        $this->showRequest = BaseIndexRequest::class;
     }
     
     public function findStore(FindStoreRequest $findStoreRequest): FindStoreResource

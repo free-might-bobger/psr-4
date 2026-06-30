@@ -20,7 +20,7 @@ class BaseRepository implements BaseInterface
     use RoleTrait, ColumnValueCriteria, OptimusId, BaseSupportRepository;
 
     protected Model|Builder|null $model;
-    protected array $params;
+    protected array $params = [];
     protected ?string $cacheKey;
     protected array $fillable;
     protected object $request;

@@ -6,13 +6,10 @@ use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
-use App\Traits\RoleTrait;
-use App\Models\RoleUser;
-use App\Models\MenuRole;
+use App\Models\StoreUser;
 use App\Exceptions\AccessDeniedException;
 
-class DeliveryMiddleware{
-    use RoleTrait;
+class StoreDeliveryMiddleware {
     /**
     * Handle an incoming request.
     *
@@ -22,18 +19,14 @@ class DeliveryMiddleware{
     public function handle( Request $request, Closure $next ): Response {
         $userId = Auth::id();
 
-        $hasRoleUser = RoleUser::where('user_id', $userId)->exists();
+        $hasStoreUser = StoreUser::where('user_id', $userId)->exists();
 
-        if (!$hasRoleUser) {
+        if (!$hasStoreUser) {
             throw new AccessDeniedException('Unable to access');
         }
 
-        $hasDeliveriesMenu = MenuRole::whereIn('role_id', function ($query) use ($userId) {
-                $query->select('role_id')
-                    ->from('role_user')
-                    ->where('user_id', $userId);
-            })
-            ->whereHas('menu', function ($query) {
+        $hasDeliveriesMenu = StoreUser::where('user_id', $userId)
+            ->whereHas('storeUserMenu.storeMenu', function ($query) {
                 $query->where('name', 'Deliveries');
             })
             ->exists();

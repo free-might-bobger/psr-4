@@ -21,7 +21,8 @@ class PatchRequest extends BaseRequest
             'latitude'      => 'required',
             'longitude'     => 'required',
             'mobile'        => 'required|string',
-            'name'          => 'sometimes|string'
+            'name'          => 'sometimes|string',
+            'is_active'     => 'sometimes|boolean'
 
         ];
     }

@@ -256,9 +256,9 @@ class RegisterController extends BaseController
 
             $user->save();
 
-            RoleUser::create([
+            RoleUser::firstOrCreate([
                 'user_id' => $user->id,
-                'role_id' => Role::CUSTOMER
+                'role_id' => Role::CUSTOMER,
             ]);
             Auth::login($user);
 

@@ -3,16 +3,16 @@
 namespace App\Http\Controllers;
 
 use App\Repositories\DeliveryRepository;
-use App\Http\Requests\DeliveryRequest;
+use App\Http\Requests\StoreDelivery\IndexRequest;
 use App\Http\Resources\BaseResource;
 use App\Http\Resources\Delivery\IndexResource;
 
-class DeliveryController extends ApiController
+class StoreDeliveryController extends ApiController
 {
 
     public function __construct(DeliveryRepository $repository){
         $this->repository = $repository;
-        $this->indexRequest = DeliveryRequest::class;
+        $this->indexRequest = IndexRequest::class;
     }
 
     public function index()

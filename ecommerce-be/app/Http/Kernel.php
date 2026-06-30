@@ -75,5 +75,6 @@ class Kernel extends HttpKernel
         'storeMenuAccessMiddleware' => \App\Http\Middleware\StoreMenuAccessMiddleware::class,
         'myTransactionsMiddleware' => \App\Http\Middleware\MyTransactionsMiddleware::class,
         'deliveryMiddleware' => \App\Http\Middleware\DeliveryMiddleware::class,
+        'storeDeliveryMiddleware' => \App\Http\Middleware\StoreDeliveryMiddleware::class,
     ];
 }

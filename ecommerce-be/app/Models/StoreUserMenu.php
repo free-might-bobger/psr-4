@@ -11,7 +11,7 @@ class StoreUserMenu extends Model  implements Auditable
     use HasFactory, \App\Traits\Obfuscate\OptimusId;
     use \OwenIt\Auditing\Auditable;
 
-    protected $table = 'store_user_menu';
+    protected $table = 'store_user_menus';
 
     protected $fillable = [
         'store_user_id',
@@ -23,6 +23,10 @@ class StoreUserMenu extends Model  implements Auditable
 
     public function storeMenu(){
         return $this->hasOne(StoreMenu::class, 'id', 'store_menu_id');
+    }
+
+    public function storeUser(){
+        return $this->hasOne(StoreUser::class, 'id', 'store_user_id');
     }
 
     
