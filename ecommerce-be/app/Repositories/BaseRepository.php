@@ -3,21 +3,31 @@
 namespace App\Repositories;
 
 use Illuminate\Database\Eloquent\Builder;
-use App\Repositories\Support\SearchFieldSupport;
-use App\Traits\Obfuscate\OptimusRequiredToModel;
+use App\Repositories\Support\ColumnValueCriteria;
+use App\Traits\Obfuscate\OptimusId;
 use Illuminate\Support\Arr;
 use App\Traits\Support\BaseSupportRepository;
 use App\Models\Image;
-use App\Traits\UtilsTrait;
+use App\Traits\RoleTrait;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use App\Http\Requests\BaseIndexRequest;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Http\Request;
 class BaseRepository implements BaseInterface
 {
-    use UtilsTrait, SearchFieldSupport, OptimusRequiredToModel, BaseSupportRepository;
+    use RoleTrait, ColumnValueCriteria, OptimusId, BaseSupportRepository;
 
-    protected $model, $params, $cacheKey, $fillable;
+    protected Model|Builder|null $model;
+    protected array $params = [];
+    protected ?string $cacheKey;
+    protected array $fillable;
+    protected object $request;
+    protected array $associatedClass;
+    protected string $name;
+    protected string $fileName;
+    protected int $size;
 
     /**
      * Set the model
@@ -63,12 +73,33 @@ class BaseRepository implements BaseInterface
     /**
      * Find the resource or fail
      * @param int $id
+     * @param array $relations
      * @return Model
      */
-    public function findOrFail(int $id): Model
+    public function findOrFail(int $id, array $relations = []): Model
     {
-        $this->model = $this->model->findOrFail($this->optimus()->decode($id));
-        return $this->model;
+        // If model is a Builder (after filterQuery), use it directly
+        if ($this->model instanceof Builder) {
+            $query = $this->model;
+        } else {
+            $query = $this->getFreshQuery();
+            $this->applyStoredFiltersToQuery($query);
+        }
+        
+        if (!empty($relations)) {
+            $query = $query->with($relations);
+        }
+        return $query->findOrFail($this->optimus()->decode($id));
+    }
+
+    /**
+     * Get a fresh query builder instance
+     * @return Builder
+     */
+    private function getFreshQuery(): Builder
+    {
+        $modelClass = get_class($this->model instanceof Model ? $this->model : $this->model->getModel());
+        return $modelClass::query();
     }
 
     /**
@@ -98,6 +129,7 @@ class BaseRepository implements BaseInterface
         }
         $this->with();
         $this->orderBy(Arr::get($parameters, 'orderBy', 'created_at:desc'));
+        $this->deleted(Arr::get($parameters, 'deleted', null));
         return $this;
     }
 
@@ -108,13 +140,63 @@ class BaseRepository implements BaseInterface
      */
     public function getResults(): LengthAwarePaginator|Collection
     {
-        $limit = Arr::get($this->params, 'limit', 10);
+        $limit = Arr::get($this->params, 'limit', 12);
         $type  = Arr::get($this->params, 'type', false);
         
-        if ($type) {
-            return $this->model->take($limit)->get();
+        // If model is a Builder (after filterQuery), use it directly
+        if ($this->model instanceof Builder) {
+            if ($type) {
+                $result = $this->model->take($limit)->get();
+                // Debug: Log the type if it's still wrong
+                if ($result instanceof Builder) {
+                    // Force execution
+                    return $result->get();
+                }
+                return $result;
+            }
+            $result = $this->model->paginate($limit);
+            // Debug: Log the type if it's still wrong  
+            if ($result instanceof Builder) {
+                // Force execution
+                return $result->paginate($limit);
+            }
+            return $result;
         }
-        return $this->model->paginate($limit);
+        
+        // Otherwise, get fresh query and apply filters
+        $query = $this->getFreshQuery();
+        $this->applyStoredFiltersToQuery($query);
+        
+        if ($type) {
+            return $query->take($limit)->get();
+        }
+        return $query->paginate($limit);
+    }
+
+    /**
+     * Apply stored filters to a fresh query
+     * @param Builder $query
+     */
+    private function applyStoredFiltersToQuery(Builder $query): void
+    {
+        // Re-apply the filters that were applied during filterQuery
+        $filters = $this->pregSplit('@,@', Arr::get($this->params, 'filters', ''));
+        foreach ($filters as $filterKeys => $filterValues) {
+            [$column, $value] = $this->pregSplit('@:@', $filterValues);
+            if (method_exists($this, $column)) {
+                // Create a temporary repository with the fresh query
+                $tempRepo = clone $this;
+                $tempRepo->model = $query;
+                call_user_func([$tempRepo, $column], $value);
+                // Update the query with any modifications
+                $query = $tempRepo->model;
+            }
+        }
+        
+        // Apply other filters
+        $this->applyWithToQuery($query);
+        $this->applyOrderByToQuery($query, Arr::get($this->params, 'orderBy', 'created_at:desc'));
+        $this->applyDeletedToQuery($query, Arr::get($this->params, 'deleted', null));
     }
 
     /**
@@ -132,51 +214,20 @@ class BaseRepository implements BaseInterface
      * Where the resource
      * @param string $field
      * @param int $optimusId
-     * @return Model
+     * @return Builder
      */
-    public function where(string $field, int $optimusId): Model
+    public function where(string $field, int $optimusId): Builder
     {
         $this->model = $this->model->where($field, $this->optimus()->decode($optimusId));
         $this->params = app(BaseIndexRequest::class)->all();
-        $this->with();
-        return $this->model->first();
+        if(Arr::get($this->params, 'with')){
+            $this->with();
+
+        }
+        return $this->model;
     }
 
 
-    /***
-     * NOT YET REWRITTEN BELOW
-      NOT YET REWRITTEN BELOW
-      NOT YET REWRITTEN BELOW
-     */
-
-    /**
-     * Filters query parameters by invoking methods named after each key in the parameter array.
-     * 
-     * This function iterates through `$this->params`, where each key-value pair represents 
-     * a specific query constraint. If a method exists within this class that matches a key, 
-     * it dynamically calls that method, passing the corresponding value as an argument.
-     * 
-     * Example:
-     * Given `$this->params = ['user_id' => 27]`, this function will call `$this->user_id(27)`, 
-     * assuming a `user_id` method exists in the class.
-     * Please check App/Support/FieldSupport for all global filter
-     * if you need specific filter you can create in your OwnRepository
-     * public function key($value)
-     *
-     * @return $this
-     */
-    // public function filterQuery(array $request): self
-    // {
-    //     foreach ($request as $key => $param) {
-    //         if(method_exists($this, $key)){
-    //             call_user_func([$this, $key], $param);
-    //         }
-    //     }
-
-    //     return $this->getResults();
-    // }
-
-    //orderBy=name:asc
     /**
      * Order the resource
      * @param string $param
@@ -398,45 +449,19 @@ class BaseRepository implements BaseInterface
         return $this->model->delete();
     }
 
-    public function upload()
+    /**
+     * Delete records matching multiple where conditions
+     * @param array $conditions Associative array of column => value pairs
+     * @return int Number of deleted rows
+     */
+    public function deleteWhere(array $conditions): int
     {
-
-        if (isset($_FILES["images"])) {
-
-
-            foreach ($_FILES["images"]['name'] as $key => $value) {
-
-                $this->name = $_FILES["images"]['name'][$key];
-                $this->fileName = time() . '-' . $this->name;
-                $fileTmp = $_FILES["images"]['tmp_name'][$key];
-                $this->size = $_FILES["images"]['size'][$key];
-                $uploadfile = file_get_contents($fileTmp);
-
-                \File::put(public_path() . '/images/uploads/' . $this->fileName, $uploadfile);
-
-                if ($this->request->isPrimary && $this->model->image) {
-                    foreach ($this->model->images as $image) {
-                        $image->update([
-                            'is_primary' => 0
-                        ]);
-                    }
-
-                    if ($this->name == $this->request->primaryName) {
-                        $this->imageUploadIsPrimary(true);
-                    } else {
-                        $this->imageUploadIsPrimary(false);
-                    }
-                } else {
-                    if ($key == 0) {
-                        $this->imageUploadIsPrimary(true);
-                    } else {
-                        $this->imageUploadIsPrimary(false);
-                    }
-                }
-            }
+        $query = $this->model;
+        foreach ($conditions as $column => $value) {
+            $query = $query->where($column, $value);
         }
+        return $query->delete();
     }
-
 
 
     public function all()
@@ -454,42 +479,49 @@ class BaseRepository implements BaseInterface
         return $this->model->where($field, $this->optimus()->decode($value));
     }
 
-    public function filesUpload()
+    /**
+     * Apply with relations to query
+     * @param Builder $query
+     */
+    private function applyWithToQuery(Builder $query): void
     {
-        $request = app()->make('request');
-        if (isset($_FILES["files"])) {
-
-            foreach ($this->model->first()->images as $image) {
-                $image->update(['is_primary' => 0]);
-            }
-
-            foreach ($_FILES["files"]['name'] as $key => $value) {
-
-                $this->name = $_FILES["files"]['name'][$key];
-                $this->fileName = time() . '-' . $this->name;
-                $fileTmp = $_FILES["files"]['tmp_name'][$key];
-                $this->size = $_FILES["files"]['size'][$key];
-                $uploadfile = file_get_contents($fileTmp);
-                \File::put(public_path() . '/images/uploads/' . $this->fileName, $uploadfile);
-
-                $image = new Image([
-                    'thumbnail' => 'images/uploads/' . $this->fileName,
-                    'path' => 'images/uploads/' . $this->fileName,
-                    'name'  => $this->name,
-                    'is_primary' => $request->primaryImageName == $this->name,
-                    'size'  => $this->size
-                ]);
-
-                $this->model->first()->images()->save($image);
-            }
+        $with = Arr::get($this->params, 'with', []);
+        if (!empty($with)) {
+            $withRelations = $this->pregSplit('@,@', $with);
+            $query->with($withRelations);
         }
-        $this->deletedFiles();
-        $this->updatePrimaryImageFromRequest($request);
     }
 
-    protected function updatePrimaryImageFromRequest($request)
+    /**
+     * Apply order by to query
+     * @param Builder $query
+     * @param string $orderBy
+     */
+    private function applyOrderByToQuery(Builder $query, string $orderBy): void
     {
-        if (!$request->primaryImageName) {
+        [$column, $value] = $this->pregSplit('@:@', $orderBy);
+        $query->orderBy($column, $value);
+    }
+
+    /**
+     * Apply deleted filter to query
+     * @param Builder $query
+     * @param string|null $deleted
+     */
+    private function applyDeletedToQuery(Builder $query, ?string $deleted): void
+    {
+        if ($deleted === 'true') {
+            $query->onlyTrashed();
+        } elseif ($deleted === 'false') {
+            $query->whereNull('deleted_at');
+        }
+    }
+
+    protected function updatePrimaryImageFromRequest(Request $request): void
+    {
+        $primaryImageName = $request->input('primaryImageName');
+        
+        if (!$primaryImageName) {
             return;
         }
 
@@ -500,24 +532,34 @@ class BaseRepository implements BaseInterface
 
         $model->images()->update(['is_primary' => 0]);
         $model->images()
-            ->where('name', $request->primaryImageName)
+            ->where('name', $primaryImageName)
             ->update(['is_primary' => 1]);
     }
 
-    protected function deletedFiles()
+    protected function deletedFiles(): void
     {
         $request = app()->make('request');
-        if ($request->deletedFiles) {
-            foreach ($request->deletedFiles as $id) {
-                $image = Image::find($id);
-                if ($image) {
-                    $path = public_path($image->path);
-                    if (file_exists($path)) {
-                        unlink($path);
-                    }
-                    $image->delete();
-                }
+        $deletedFileIds = $request->input('deletedFiles');
+        
+        if (!$deletedFileIds) {
+            return;
+        }
+
+        if (!is_array($deletedFileIds)) {
+            $deletedFileIds = [$deletedFileIds];
+        }
+
+        foreach ($deletedFileIds as $id) {
+            $image = Image::find($id);
+            if (!$image) {
+                continue;
             }
+
+            if (Storage::disk('public')->exists($image->path)) {
+                Storage::disk('public')->delete($image->path);
+            }
+
+            $image->delete();
         }
     }
 }

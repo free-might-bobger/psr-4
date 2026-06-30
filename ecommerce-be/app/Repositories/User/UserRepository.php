@@ -5,10 +5,10 @@ namespace App\Repositories\User;
 use App\Models\User;
 use App\Repositories\BaseRepository;
 use Exception;
-use App\Mail\EmailInvitation;
+
 use App\Models\Store;
 
-class UserRepository extends BaseRepository implements UserInterface
+class UserRepository extends BaseRepository
 {
     public function __construct()
     {
@@ -31,18 +31,8 @@ class UserRepository extends BaseRepository implements UserInterface
         $this->model = $this->model->where('lastname', 'LIKE', '%' . $value . '%');
     }
 
-    public function inviteByEmail(int $storeId, string $email): void {
-        
-        $store = Store::find($storeId);
-        $stringRandom = str_random(32);
-        $url = env('APP_URL');
-        $inviteInfo = [
-            'storeName' => $store->name,
-            'activation_code' => $url . '//invitation-code/' . $stringRandom
-        ];
-        
-        Mail::to($email)
-            ->send(new EmailInvitation($inviteInfo));
+    public function whereEmail($email):void {
+        $this->model = $this->model->whereEmail($email);
     }
 
 }

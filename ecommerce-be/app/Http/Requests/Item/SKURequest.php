@@ -4,10 +4,10 @@ namespace App\Http\Requests\Item;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
-use App\Traits\Obfuscate\OptimusRequiredToModel;
+use App\Traits\Obfuscate\OptimusId;
 class SKURequest extends FormRequest
 {
-    use OptimusRequiredToModel;
+    use OptimusId;
     /**
      * Determine if the user is authorized to make this request.
      *

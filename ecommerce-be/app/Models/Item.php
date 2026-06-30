@@ -6,13 +6,13 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Traits\Slug;
-use App\Traits\Obfuscate\OptimusRequiredToModel;
+use App\Traits\Obfuscate\OptimusId;
 use OwenIt\Auditing\Contracts\Auditable;
 
 
 class Item extends Model implements Auditable
 {
-    use HasFactory, Slug, OptimusRequiredToModel, SoftDeletes;
+    use HasFactory, Slug, OptimusId, SoftDeletes;
     use \OwenIt\Auditing\Auditable;
 
     protected $table = 'items';

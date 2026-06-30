@@ -3,22 +3,19 @@
 namespace App\Http\Controllers;
 
 use App\Repositories\StoreMenuAccessRepository;
+use App\Http\Requests\StoreMenuAccess\IndexRequest;
 use App\Http\Requests\BaseIndexRequest;
-use App\Http\Requests\StoreMenuAccessRequest;
-use App\Models\Store;
-use App\Http\Resources\BaseResource;
+use App\Http\Requests\StoreMenuAccess\StoreRequest;
+use App\Http\Requests\StoreMenuAccess\UpdateRequest;
 
 class StoreMenuAccessController extends ApiController
 {
     public function __construct(StoreMenuAccessRepository $repository){
-        $this->middleware('storeMenuAccessMiddleware')->only(['store']);
         $this->repository = $repository;
-        $this->indexRequest = BaseIndexRequest::class;
-        $this->storeRequest = StoreMenuAccessRequest::class;
-        $this->updateRequest = StoreMenuAccessRequest::class;
+        $this->indexRequest = IndexRequest::class;
+        $this->showRequest = BaseIndexRequest::class;
+        $this->storeRequest = StoreRequest::class;
+        $this->updateRequest = UpdateRequest::class;
     }
 
-    protected function getResource() : BaseResource {
-        return new BaseResource( $this->result );
-    }
 }

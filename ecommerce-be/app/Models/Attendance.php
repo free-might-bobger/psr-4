@@ -4,12 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Traits\Obfuscate\OptimusRequiredToModel;
+use App\Traits\Obfuscate\OptimusId;
 use Carbon\Carbon;
 
 class Attendance extends Model
 {
-    use HasFactory, OptimusRequiredToModel;
+    use HasFactory, OptimusId;
 
     protected $table = 'attendance';
     protected $fillable = ['login', 'logout', 'user_id'];

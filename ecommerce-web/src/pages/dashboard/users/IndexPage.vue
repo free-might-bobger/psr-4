@@ -1,223 +1,132 @@
 <template>
   <div class="stores-page-container">
     <!-- Header Section -->
-    <div class="page-header q-mb-md">
+    <div class="page-header q-mb-lg">
+      <div class="header-bg-accent"></div>
       <div class="header-content">
         <div class="header-title-section">
-          <q-icon name="person" size="32px" color="primary" class="q-mr-sm" />
-          <h2 class="page-title">Users</h2>
+          <div class="header-icon-wrap">
+            <q-icon name="group" size="26px" color="white" />
+          </div>
+          <div>
+            <h2 class="page-title">Users</h2>
+            <div class="page-subtitle">Manage registered users</div>
+          </div>
         </div>
         <div class="header-actions">
-          <q-input
-            v-model="search"
-            placeholder="Search users..."
-            outlined
-            dense
-            clearable
-            debounce="300"
-            class="search-input"
-          >
+          <q-input v-model="search" placeholder="Search users..." outlined dense clearable debounce="1000"
+            class="search-input">
             <template v-slot:prepend>
-              <q-icon name="search" />
+              <q-icon name="search" color="grey-5" />
             </template>
           </q-input>
         </div>
       </div>
     </div>
 
-    <!-- Desktop Grid View -->
+    <!-- Desktop Table View -->
     <div class="desktop-only">
       <div v-if="typedResult.length === 0" class="empty-state-desktop">
-        <q-icon name="person_off" size="80px" color="grey-4" />
-        <div class="text-h5 q-mt-md text-grey-6">No users found</div>
-        <div class="text-body2 text-grey-5 q-mt-sm">Try adjusting your search criteria</div>
-      </div>
-      <div v-else>
-        <!-- Grid Header -->
-        <div class="grid-header">
-          <div class="grid-header-cell header-name">
-            <q-icon name="person" size="20px" color="primary" class="q-mr-xs" />
-            <span class="header-label">User Name</span>
-          </div>
-          <div class="grid-header-cell header-mobile">
-            <q-icon name="phone" size="20px" color="primary" class="q-mr-xs" />
-            <span class="header-label">Mobile</span>
-          </div>
-          <div class="grid-header-cell header-actions">
-            <q-icon name="settings" size="20px" color="primary" class="q-mr-xs" />
-            <span class="header-label">Actions</span>
-          </div>
+        <div class="empty-icon-wrap">
+          <q-icon name="person_off" size="48px" color="white" />
         </div>
+        <div class="empty-title q-mt-md">No users found</div>
+        <div class="empty-subtitle q-mt-sm">Try adjusting your search criteria</div>
+      </div>
+      <q-table v-else flat :rows="typedResult" :columns="columns" row-key="optimus_id" class="users-table"
+        :rows-per-page-options="[0]" hide-pagination>
+        <template v-slot:body-cell-name="props">
+          <q-td :props="props">
+            <router-link :to="`${$route.path}/${props.row.optimus_id}`" class="user-name-link">
+              <q-icon name="person" color="primary" class="q-mr-xs" />
+              <span>{{ props.row.name || props.row.label || 'N/A' }}</span>
+            </router-link>
+          </q-td>
+        </template>
 
-        <!-- Grid Rows -->
-        <div class="stores-grid">
-          <q-card
-            v-for="user in typedResult"
-            :key="user.id"
-            flat
-            bordered
-            class="store-grid-item"
-          >
-            <div class="grid-row">
-              <div class="grid-cell cell-name">
-                <router-link
-                  :to="`${$route.path}/${user.optimus_id}`"
-                  class="store-name-grid"
-                >
-                  <q-icon name="person" color="primary" />
-                  <span class="store-name-text">{{ user.name || user.label || 'N/A' }}</span>
-                </router-link>
-              </div>
-              <div class="grid-cell cell-mobile">
-                <div class="mobile-info">
-                  <q-icon name="phone" color="primary" />
-                  <span>{{ user.mobile || 'N/A' }}</span>
-                </div>
-              </div>
-              <div class="grid-cell cell-actions">
-                <div class="action-buttons">
-                  <q-btn
-                    unelevated
-                    round
-                    dense
-                    color="primary"
-                    icon="edit_note"
-                    :to="`${$route.path}/${user.optimus_id}`"
-                    class="action-btn-grid action-btn-edit"
-                  >
-                    <q-tooltip>Edit User</q-tooltip>
-                  </q-btn>
-                  <q-btn
-                    unelevated
-                    round
-                    dense
-                    color="negative"
-                    icon="delete_forever"
-                    @click="handleDeleteUser(user)"
-                    class="action-btn-grid action-btn-delete"
-                  >
-                    <q-tooltip>Delete User</q-tooltip>
-                  </q-btn>
-                </div>
-              </div>
+        <template v-slot:body-cell-mobile="props">
+          <q-td :props="props">
+            <div class="mobile-cell">
+              <q-icon name="phone" color="primary" class="q-mr-xs" />
+              <span>{{ props.row.mobile || 'N/A' }}</span>
             </div>
-          </q-card>
-        </div>
+          </q-td>
+        </template>
 
-        <!-- Pagination -->
-        <div class="grid-pagination">
-          <div class="pagination-info">
-            Showing {{ pagination.from }} - {{ pagination.to }} of {{ pagination.rowsNumber }} users
+        <template v-slot:body-cell-actions="props">
+          <q-td :props="props">
+            <div class="action-buttons">
+              <router-link :to="`${$route.path}/${props.row.optimus_id}`" class="action-pill action-edit">
+                <q-icon name="edit_note" size="16px" />
+                Edit
+              </router-link>
+              <button class="action-pill action-delete" @click="handleDeleteUser(props.row)">
+                <q-icon name="delete_forever" size="16px" />
+                Delete
+              </button>
+            </div>
+          </q-td>
+        </template>
+
+        <template v-slot:bottom>
+          <div class="table-pagination">
+            <div class="pagination-info">
+              Showing {{ pagination.from }} - {{ pagination.to }} of {{ pagination.rowsNumber }} users
+            </div>
+            <div class="pagination-controls">
+              <q-btn v-if="pagination.lastPage > 2" flat round dense icon="first_page" color="grey-8"
+                :disable="pagination.page === 1" @click="goToFirstPage" />
+              <q-btn flat round dense icon="chevron_left" color="grey-8" :disable="pagination.page === 1"
+                @click="goToPreviousPage" />
+              <span class="page-number">{{ pagination.page }} / {{ pagination.lastPage }}</span>
+              <q-btn flat round dense icon="chevron_right" color="grey-8"
+                :disable="pagination.page === pagination.lastPage" @click="goToNextPage" />
+              <q-btn v-if="pagination.lastPage > 2" flat round dense icon="last_page" color="grey-8"
+                :disable="pagination.page === pagination.lastPage" @click="goToLastPage" />
+            </div>
           </div>
-          <div class="pagination-controls">
-            <q-btn
-              v-if="pagination.lastPage > 2"
-              flat
-              round
-              dense
-              icon="first_page"
-              color="grey-8"
-              :disable="pagination.page === 1"
-              @click="goToFirstPage"
-            />
-            <q-btn
-              flat
-              round
-              dense
-              icon="chevron_left"
-              color="grey-8"
-              :disable="pagination.page === 1"
-              @click="goToPreviousPage"
-            />
-            <span class="page-number">{{ pagination.page }} / {{ pagination.lastPage }}</span>
-            <q-btn
-              flat
-              round
-              dense
-              icon="chevron_right"
-              color="grey-8"
-              :disable="pagination.page === pagination.lastPage"
-              @click="goToNextPage"
-            />
-            <q-btn
-              v-if="pagination.lastPage > 2"
-              flat
-              round
-              dense
-              icon="last_page"
-              color="grey-8"
-              :disable="pagination.page === pagination.lastPage"
-              @click="goToLastPage"
-            />
-          </div>
-        </div>
-      </div>
+        </template>
+      </q-table>
     </div>
 
     <!-- Mobile Card View -->
     <div class="mobile-only">
       <div v-if="typedResult.length === 0" class="empty-state">
-        <q-icon name="person_off" size="64px" color="grey-4" />
-        <div class="text-h6 q-mt-md text-grey-6">No users found</div>
+        <div class="empty-icon-wrap">
+          <q-icon name="person_off" size="40px" color="white" />
+        </div>
+        <div class="empty-title q-mt-md">No users found</div>
       </div>
       <div v-else class="stores-cards">
-        <q-card
-          v-for="user in typedResult"
-          :key="user.id"
-          flat
-          bordered
-          class="store-card q-mb-md"
-        >
+        <q-card v-for="user in typedResult" :key="user.id" flat class="store-card q-mb-md">
           <q-card-section>
             <div class="store-card-header">
               <div class="store-card-title">
-                <q-icon name="person" color="primary" size="24px" class="q-mr-sm" />
-                <router-link
-                  :to="`${$route.path}/${user.optimus_id}`"
-                  class="store-name-link"
-                >
+                <div class="card-user-icon">
+                  <q-icon name="person" size="18px" color="white" />
+                </div>
+                <router-link :to="`${$route.path}/${user.optimus_id}`" class="store-name-link">
                   {{ user.name || user.label || 'N/A' }}
                 </router-link>
               </div>
             </div>
             <div v-if="user.mobile" class="store-card-info q-mt-sm">
-              <q-icon name="phone" size="16px" color="grey-6" class="q-mr-xs" />
-              <span class="text-body2 text-grey-7">{{ user.mobile }}</span>
+              <q-icon name="phone" size="15px" class="q-mr-xs card-info-icon" />
+              <span class="card-info-text">{{ user.mobile }}</span>
             </div>
             <div class="store-card-actions q-mt-md">
-              <q-btn
-                unelevated
-                dense
-                color="primary"
-                icon="edit_note"
-                label="Edit"
-                :to="`${$route.path}/${user.optimus_id}`"
-                class="action-btn-mobile action-btn-edit-mobile"
-              />
-              <q-btn
-                unelevated
-                dense
-                color="negative"
-                icon="delete_forever"
-                label="Delete"
-                @click="handleDeleteUser(user)"
-                class="action-btn-mobile action-btn-delete-mobile"
-              />
+              <q-btn unelevated dense color="primary" icon="edit_note" label="Edit"
+                :to="`${$route.path}/${user.optimus_id}`" class="action-btn-mobile" />
+              <q-btn unelevated dense color="negative" icon="delete_forever" label="Delete"
+                @click="handleDeleteUser(user)" class="action-btn-mobile" />
             </div>
           </q-card-section>
         </q-card>
       </div>
       <!-- Mobile Pagination -->
       <div v-if="typedResult.length > 0" class="mobile-pagination q-mt-md">
-        <q-pagination
-          v-model="pagination.page"
-          :max="pagination.lastPage"
-          :max-pages="5"
-          direction-links
-          boundary-links
-          color="primary"
-          @update:model-value="handlePageChange"
-        />
+        <q-pagination v-model="pagination.page" :max="pagination.lastPage" :max-pages="5" direction-links boundary-links
+          color="primary" @update:model-value="handlePageChange" />
       </div>
     </div>
   </div>
@@ -254,6 +163,32 @@ entityQuery.value = {
 };
 
 const typedResult = result as unknown as UserRow[];
+
+const columns = [
+  {
+    name: 'name',
+    required: true,
+    label: 'User Name',
+    align: 'left' as const,
+    field: (row: UserRow) => row.name || row.label || 'N/A',
+    sortable: true
+  },
+  {
+    name: 'mobile',
+    required: true,
+    label: 'Mobile',
+    align: 'left' as const,
+    field: 'mobile',
+    sortable: true
+  },
+  {
+    name: 'actions',
+    required: true,
+    label: 'Actions',
+    align: 'right' as const,
+    field: ''
+  }
+];
 
 const handleDeleteUser = (user: UserRow) => {
   onDeleteEntity('users', user.optimus_id, user.name || user.label || 'User');
@@ -298,5 +233,527 @@ watch(search, (newValue) => {
 </script>
 
 <style scoped lang="scss">
-@import 'src/css/dashboard/all-stores/index.scss';
+// ── Dark theme tokens ──────────────────────────────────────────────────────
+$dark-base: #0f172a;
+$dark-card: #1e293b;
+$dark-elevated: #273549;
+$border: rgba(255, 255, 255, 0.08);
+$accent: #6366f1;
+$accent-2: #7c3aed;
+$white: #ffffff;
+$muted: rgba(255, 255, 255, 0.5);
+
+// ── Container ──────────────────────────────────────────────────────────────
+.stores-page-container {
+  padding: 28px 24px;
+  max-width: 1400px;
+  margin: 0 auto;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: $dark-base !important;
+  color: $white !important;
+}
+
+// ── Header ─────────────────────────────────────────────────────────────────
+.page-header {
+  position: relative;
+  background: $dark-card !important;
+  border-radius: 20px !important;
+  border: 1px solid $border !important;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.3) !important;
+  overflow: hidden;
+}
+
+.header-bg-accent {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.18) 0%, rgba(124, 58, 237, 0.10) 60%, transparent 100%);
+  pointer-events: none;
+}
+
+.header-content {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 24px;
+  padding: 28px 32px;
+}
+
+.header-title-section {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.header-icon-wrap {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, $accent 0%, $accent-2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 16px rgba(99, 102, 241, 0.4);
+  flex-shrink: 0;
+}
+
+.page-title {
+  font-size: 24px !important;
+  font-weight: 800 !important;
+  color: $white !important;
+  margin: 0 0 4px !important;
+  letter-spacing: -0.3px;
+  line-height: 1.2;
+}
+
+.page-subtitle {
+  font-size: 13px;
+  color: $muted;
+  font-weight: 500;
+}
+
+.search-input {
+  min-width: 280px;
+  max-width: 380px;
+
+  :deep(.q-field__control) {
+    background: $dark-elevated !important;
+    border-radius: 12px !important;
+    border: 1px solid $border !important;
+  }
+
+  :deep(.q-field__native),
+  :deep(.q-field__input) {
+    color: $white !important;
+  }
+
+  :deep(.q-field__label) {
+    color: $muted !important;
+  }
+
+  :deep(.q-field__prepend .q-icon),
+  :deep(.q-field__append .q-icon) {
+    color: $muted !important;
+  }
+
+  :deep(.q-field--outlined .q-field__control:before) {
+    border-color: $border !important;
+  }
+
+  :deep(.q-field--outlined:hover .q-field__control:before) {
+    border-color: rgba(99, 102, 241, 0.4) !important;
+  }
+
+  :deep(.q-field--focused .q-field__control:before) {
+    border-color: $accent !important;
+  }
+}
+
+// ── Empty states ───────────────────────────────────────────────────────────
+.empty-state-desktop,
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 20px;
+  text-align: center;
+  background: $dark-card !important;
+  border-radius: 20px !important;
+  border: 1px solid $border !important;
+}
+
+.empty-icon-wrap {
+  width: 80px;
+  height: 80px;
+  border-radius: 24px;
+  background: linear-gradient(135deg, $accent 0%, $accent-2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 24px rgba(99, 102, 241, 0.35);
+}
+
+.empty-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: $white;
+}
+
+.empty-subtitle {
+  font-size: 14px;
+  color: $muted;
+}
+
+// ── Desktop table ──────────────────────────────────────────────────────────
+.users-table {
+  width: 100%;
+
+  :deep(.q-table__container) {
+    background: $dark-card !important;
+    border: 1px solid $border !important;
+    border-radius: 20px !important;
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.25) !important;
+    overflow: hidden !important;
+  }
+
+  :deep(.q-table) {
+    border: none !important;
+  }
+
+  :deep(.q-table td),
+  :deep(.q-table th) {
+    border-right: none !important;
+  }
+
+  :deep(.q-table thead tr th) {
+    background: $dark-elevated !important;
+    color: $muted !important;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    padding: 16px 24px;
+    border-bottom: 1px solid $border !important;
+  }
+
+  :deep(.q-table tbody tr) {
+    background: $dark-card !important;
+  }
+
+  :deep(.q-table tbody tr td) {
+    background: transparent !important;
+    color: $white !important;
+    font-size: 14px;
+    padding: 16px 24px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04) !important;
+  }
+
+  :deep(.q-table tbody tr:last-child td) {
+    border-bottom: none !important;
+  }
+
+  :deep(.q-table tbody tr:hover) {
+    background: $dark-card !important;
+  }
+
+  :deep(.q-table__bottom) {
+    background: $dark-elevated !important;
+    border-top: 1px solid $border !important;
+  }
+}
+
+.user-name-link {
+  text-decoration: none;
+  color: $white;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  font-size: 14px;
+  transition: color 0.2s;
+
+  &:hover {
+    color: #a5b4fc;
+  }
+}
+
+.mobile-cell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: $muted;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 6px;
+  justify-content: flex-end;
+}
+
+.action-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 16px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.2s ease;
+
+  &.action-edit {
+    background: rgba($accent, 0.12);
+    color: #a5b4fc;
+    border: 1px solid rgba($accent, 0.2);
+
+    &:hover {
+      background: rgba($accent, 0.2);
+      border-color: rgba($accent, 0.4);
+    }
+  }
+
+  &.action-delete {
+    background: rgba(#ef4444, 0.1);
+    color: #fca5a5;
+    border: 1px solid rgba(#ef4444, 0.2);
+
+    &:hover {
+      background: rgba(#ef4444, 0.2);
+      border-color: rgba(#ef4444, 0.4);
+    }
+  }
+}
+
+// ── Pagination footer ──────────────────────────────────────────────────────
+.table-pagination {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 24px;
+  color: $white;
+}
+
+.pagination-info {
+  font-size: 13px;
+  color: $muted;
+  font-weight: 500;
+}
+
+.pagination-controls {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+
+  :deep(.q-btn) {
+    color: $muted !important;
+
+    &:hover {
+      color: $white !important;
+      background: rgba(255, 255, 255, 0.06) !important;
+    }
+  }
+}
+
+.page-number {
+  font-size: 14px;
+  color: $white;
+  font-weight: 700;
+  min-width: 60px;
+  text-align: center;
+  padding: 0 8px;
+}
+
+// ── Mobile cards ───────────────────────────────────────────────────────────
+.stores-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.store-card {
+  background: $dark-card !important;
+  border: 1px solid $border !important;
+  border-radius: 16px !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25) !important;
+  overflow: hidden;
+  position: relative;
+  transition: transform 0.2s, box-shadow 0.2s;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 3px;
+    height: 100%;
+    background: linear-gradient(180deg, $accent 0%, $accent-2 100%);
+  }
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3) !important;
+    border-color: rgba(99, 102, 241, 0.3) !important;
+  }
+
+  :deep(.q-card__section) {
+    background: transparent !important;
+    color: $white !important;
+  }
+}
+
+.store-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.store-card-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+}
+
+.card-user-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, $accent 0%, $accent-2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 3px 10px rgba(99, 102, 241, 0.35);
+}
+
+.store-name-link {
+  text-decoration: none;
+  color: $white;
+  font-weight: 700;
+  font-size: 15px;
+  transition: color 0.2s;
+
+  &:hover {
+    color: #a5b4fc;
+  }
+}
+
+.store-card-info {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 0;
+}
+
+.card-info-icon {
+  color: $muted;
+}
+
+.card-info-text {
+  font-size: 13px;
+  color: $muted;
+}
+
+.store-card-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  padding-top: 14px;
+  border-top: 1px solid $border;
+  margin-top: 4px;
+}
+
+.action-btn-mobile {
+  border-radius: 10px !important;
+  font-weight: 700 !important;
+  font-size: 13px !important;
+  height: 38px !important;
+  text-transform: none !important;
+  letter-spacing: 0 !important;
+}
+
+.mobile-pagination {
+  display: flex;
+  justify-content: center;
+  padding: 20px 0 4px;
+  background: transparent !important;
+}
+
+// ── Responsive ─────────────────────────────────────────────────────────────
+@media (max-width: 768px) {
+  .stores-page-container {
+    padding: 16px 12px;
+  }
+
+  .header-content {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 20px;
+  }
+
+  .header-title-section {
+    justify-content: flex-start;
+  }
+
+  .page-title {
+    font-size: 20px !important;
+  }
+
+  .search-input {
+    min-width: 0;
+    max-width: 100%;
+  }
+}
+</style>
+
+<style>
+/* Table container */
+.stores-page-container .users-table .q-table__container {
+  background: #1e293b !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 20px !important;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.25) !important;
+  overflow: hidden !important;
+}
+
+/* Strip all table borders */
+.stores-page-container .users-table .q-table,
+.stores-page-container .users-table .q-table td,
+.stores-page-container .users-table .q-table th,
+.stores-page-container .users-table .q-table tr {
+  border: none !important;
+  outline: none !important;
+}
+
+/* Header row */
+.stores-page-container .users-table thead tr th {
+  background: #273549 !important;
+  color: rgba(255, 255, 255, 0.55) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+/* Body rows — no hover flash */
+.stores-page-container .users-table tbody tr,
+.stores-page-container .users-table tbody tr:hover {
+  background: #1e293b !important;
+  cursor: default;
+}
+
+.stores-page-container .users-table tbody tr td {
+  background: transparent !important;
+  color: #ffffff !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+}
+
+.stores-page-container .users-table tbody tr:last-child td {
+  border-bottom: none !important;
+}
+
+/* Pagination footer */
+.stores-page-container .users-table .q-table__bottom {
+  background: #273549 !important;
+  color: #ffffff !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+/* Mobile cards */
+.stores-page-container .store-card {
+  background: #1e293b !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+.stores-page-container .store-card .q-card__section {
+  background: transparent !important;
+  color: #ffffff !important;
+}
+
+/* Empty states */
+.stores-page-container .empty-state-desktop,
+.stores-page-container .empty-state {
+  background: #1e293b !important;
+}
 </style>

@@ -12,6 +12,7 @@ class ScheduleController extends ApiController
         $this->model =  Schedule::class;
         $this->repository = $repository;
         $this->indexRequest = BaseIndexRequest::class;
+        $this->showRequest = BaseIndexRequest::class;
         $this->storeRequest    = BaseIndexRequest::class;
         $this->updateRequest    = BaseIndexRequest::class;
     }

@@ -3,48 +3,25 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Repositories\Image\ImageRepository;
-
-class ImageController extends Controller
+use App\Repositories\ImageRepository;
+use App\Models\Image;
+class ImageController
 {
-    protected $repository;
-    protected $indexRequest;
-    protected $storeRequest;
+    public function __construct(ImageRepository $repository)
+    {
 
-    public function __construct(ImageRepository $repository, Request $request){
         $this->repository = $repository;
-        $this->indexRequest = $request;
-        $this->storeRequest = $request;
+        $this->model = Image::class;
     }
 
-    public function store(){
+    public function updatePrimaryImage(Request $request){
 
-        $request = app()->make('request');
-        $query = $request->query->all();
-        $model = '\App\Models\\' . $query['entity'];
-        $model = $model::where('id',  $query['id'])->first();
-     
-        if($request->deletedFiles){
-            $deletedFiles = explode(',', $request->deletedFiles);
-            $deletedFiles = collect($deletedFiles)->filter(function($value){
-                return $value!= '';
-            })->all();
-
-
-            foreach($deletedFiles as $file){
-                $image = Image::where('id', $file)->first();
-                $path = public_path() . '/' . $image->path;
-                if(File::exists($path)){
-                    File::delete($path);
-                }
-                $image->delete();
-            }
-           
-        }
+       $this->repository->updatePrimaryImage($request);
 
         return response()->json([
-            'success' =>  $this->repository->setModel($model)->setRequest($request)->upload()
+            'success' => true
         ]);
 
     }
+
 }

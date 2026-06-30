@@ -4,11 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Traits\Obfuscate\OptimusRequiredToModel;
+use App\Traits\Obfuscate\OptimusId;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Carbon\Carbon;
 class Enrollee extends Model {
-    use HasFactory, OptimusRequiredToModel;
+    use HasFactory, OptimusId;
 
     protected $table = 'enrollees';
     protected $fillable = [

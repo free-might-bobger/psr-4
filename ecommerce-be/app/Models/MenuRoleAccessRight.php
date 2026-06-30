@@ -4,12 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\Pivot;
-use App\Traits\Obfuscate\OptimusRequiredToModel;
+use App\Traits\Obfuscate\OptimusId;
 use OwenIt\Auditing\Contracts\Auditable;
 
 class MenuRoleAccessRight extends Pivot implements Auditable
 {
-    use OptimusRequiredToModel;
+    use OptimusId;
     use \OwenIt\Auditing\Auditable;
 
     protected $table = 'menu_role_access_right';

@@ -7,7 +7,8 @@ use App\Repositories\ItemRepository;
 use App\Http\Requests\Item\StoreRequest;
 use App\Http\Requests\BaseIndexRequest;
 use Illuminate\Http\Request;
-
+use App\Http\Resources\Item\IndexResource;
+use App\Http\Resources\Item\ShowResource;
 class ItemController extends ApiController
 {
 
@@ -15,6 +16,7 @@ class ItemController extends ApiController
     {
         $this->repository = $repository;
         $this->indexRequest = BaseIndexRequest::class;
+        $this->showRequest = BaseIndexRequest::class;
         $this->storeRequest = StoreRequest::class;
         $this->updateRequest = Request::class;
     }
@@ -23,5 +25,13 @@ class ItemController extends ApiController
         $params = app( $this->storeRequest )->all();
         $this->result = $this->repository->itemUpdateWithImage( $id, $params );
         return $this->getResource();
+    }
+
+    public function getResource(){
+        return new IndexResource($this->result);
+    }
+
+    public function showResource(){
+        return new ShowResource($this->result);
     }
 }

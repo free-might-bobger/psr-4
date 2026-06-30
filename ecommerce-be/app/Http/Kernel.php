@@ -36,6 +36,7 @@ class Kernel extends HttpKernel
             \Illuminate\View\Middleware\ShareErrorsFromSession::class,
             \App\Http\Middleware\VerifyCsrfToken::class,
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
+            'throttle:60,1',
         ],
 
         'api' => [
@@ -73,5 +74,7 @@ class Kernel extends HttpKernel
         'allTransactionsMiddleware' => \App\Http\Middleware\AllTransactionsMiddleware::class,
         'storeMenuAccessMiddleware' => \App\Http\Middleware\StoreMenuAccessMiddleware::class,
         'myTransactionsMiddleware' => \App\Http\Middleware\MyTransactionsMiddleware::class,
+        'deliveryMiddleware' => \App\Http\Middleware\DeliveryMiddleware::class,
+        'storeDeliveryMiddleware' => \App\Http\Middleware\StoreDeliveryMiddleware::class,
     ];
 }

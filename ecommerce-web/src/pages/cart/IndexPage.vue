@@ -1,226 +1,226 @@
 <template>
-  <div class="cart-container">
-    <!-- Header -->
-    <div class="cart-header q-mb-lg">
-      <BreadCrumbsWrapper :bread-crumbs="[
-        {
-          name: 'Cart',
-          path: '',
-        },
-      ]" />
-      <div class="cart-title-section q-mt-md">
-        <div class="text-h4 text-weight-bold">
-          <q-icon name="shopping_cart" class="q-mr-sm" />
-          Shopping Cart
-        </div>
-        <div class="text-body2 text-grey-7 q-mt-xs" v-if="countTotalItems > 0">
-          {{ countTotalItems }} {{ countTotalItems === 1 ? 'item' : 'items' }} in your cart
+  <div class="cart-page">
+
+    <!-- Hero Banner -->
+    <div class="cart-hero">
+      <div class="hero-bg">
+        <div class="hero-orb orb-1"></div>
+        <div class="hero-orb orb-2"></div>
+        <div class="hero-grid"></div>
+      </div>
+      <div class="hero-inner">
+        <BreadCrumbsWrapper :bread-crumbs="[{ name: 'Cart', path: '' }]" />
+        <div class="hero-content">
+          <div class="hero-icon-wrap">
+            <q-icon name="shopping_cart" size="28px" color="white" />
+          </div>
+          <div>
+            <div class="hero-title">Shopping Cart</div>
+            <div class="hero-sub" v-if="countTotalItems > 0">
+              {{ countTotalItems }} {{ countTotalItems === 1 ? 'item' : 'items' }} ready for checkout
+            </div>
+            <div class="hero-sub" v-else>Your cart is currently empty</div>
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- Empty Cart State -->
-    <div v-if="countTotalItems === 0" class="empty-cart-container">
-      <div class="empty-cart-content">
-        <div class="empty-cart-icon">
-          <q-icon name="shopping_cart" size="120px" color="grey-4" />
+    <div class="cart-body">
+
+      <!-- Empty State -->
+      <div v-if="countTotalItems === 0" class="empty-state">
+        <div class="empty-icon-wrap">
+          <q-icon name="shopping_cart" size="56px" color="white" />
         </div>
-        <div class="text-h5 text-weight-bold text-grey-8 q-mt-lg">
-          Your cart is empty
-        </div>
-        <div class="text-body1 text-grey-6 q-mt-sm q-mb-lg">
-          Looks like you haven't added any items to your cart yet.
-        </div>
-        <q-btn color="primary" label="Start Shopping" icon="storefront" size="lg" unelevated to="/"
-          class="start-shopping-btn" />
+        <div class="empty-title">Your cart is empty</div>
+        <div class="empty-sub">Looks like you haven't added any items yet.</div>
+        <button class="empty-cta" @click="$router.push('/')">
+          <q-icon name="storefront" size="18px" class="q-mr-xs" />
+          Start Shopping
+        </button>
       </div>
-    </div>
 
-    <!-- Cart Content -->
-    <div v-else>
+      <!-- Cart Content -->
+      <div v-else class="cart-layout">
 
-      <div class="cart-layout">
-        <!-- Left Column: Cart Items -->
-        <div class="cart-items-column">
-          <!-- Cart Items -->
-          <div class="cart-items-section">
-            <div v-for="(item, i) in cart" :key="i" class="cart-item-card q-mb-md">
-              <q-card flat bordered class="cart-item">
-                <q-card-section>
-                  <div class="row q-col-gutter-md">
-                    <!-- Product Image -->
-                    <div class="col-12 col-sm-4 col-md-3">
-                      <router-link :to="`/public_stores/${item.store.optimus_id}/item/${item.optimus_id}`"
-                        class="cart-item-image-link">
-                        <q-img :src="item.primary_img.path_url" class="cart-item-image" :ratio="1" fit="cover">
-                          <template v-slot:error>
-                            <div class="absolute-full flex flex-center bg-grey-3">
-                              <q-icon name="image_not_supported" size="32px" color="grey-6" />
-                            </div>
-                          </template>
-                        </q-img>
-                      </router-link>
+        <!-- Left: Items + Options -->
+        <div class="cart-left">
+
+          <!-- Section heading -->
+          <div class="section-heading">
+            <span class="section-heading-dot"></span>
+            Cart Items
+          </div>
+
+          <!-- Item Cards -->
+          <div class="item-list">
+            <div v-for="(item, i) in cart" :key="i" class="item-card">
+              <!-- Image -->
+              <router-link :to="`/public_stores/${item.store.optimus_id}/item/${item.optimus_id}`"
+                class="item-img-link">
+                <q-img :src="item.primary_img.path_url" class="item-img" :ratio="1" fit="cover">
+                  <template v-slot:error>
+                    <div class="absolute-full flex flex-center bg-grey-2">
+                      <q-icon name="image_not_supported" size="28px" color="grey-5" />
                     </div>
+                  </template>
+                </q-img>
+                <div class="img-overlay">
+                  <q-icon name="open_in_new" size="20px" color="white" />
+                </div>
+              </router-link>
 
-                    <!-- Product Details -->
-                    <div class="col-12 col-sm-8 col-md-9">
-                      <div class="cart-item-content">
-                        <!-- Product Name and Remove -->
-                        <div class="flex justify-between items-start q-mb-sm">
-                          <router-link :to="`/public_stores/${item.store.optimus_id}/item/${item.optimus_id}`"
-                            class="cart-item-name-link">
-                            <div class="text-h6 text-weight-medium cart-item-name">
-                              {{ item.name }}
-                            </div>
-                          </router-link>
-                          <q-btn flat round dense icon="close" color="grey-7" size="sm"
-                            @click="userCart.removeItem(item.optimus_id)" class="remove-btn">
-                            <q-tooltip>Remove item</q-tooltip>
-                          </q-btn>
-                        </div>
+              <!-- Details -->
+              <div class="item-details">
+                <div class="item-top-row">
+                  <router-link :to="`/public_stores/${item.store.optimus_id}/item/${item.optimus_id}`"
+                    class="item-name">{{ item.name
+                    }}</router-link>
+                  <button class="remove-btn" @click="userCart.removeItem(item.optimus_id)">
+                    <q-icon name="close" size="16px" />
+                  </button>
+                </div>
 
-                        <!-- Order Details -->
-                        <div class="cart-item-details">
-                          <div v-for="(orderDetail, index) in getOrderDetail(
-                            item.item_price as any,
-                            item.variations
-                          )" :key="index" class="cart-item-variation">
-                            <div class="variation-info">
-                              <q-icon name="check_circle" size="xs" color="positive" class="q-mr-xs" />
-                              <span class="text-body2">
-                                <strong>{{ orderDetail.count }}</strong> {{ orderDetail.unit_name }} ×
-                                <span class="text-primary">{{ formatMoney(orderDetail.price) }}</span>
-                              </span>
-                            </div>
-                            <div class="variation-total text-body1 text-weight-bold text-primary">
-                              {{ formatMoney(computePrice(orderDetail.count, orderDetail.price)) }}
-                            </div>
-                          </div>
-                        </div>
-
-                        <!-- Item Subtotal -->
-                        <div class="cart-item-subtotal q-mt-sm">
-                          <q-separator class="q-mb-sm" />
-                          <div class="flex justify-between items-center">
-                            <span class="text-body2 text-grey-7">Item Subtotal:</span>
-                            <span class="text-h6 text-weight-bold text-primary">
-                              {{ formatMoney(getItemTotal(item)) }}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
+                <div class="variation-list">
+                  <div v-for="(orderDetail, index) in getOrderDetail(item.item_price as any, item.variations)"
+                    :key="index" class="variation-row">
+                    <div class="variation-left">
+                      <span class="variation-dot"></span>
+                      <span class="variation-text">
+                        <strong>{{ orderDetail.count }}</strong> {{ orderDetail.unit_name }}
+                        <span class="variation-x">×</span>
+                        <span class="variation-price">{{ formatMoney(orderDetail.price) }}</span>
+                      </span>
                     </div>
+                    <span class="variation-total">
+                      {{ formatMoney(computePrice(orderDetail.count, orderDetail.price)) }}
+                    </span>
                   </div>
-                </q-card-section>
-              </q-card>
-            </div>
-          </div>
+                </div>
 
-          <!-- Options Section -->
-          <div class="cart-options-section q-mt-lg">
-            <div class="row q-col-gutter-md">
-              <!-- Delivery Method -->
-              <div class="col-12 col-md-6">
-                <q-card flat bordered class="options-card">
-                  <q-card-section>
-                    <div class="text-subtitle1 text-weight-bold q-mb-md">
-                      <q-icon name="local_shipping" class="q-mr-sm" />
-                      Delivery Method
-                    </div>
-                    <div class="row q-col-gutter-sm">
-                      <div class="col-12" v-for="receiveMethod in receiveMethods" :key="receiveMethod.id">
-                        <q-radio v-model="selectedReceiveMethod" :val="receiveMethod.value" :label="receiveMethod.name"
-                          color="primary" class="delivery-option" />
-                      </div>
-                    </div>
-                  </q-card-section>
-                </q-card>
-              </div>
-
-              <!-- Payment Method -->
-              <div class="col-12 col-md-6">
-                <q-card flat bordered class="options-card">
-                  <q-card-section>
-                    <div class="text-subtitle1 text-weight-bold q-mb-md">
-                      <q-icon name="payment" class="q-mr-sm" />
-                      Payment Method
-                    </div>
-                    <div class="row q-col-gutter-sm">
-                      <div class="col-12" v-for="peymentMethod in paymentMethods" :key="peymentMethod.id">
-                        <q-radio v-model="selectedPaymenthMethod" :val="peymentMethod.value" :label="peymentMethod.name"
-                          color="primary" class="payment-option" />
-                      </div>
-                    </div>
-                  </q-card-section>
-                </q-card>
+                <div class="item-subtotal-row">
+                  <span class="item-subtotal-label">Item Subtotal</span>
+                  <span class="item-subtotal-value">{{ formatMoney(getItemTotal(item)) }}</span>
+                </div>
               </div>
             </div>
           </div>
+
+          <!-- Options: Delivery + Payment -->
+          <div class="section-heading q-mt-xl">
+            <span class="section-heading-dot"></span>
+            Order Options
+          </div>
+
+          <div class="options-grid">
+            <!-- Delivery -->
+            <div class="option-card">
+              <div class="option-card-header">
+                <div class="option-icon-wrap">
+                  <q-icon name="local_shipping" size="20px" color="white" />
+                </div>
+                <span class="option-card-title">Delivery Method</span>
+              </div>
+              <div class="option-radio-list">
+                <label v-for="receiveMethod in receiveMethods" :key="receiveMethod.id" class="option-radio-row"
+                  :class="{ active: selectedReceiveMethod === receiveMethod.value }">
+                  <q-radio v-model="selectedReceiveMethod" :val="receiveMethod.value" color="indigo-6" dense />
+                  <span class="option-radio-label">{{ receiveMethod.name }}</span>
+                </label>
+              </div>
+            </div>
+
+            <!-- Payment -->
+            <div class="option-card">
+              <div class="option-card-header">
+                <div class="option-icon-wrap">
+                  <q-icon name="payment" size="20px" color="white" />
+                </div>
+                <span class="option-card-title">Payment Method</span>
+              </div>
+              <div class="option-radio-list">
+                <label v-for="peymentMethod in paymentMethods" :key="peymentMethod.id" class="option-radio-row"
+                  :class="{ active: selectedPaymenthMethod === peymentMethod.value }">
+                  <q-radio v-model="selectedPaymenthMethod" :val="peymentMethod.value" color="indigo-6" dense />
+                  <span class="option-radio-label">{{ peymentMethod.name }}</span>
+                </label>
+              </div>
+            </div>
+          </div>
+
         </div>
 
-        <!-- Right Column: Order Summary (Sticky) -->
-        <div class="cart-summary-column">
+        <!-- Right: Order Summary -->
+        <div class="cart-right">
           <div class="summary-sticky">
-            <q-card flat bordered class="summary-card">
-              <q-card-section>
-                <div class="text-h6 text-weight-bold q-mb-md">
-                  <q-icon name="receipt_long" class="q-mr-sm" />
-                  Order Summary
-                </div>
+            <div class="summary-card">
 
-                <q-separator class="q-mb-md" />
+              <div class="summary-header">
+                <q-icon name="receipt_long" size="20px" color="white" class="q-mr-sm" />
+                Order Summary
+              </div>
 
-                <div class="summary-row q-mb-sm">
-                  <span class="summary-label">Subtotal ({{ countTotalItems }} {{ countTotalItems === 1 ? 'item' :
-                    'items'
-                  }}):</span>
-                  <span class="summary-value">{{ formatMoney(total) }}</span>
-                </div>
+              <div class="summary-body">
 
-                <div v-if="selectedReceiveMethod === DELIVERY_TYPE.DELIVER" class="summary-row q-mb-sm">
-                  <span class="summary-label">
-                    <q-icon name="local_shipping" size="xs" class="q-mr-xs" />
-                    Delivery Charge:
+                <div class="summary-line">
+                  <span class="summary-line-label">
+                    Subtotal
+                    <span class="summary-item-count">({{ countTotalItems }} {{ countTotalItems === 1 ? 'item' : 'items'
+                    }})</span>
                   </span>
-                  <span class="summary-value">{{ formatMoney(deliveryCharge) }}</span>
+                  <span class="summary-line-value">{{ formatMoney(total) }}</span>
                 </div>
 
-                <div v-else class="summary-row q-mb-sm">
-                  <span class="summary-label text-positive">
-                    <q-icon name="check_circle" size="xs" class="q-mr-xs" />
-                    Pickup (Free):
+                <div v-if="selectedReceiveMethod === DELIVERY_TYPE.DELIVER" class="summary-line">
+                  <span class="summary-line-label">
+                    <q-icon name="local_shipping" size="14px" class="q-mr-xs" />
+                    Delivery Charge
                   </span>
-                  <span class="summary-value text-positive">₱0.00</span>
+                  <span class="summary-line-value">{{ formatMoney(deliveryCharge) }}</span>
                 </div>
 
-                <q-separator class="q-my-md" />
-
-                <div class="summary-row-total">
-                  <span class="summary-label-total">Total Amount:</span>
-                  <span class="summary-value-total">{{
-                    decimalThousandSeparator(total + deliveryCharge)
-                  }}</span>
+                <div v-else class="summary-line">
+                  <span class="summary-line-label summary-free">
+                    <q-icon name="check_circle" size="14px" class="q-mr-xs" />
+                    Pickup
+                  </span>
+                  <span class="summary-line-value summary-free">Free</span>
                 </div>
 
-                <!-- Trust Indicators -->
-                <div class="trust-indicators q-mt-md">
-                  <div class="trust-item">
-                    <q-icon name="lock" size="sm" color="positive" class="q-mr-xs" />
-                    <span class="text-caption">Secure Checkout</span>
+                <div class="summary-divider"></div>
+
+                <div class="summary-total-row">
+                  <span class="summary-total-label">Total</span>
+                  <span class="summary-total-value">
+                    {{ decimalThousandSeparator(total + deliveryCharge) }}
+                  </span>
+                </div>
+
+                <!-- Trust badges -->
+                <div class="trust-row">
+                  <div class="trust-badge">
+                    <q-icon name="lock" size="14px" />
+                    Secure Checkout
                   </div>
-                  <div class="trust-item">
-                    <q-icon name="verified" size="sm" color="positive" class="q-mr-xs" />
-                    <span class="text-caption">Protected Payment</span>
+                  <div class="trust-badge">
+                    <q-icon name="verified" size="14px" />
+                    Protected
                   </div>
                 </div>
 
-                <!-- Checkout Button -->
-                <q-btn color="primary" class="checkout-btn q-mt-lg" to="/cart/checkout" label="Proceed to Checkout"
-                  icon="arrow_forward" size="lg" unelevated :disable="disabledCheckout" :loading="disabledCheckout" />
-              </q-card-section>
-            </q-card>
+                <!-- CTA -->
+                <button class="checkout-btn" :class="{ 'is-disabled': disabledCheckout }" :disabled="disabledCheckout"
+                  @click="$router.push('/cart/checkout')">
+                  <q-spinner v-if="disabledCheckout" size="18px" color="white" class="q-mr-sm" />
+                  <q-icon v-else name="arrow_forward" size="18px" class="q-mr-sm" />
+                  Proceed to Checkout
+                </button>
+
+              </div>
+            </div>
           </div>
         </div>
+
       </div>
     </div>
   </div>
@@ -261,6 +261,21 @@ interface PaymentMethod {
   name: string;
 }
 
+interface ApiResponse<T> {
+  data: {
+    data: T;
+  };
+}
+
+interface DeliveryCharge {
+  delivery_amount: number;
+}
+
+interface CartItem {
+  item_price: number | string;
+  variations: any;
+}
+
 const receiveMethods = ref<ReceiveMethod[]>([]);
 
 const getReceiveMethods = async () => {
@@ -275,7 +290,7 @@ const getReceiveMethods = async () => {
     false
   );
 
-  receiveMethods.value = (result as any).data?.data || [];
+  receiveMethods.value = (result as ApiResponse<ReceiveMethod[]>).data?.data || [];
 };
 
 const paymentMethods = ref<PaymentMethod[]>([]);
@@ -291,7 +306,7 @@ const getPaymentMethods = async () => {
     false
   );
 
-  paymentMethods.value = (result as any).data?.data || [];
+  paymentMethods.value = (result as ApiResponse<PaymentMethod[]>).data?.data || [];
 };
 
 const disabledCheckout = ref(true);
@@ -304,7 +319,7 @@ onMounted(() => {
 });
 
 
-watch(selectedReceiveMethod, async (currentVal) => {
+watch(selectedReceiveMethod, async () => {
   updateDeliveryCharge();
 });
 
@@ -323,7 +338,7 @@ const updateDeliveryCharge = async () => {
       },
       true
     );
-    const delivery = (result as any).data?.data?.find((v: any) => v);
+    const delivery = (result as ApiResponse<DeliveryCharge[]>).data?.data?.find((v) => v);
     if (delivery) {
       deliveryCharge.value = delivery.delivery_amount;
       disabledCheckout.value = false;
@@ -335,8 +350,8 @@ const updateDeliveryCharge = async () => {
 };
 
 // Calculate total for a single item
-const getItemTotal = (item: any): number => {
-  const orderDetails = getOrderDetail(item.item_price as any, item.variations);
+const getItemTotal = (item: CartItem): number => {
+  const orderDetails = getOrderDetail(item.item_price, item.variations);
   return orderDetails.reduce((sum, detail) => {
     return sum + computePrice(detail.count, detail.price);
   }, 0);
@@ -344,310 +359,638 @@ const getItemTotal = (item: any): number => {
 </script>
 
 <style scoped lang="scss">
-.cart-container {
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 16px;
+// ── Page ──────────────────────────────────────────────────────────────────
+.cart-page {
+  background: #f4f5f7;
+  min-height: 100vh;
 }
 
-.empty-cart-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 500px;
-  padding: 60px 20px;
+// ── Hero Banner ───────────────────────────────────────────────────────────
+.cart-hero {
+  position: relative;
+  background: linear-gradient(145deg, #1e1b4b 0%, #312e81 55%, #4c1d95 100%);
+  overflow: hidden;
 }
 
-.empty-cart-content {
-  text-align: center;
-  max-width: 500px;
-  width: 100%;
+.hero-bg {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
 }
 
-.empty-cart-icon {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-bottom: 24px;
-  animation: float 3s ease-in-out infinite;
+.hero-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(70px);
+  animation: heroFloat 12s ease-in-out infinite;
+
+  &.orb-1 {
+    width: 420px;
+    height: 420px;
+    background: rgba(139, 92, 246, 0.28);
+    top: -180px;
+    right: -60px;
+  }
+
+  &.orb-2 {
+    width: 220px;
+    height: 220px;
+    background: rgba(99, 102, 241, 0.2);
+    bottom: -60px;
+    left: -40px;
+    animation-delay: 6s;
+  }
 }
 
-@keyframes float {
+@keyframes heroFloat {
 
   0%,
   100% {
-    transform: translateY(0px);
+    transform: translate(0, 0);
   }
 
   50% {
-    transform: translateY(-20px);
+    transform: translate(14px, -18px);
   }
 }
 
-.start-shopping-btn {
-  height: 56px;
-  font-size: 16px;
-  font-weight: 600;
-  border-radius: 8px;
-  letter-spacing: 0.5px;
+.hero-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+
+.hero-inner {
+  position: relative;
+  z-index: 1;
+  padding: 20px 32px 28px;
+
+  :deep(.q-breadcrumbs) {
+    color: rgba(255, 255, 255, 0.45);
+  }
+
+  :deep(.q-breadcrumbs__el) {
+    color: rgba(255, 255, 255, 0.45);
+  }
+
+  :deep(.q-breadcrumbs__separator) {
+    color: rgba(255, 255, 255, 0.25);
+  }
+
+  :deep(a) {
+    color: rgba(255, 255, 255, 0.65) !important;
+  }
+}
+
+.hero-content {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 14px;
+}
+
+.hero-icon-wrap {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.hero-title {
+  font-size: 26px;
+  font-weight: 900;
+  color: white;
+  letter-spacing: -0.5px;
+  line-height: 1.2;
+}
+
+.hero-sub {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.55);
+  font-weight: 500;
+  margin-top: 3px;
+}
+
+// ── Body ──────────────────────────────────────────────────────────────────
+.cart-body {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 32px;
+}
+
+// ── Empty State ───────────────────────────────────────────────────────────
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 20px;
+  text-align: center;
+}
+
+.empty-icon-wrap {
+  width: 100px;
+  height: 100px;
+  border-radius: 28px;
+  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 12px 32px rgba(99, 102, 241, 0.35);
+  margin-bottom: 24px;
+  animation: floatIcon 3s ease-in-out infinite;
+}
+
+@keyframes floatIcon {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-12px);
+  }
+}
+
+.empty-title {
+  font-size: 24px;
+  font-weight: 900;
+  color: #111827;
+  margin-bottom: 8px;
+}
+
+.empty-sub {
+  font-size: 15px;
+  color: #6b7280;
+  margin-bottom: 28px;
+}
+
+.empty-cta {
+  display: inline-flex;
+  align-items: center;
+  height: 50px;
   padding: 0 32px;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border: none;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+  color: white;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 6px 20px rgba(99, 102, 241, 0.35);
+  transition: all 0.25s ease;
 
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+    box-shadow: 0 10px 28px rgba(99, 102, 241, 0.45);
   }
 }
 
-.cart-header {
-  padding: 16px 0;
-}
-
-.cart-title-section {
-  margin-top: 16px;
-}
-
+// ── Layout ────────────────────────────────────────────────────────────────
 .cart-layout {
   display: grid;
-  grid-template-columns: 1fr 400px;
-  gap: 32px;
+  grid-template-columns: 1fr 380px;
+  gap: 28px;
   align-items: start;
 }
 
-.cart-items-column {
+.cart-left {
   min-width: 0;
 }
 
-.cart-items-section {
-  margin-bottom: 32px;
+// ── Section Heading ───────────────────────────────────────────────────────
+.section-heading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  font-weight: 800;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin-bottom: 16px;
 }
 
-.cart-item-card {
-  transition: transform 0.2s ease;
+.section-heading-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #4f46e5, #7c3aed);
+  flex-shrink: 0;
+}
+
+// ── Item Cards ────────────────────────────────────────────────────────────
+.item-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.item-card {
+  background: white;
+  border-radius: 18px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  display: grid;
+  grid-template-columns: 110px 1fr;
+  overflow: hidden;
+  transition: box-shadow 0.25s, transform 0.25s;
 
   &:hover {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
     transform: translateY(-2px);
   }
 }
 
-.cart-item {
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  transition: box-shadow 0.3s ease;
+.item-img-link {
+  display: block;
+  position: relative;
+  overflow: hidden;
+  background: #f3f4f6;
+  text-decoration: none;
 
-  &:hover {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  &:hover .img-overlay {
+    opacity: 1;
+  }
+
+  &:hover .item-img {
+    transform: scale(1.07);
   }
 }
 
-.cart-item-image-link {
-  display: block;
-  text-decoration: none;
-  border-radius: 8px;
-  overflow: hidden;
-  background: #f5f5f5;
+.item-img {
+  width: 100%;
+  height: 100%;
+  transition: transform 0.35s ease;
 }
 
-.cart-item-image {
-  border-radius: 8px;
-  transition: transform 0.3s ease;
+.img-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(79, 70, 229, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.25s;
 }
 
-.cart-item-image-link:hover .cart-item-image {
-  transform: scale(1.05);
-}
-
-.cart-item-content {
+.item-details {
+  padding: 18px 20px;
   display: flex;
   flex-direction: column;
-  height: 100%;
+  gap: 10px;
 }
 
-.cart-item-name-link {
+.item-top-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.item-name {
+  font-size: 16px;
+  font-weight: 700;
+  color: #111827;
   text-decoration: none;
-  color: inherit;
-  transition: color 0.2s ease;
+  line-height: 1.35;
   flex: 1;
+  transition: color 0.15s;
 
   &:hover {
-    color: var(--q-primary);
+    color: #4f46e5;
   }
-}
-
-.cart-item-name {
-  color: #1a1a1a;
-  line-height: 1.4;
-  margin-right: 8px;
 }
 
 .remove-btn {
-  transition: all 0.2s ease;
+  width: 30px;
+  height: 30px;
+  border: none;
+  border-radius: 8px;
+  background: #f3f4f6;
+  color: #9ca3af;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.2s;
 
   &:hover {
-    background-color: #ffebee;
-    color: #c62828;
+    background: #fee2e2;
+    color: #dc2626;
   }
 }
 
-.cart-item-details {
-  padding: 12px 0;
+.variation-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
-.cart-item-variation {
+.variation-row {
   display: flex;
+  align-items: center;
   justify-content: space-between;
-  align-items: center;
-  padding: 8px 0;
-  color: #666;
-  border-bottom: 1px solid #f0f0f0;
-
-  &:last-child {
-    border-bottom: none;
-  }
+  padding: 7px 10px;
+  background: #f9fafb;
+  border-radius: 8px;
 }
 
-.variation-info {
+.variation-left {
   display: flex;
   align-items: center;
+  gap: 8px;
   flex: 1;
 }
 
+.variation-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #4f46e5;
+  flex-shrink: 0;
+}
+
+.variation-text {
+  font-size: 13px;
+  color: #374151;
+}
+
+.variation-x {
+  color: #9ca3af;
+  margin: 0 3px;
+}
+
+.variation-price {
+  color: #4f46e5;
+  font-weight: 600;
+}
+
 .variation-total {
-  margin-left: 16px;
-  min-width: 100px;
+  font-size: 14px;
+  font-weight: 800;
+  color: #111827;
+  min-width: 80px;
   text-align: right;
 }
 
-.cart-item-subtotal {
-  padding-top: 8px;
+.item-subtotal-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 10px;
+  border-top: 1px solid #f3f4f6;
 }
 
-.cart-options-section {
-  margin-top: 32px;
+.item-subtotal-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: #9ca3af;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
-.options-card {
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  height: 100%;
-  transition: box-shadow 0.3s ease;
-
-  &:hover {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
-  }
+.item-subtotal-value {
+  font-size: 17px;
+  font-weight: 900;
+  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
-.delivery-option,
-.payment-option {
+// ── Options Grid ──────────────────────────────────────────────────────────
+.options-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.option-card {
+  background: white;
+  border-radius: 18px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+}
+
+.option-card-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+}
+
+.option-icon-wrap {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.option-card-title {
+  font-size: 14px;
+  font-weight: 800;
+  color: white;
+  letter-spacing: 0.3px;
+}
+
+.option-radio-list {
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.option-radio-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
   padding: 10px 12px;
-  border-radius: 8px;
-  transition: all 0.2s ease;
-  margin-bottom: 4px;
+  border-radius: 10px;
+  border: 1.5px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s;
 
   &:hover {
-    background-color: #f5f5f5;
+    background: #f5f3ff;
+    border-color: #e0e7ff;
+  }
+
+  &.active {
+    background: #f5f3ff;
+    border-color: #a5b4fc;
   }
 }
 
-.cart-summary-column {
-  position: relative;
+.option-radio-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+}
+
+// ── Summary Card ──────────────────────────────────────────────────────────
+.cart-right {
+  min-width: 0;
 }
 
 .summary-sticky {
   position: sticky;
-  top: 80px;
+  top: 24px;
 }
 
 .summary-card {
-  border-radius: 12px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
-  border: 1px solid #e0e0e0;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(79, 70, 229, 0.15);
 }
 
-.summary-row {
+.summary-header {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  padding: 20px 24px;
+  background: linear-gradient(135deg, #1e1b4b 0%, #312e81 55%, #4c1d95 100%);
+  font-size: 16px;
+  font-weight: 800;
+  color: white;
+  letter-spacing: 0.3px;
+}
+
+.summary-body {
+  background: white;
+  padding: 20px 24px 24px;
+}
+
+.summary-line {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   padding: 10px 0;
+  border-bottom: 1px dashed #f3f4f6;
+
+  &:last-of-type {
+    border-bottom: none;
+  }
 }
 
-.summary-label {
-  font-size: 15px;
-  color: #666;
+.summary-line-label {
+  font-size: 14px;
+  color: #6b7280;
   display: flex;
   align-items: center;
 }
 
-.summary-value {
-  font-size: 15px;
-  font-weight: 600;
-  color: #1a1a1a;
-  text-align: right;
+.summary-item-count {
+  margin-left: 4px;
+  color: #9ca3af;
+  font-size: 13px;
 }
 
-.summary-row-total {
+.summary-line-value {
+  font-size: 14px;
+  font-weight: 700;
+  color: #111827;
+}
+
+.summary-free {
+  color: #059669 !important;
+}
+
+.summary-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #e5e7eb, transparent);
+  margin: 10px 0 14px;
+}
+
+.summary-total-row {
   display: flex;
+  align-items: center;
   justify-content: space-between;
-  align-items: center;
-  padding: 16px 0 0;
-  margin-top: 8px;
+  margin-bottom: 20px;
 }
 
-.summary-label-total {
-  font-size: 18px;
-  font-weight: bold;
-  color: #1a1a1a;
+.summary-total-label {
+  font-size: 16px;
+  font-weight: 800;
+  color: #111827;
 }
 
-.summary-value-total {
-  font-size: 24px;
-  font-weight: bold;
-  color: var(--q-primary);
-  letter-spacing: 0.5px;
+.summary-total-value {
+  font-size: 26px;
+  font-weight: 900;
+  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  line-height: 1;
 }
 
-.trust-indicators {
+.trust-row {
   display: flex;
-  justify-content: space-around;
-  padding: 12px 0;
-  border-top: 1px solid #e0e0e0;
-  border-bottom: 1px solid #e0e0e0;
-  margin: 16px 0;
+  gap: 10px;
+  margin-bottom: 20px;
 }
 
-.trust-item {
+.trust-badge {
+  flex: 1;
   display: flex;
   align-items: center;
-  color: #666;
-  font-size: 12px;
+  justify-content: center;
+  gap: 5px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: #f0fdf4;
+  color: #059669;
+  font-size: 11px;
+  font-weight: 700;
+  border: 1px solid #bbf7d0;
 }
 
 .checkout-btn {
   width: 100%;
-  height: 56px;
-  font-size: 16px;
-  font-weight: 600;
-  border-radius: 8px;
-  letter-spacing: 0.5px;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  text-transform: none;
+  height: 52px;
+  border: none;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+  color: white;
+  font-size: 15px;
+  font-weight: 800;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 20px rgba(99, 102, 241, 0.35);
+  transition: all 0.25s ease;
+  letter-spacing: 0.3px;
 
-  &:hover:not(:disabled) {
+  &:hover:not(.is-disabled) {
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+    box-shadow: 0 10px 28px rgba(99, 102, 241, 0.45);
   }
 
-  &:disabled {
-    opacity: 0.6;
+  &.is-disabled {
+    opacity: 0.55;
     cursor: not-allowed;
-    transform: none;
   }
 }
 
-@media (max-width: 1024px) {
+// ── Responsive ────────────────────────────────────────────────────────────
+@media (max-width: 1100px) {
   .cart-layout {
     grid-template-columns: 1fr;
     gap: 24px;
@@ -656,43 +999,49 @@ const getItemTotal = (item: any): number => {
   .summary-sticky {
     position: static;
   }
+
+  .cart-right {
+    order: -1;
+  }
 }
 
-@media (max-width: 600px) {
-  .cart-container {
-    padding: 8px;
+@media (max-width: 768px) {
+  .hero-inner {
+    padding: 16px 20px 22px;
   }
 
-  .cart-item-name {
-    font-size: 1rem;
+  .cart-body {
+    padding: 20px;
   }
 
-  .cart-layout {
-    gap: 16px;
+  .hero-title {
+    font-size: 22px;
   }
 
-  .summary-label-total {
-    font-size: 16px;
+  .options-grid {
+    grid-template-columns: 1fr;
   }
 
-  .summary-value-total {
-    font-size: 20px;
+  .item-card {
+    grid-template-columns: 90px 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .cart-body {
+    padding: 12px;
   }
 
-  .checkout-btn {
-    height: 48px;
-    font-size: 15px;
+  .item-card {
+    grid-template-columns: 80px 1fr;
   }
 
-  .variation-total {
-    min-width: 80px;
-    font-size: 14px;
+  .item-details {
+    padding: 14px 14px;
   }
 
-  .trust-indicators {
-    flex-direction: column;
-    gap: 8px;
-    align-items: center;
+  .summary-total-value {
+    font-size: 22px;
   }
 }
 </style>

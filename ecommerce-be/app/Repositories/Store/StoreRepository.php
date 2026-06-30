@@ -5,12 +5,12 @@ namespace App\Repositories\Store;
 use App\Models\Store;
 use App\Repositories\BaseRepository;
 use App\Models\Franchisee;
-use App\Traits\Obfuscate\OptimusRequiredToModel;
+use App\Traits\Obfuscate\OptimusId;
 use Illuminate\Support\Arr;
 
 class StoreRepository extends BaseRepository implements StoreInterface
 {
-    use OptimusRequiredToModel;
+    use OptimusId;
     public function __construct()
     {
         $this->model = new Store;

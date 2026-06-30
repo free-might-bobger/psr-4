@@ -4,12 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Traits\Obfuscate\OptimusRequiredToModel;
+use App\Traits\Obfuscate\OptimusId;
 use OwenIt\Auditing\Contracts\Auditable;
 
 class PaymentMethod extends Model implements Auditable
 {
-    use HasFactory, OptimusRequiredToModel;
+    use HasFactory, OptimusId;
     use \OwenIt\Auditing\Auditable;
 
     protected $table = 'payment_methods';

@@ -20,6 +20,7 @@ export interface GetQuery {
   whereHas?: string
   listingApi?: string,
   show_mobile?: number
+  deleted?: number
 }
 export interface GetParams {
   message?: string
@@ -64,6 +65,7 @@ interface UserMenu {
   name: string 
   icon: string 
   path: string
+  all_children: Array<UserMenu>
 }
 
 export interface ProfileState {
@@ -146,7 +148,8 @@ export interface CustomerOrder {
 }
 
 export interface LoginInterface {
-  mobile: string
+  mobile?: string
+  email?: string
   password: string
 }
 
@@ -164,6 +167,12 @@ export interface DeleteInterface {
   query?: GetQuery
 }
 
+export interface RestoreInterface {
+  label: string
+  entity: string
+  optimus_id: number
+}
+
 export interface UpdateInterface {
   message?: string
   entity: string
@@ -172,9 +181,17 @@ export interface UpdateInterface {
   query?: GetQuery
 }
 
+export interface ItemInterface {
+  id: number
+  name: string
+  optimus_id: number,
+  store: StoreInterface
+}
+
 export interface StoreInterface {
   id: number
   name: string
+  mobile: string
   latitude: number
   longitude: number
   distance: number
@@ -215,6 +232,8 @@ export interface CustomerTransactionRow {
   optimus_id: number,
   created_at: string
   status?: { label: string; name: string }
+  store?: StoreInterface
+  distance: number
 }
 
 export interface StoreRow {
@@ -222,6 +241,8 @@ export interface StoreRow {
   name: string;
   mobile: string;
   optimus_id: number;
+  store?: StoreInterface;
+  deleted_at?: string | null;
 }
 
 export interface AccessRightInterface {
@@ -247,5 +268,58 @@ export interface StoreMenuAccessInterface {
 export interface ErrorValidationInterface{
   message: string
   status: boolean
+}
+
+export interface StoreUser {
+  id: number;
+  email: string;
+  user_id: string;
+  store_id: number;
+  store?: StoreInterface;
+  optimus_id: number;
+  is_verified: boolean;
+  user?: {
+    optimus_id: number;
+    email: string;
+  };
+  storeUserMenu?: {
+    id: number;
+    optimus_id: number;
+    store_user_id: number;
+    store_menu_id: number;
+    store_menu?: {
+      id: number;
+      optimus_id: number;
+      name: string;
+      icon: string;
+      label: string;
+      value: number;
+    };
+  }[];
+}
+
+export interface StoreUserMenu {
+  id: number;
+  optimus_id: number;
+  store_user_id: number;
+  store_menu_id: number;
+  storeMenu?: {
+    id: number;
+    optimus_id: number;
+    name: string;
+    icon: string;
+    value: number;
+    label: string;
+  };
+  storeUser?: {
+    id: number;
+    optimus_id: number;
+    email: string;
+    user?: {
+      id: number;
+      optimus_id: number;
+      email: string;
+    };
+  };
 }
 

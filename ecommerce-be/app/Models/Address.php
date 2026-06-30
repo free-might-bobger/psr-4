@@ -4,11 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Traits\Obfuscate\OptimusRequiredToModel;
+use App\Traits\Obfuscate\OptimusId;
 use Illuminate\Database\Eloquent\SoftDeletes;
 class Address extends Model
 {
-    use HasFactory, OptimusRequiredToModel, SoftDeletes;
+    use HasFactory, OptimusId, SoftDeletes;
 
     protected $table = 'address';
     protected $fillable = [

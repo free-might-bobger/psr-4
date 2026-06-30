@@ -4,11 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Traits\Obfuscate\OptimusRequiredToModel;
+use App\Traits\Obfuscate\OptimusId;
 
 class PaymentOption extends Model
 {
-    use HasFactory, OptimusRequiredToModel;
+    use HasFactory, OptimusId;
 
     protected $table = 'payment_options';
     protected $fillable = [

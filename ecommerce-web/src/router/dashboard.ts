@@ -4,7 +4,7 @@ export default [
     {
       path: '/dashboard',
       meta: {
-        needAuth: true
+        requiresAuth: true
       },
       component: () => import('layouts/DashboardLayout.vue'),
       children: [
@@ -18,8 +18,14 @@ export default [
           path: 'users',
           children: [
             { path: '', component: () => import('src/pages/dashboard/users/IndexPage.vue') },
-            { path: 'create', component: () => import('src/pages/dashboard/users/CreatePage.vue') },
             { path: ':id', component: () => import('src/pages/dashboard/users/EditPage.vue') },
+          ]
+        },
+        {
+          path: 'deliveries',
+          children: [
+            { path: '', component: () => import('src/pages/dashboard/deliveries/IndexPage.vue') },
+            { path: ':id', component: () => import('src/pages/dashboard/deliveries/ShowPage.vue') },
           ]
         },
         {
@@ -57,6 +63,9 @@ export default [
           children: [
             { path: '', component: () => import('src/pages/dashboard/my-stores/IndexPage.vue') },
             { path: ':id', component: () => import('src/pages/dashboard/my-stores/EditPage.vue') },
+            { path: ':id/store-users', component: () => import('src/pages/dashboard/my-stores/store-users/IndexPage.vue') },
+            { path: ':id/store-users/invite-users', component: () => import('src/pages/dashboard/my-stores/store-users/InvitePage.vue') },
+            { path: ':id/store-users/menus', component: () => import('src/pages/dashboard/my-stores/store-users/MenusPage.vue') },
             { path: ':id/items', component: () => import('src/pages/dashboard/my-stores/items/IndexPage.vue') },
             { path: ':id/items/:itemId', component: () => import('src/pages/dashboard/my-stores/items/EditPage.vue') },
             { path: ':id/items/:itemId/item-prices', component: () => import('src/pages/dashboard/my-stores/items/ItemPrice.vue') },
@@ -65,13 +74,34 @@ export default [
           ]
         },
         {
+          path: 'shared-store-access',
+          children: [
+            { path: '', component: () => import('src/pages/dashboard/shared-store-access/IndexPage.vue') },
+            { path: ':id', component: () => import('src/pages/dashboard/shared-store-access/EditPage.vue') },
+            { path: ':id/users', component: () => import('src/pages/dashboard/shared-store-access/users/IndexPage.vue') },
+            { path: ':id/users/invite-users', component: () => import('src/pages/dashboard/shared-store-access/users/InvitePage.vue') },
+            { path: ':id/items', component: () => import('src/pages/dashboard/shared-store-access/items/IndexPage.vue') },
+            { path: ':id/items/:itemId', component: () => import('src/pages/dashboard/shared-store-access/items/EditPage.vue') },
+            { path: ':id/items/:itemId/item-prices', component: () => import('src/pages/dashboard/shared-store-access/items/ItemPrice.vue') },
+            { path: ':id/transactions', component: () => import('src/pages/dashboard/shared-store-access/transactions/IndexPage.vue') },
+            { path: ':id/transactions/:transactionId', component: () => import('src/pages/dashboard/shared-store-access/transactions/ShowPage.vue') },
+            { path: ':id/deliveries', component: () => import('src/pages/dashboard/shared-store-access/deliveries/IndexPage.vue') },
+            { path: ':id/deliveries/:deliveryId', component: () => import('src/pages/dashboard/shared-store-access/deliveries/ShowPage.vue') },
+          ]
+        },
+        {
           path: 'all-stores',
           children: [
             { path: '', component: () => import('src/pages/dashboard/all-stores/IndexPage.vue') },
             { path: ':id', component: () => import('src/pages/dashboard/all-stores/EditPage.vue') },
+            { path: ':id/store-users', component: () => import('src/pages/dashboard/all-stores/store-users/IndexPage.vue') },
+            { path: ':id/store-users/invite-users', component: () => import('src/pages/dashboard/all-stores/store-users/InvitePage.vue') },
+            { path: ':id/store-users/menus', component: () => import('src/pages/dashboard/all-stores/store-users/MenusPage.vue') },
             { path: ':id/items', component: () => import('src/pages/dashboard/all-stores/items/IndexPage.vue') },
             { path: ':id/items/:itemId', component: () => import('src/pages/dashboard/all-stores/items/EditPage.vue') },
             { path: ':id/items/:itemId/item-prices', component: () => import('src/pages/dashboard/all-stores/items/PricePage.vue') },
+            { path: ':id/transactions', component: () => import('src/pages/dashboard/all-stores/transactions/IndexPage.vue') },
+            { path: ':id/transactions/:transactionId', component: () => import('src/pages/dashboard/all-stores/transactions/ShowPage.vue') },
           ]
         }
       ]

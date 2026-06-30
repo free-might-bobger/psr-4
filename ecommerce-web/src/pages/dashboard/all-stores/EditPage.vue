@@ -1,483 +1,273 @@
 <template>
   <div class="edit-store-page">
-    <!-- Header Section -->
-    <q-card flat bordered class="page-header-card q-mb-lg">
-      <q-card-section class="header-section">
-        <div class="header-content">
-          <div class="header-left">
-            <div class="header-icon-wrapper">
-              <q-icon name="store" size="40px" color="primary" />
-            </div>
-            <div class="header-text">
-              <h1 class="page-title">Edit Store</h1>
-              <p class="page-subtitle">Update store information and location</p>
-            </div>
-          </div>
-          <div class="header-actions">
-            <q-btn 
-              unelevated
-              color="primary"
-              label="View Items"
-              icon="inventory_2"
-              :to="`${$route.path}/items`"
-              class="view-items-btn"
-            >
-              <q-tooltip>View store items</q-tooltip>
-            </q-btn>
-          </div>
+
+    <!-- Hero Header -->
+    <div class="page-hero q-mb-xl">
+      <div class="hero-accent-overlay"></div>
+      <div class="hero-inner">
+        <q-btn flat round dense icon="arrow_back" color="white" class="hero-back-btn" @click="$router.back()" />
+        <div class="hero-icon-wrap">
+          <q-icon name="store" size="28px" color="white" />
         </div>
-        
-      </q-card-section>
-    </q-card>
+        <div class="hero-text">
+          <h1 class="hero-title">Edit Store</h1>
+          <div class="hero-subtitle">Update store information and location</div>
+        </div>
+        <router-link :to="`${$route.path}/items`" class="hero-action-btn">
+          <q-icon name="inventory_2" size="18px" />
+          <span>View Items</span>
+        </router-link>
+      </div>
+    </div>
 
     <!-- Form Section -->
-    <q-card flat bordered class="form-card">
-      <q-card-section>
-        <q-form @submit.prevent="onSubmit" class="edit-store-form" ref="myForm">
-          <!-- Store Information Section -->
-          <div class="form-section">
-            <div class="section-header">
-              <q-icon name="info" color="primary" size="24px" class="q-mr-sm" />
-              <h2 class="section-title">Store Information</h2>
-            </div>
-            
-            <div class="form-row">
-              <div class="form-col">
-                <q-input
-                  clearable
-                  v-model="store.name"
-                  dense
-                  outlined
-                  label="Store Name"
-                  :rules="[(val) => (val && val.length > 0) || 'Store name is required.']"
-                  hide-bottom-space
-                  class="form-input"
-                >
-                  <template v-slot:prepend>
-                    <q-icon name="store" color="primary" />
-                  </template>
-                </q-input>
-              </div>
-              
-              <div class="form-col">
-                <q-input
-                  clearable
-                  v-model="store.mobile"
-                  dense
-                  outlined
-                  label="Mobile Number"
-                  :rules="[(val) => (val && val.length > 0) || 'Mobile number is required.']"
-                  hide-bottom-space
-                  class="form-input"
-                >
-                  <template v-slot:prepend>
-                    <q-icon name="phone" color="primary" />
-                  </template>
-                </q-input>
-              </div>
-            </div>
-          </div>
-
-          <div class="form-row q-mt-md">
-            <div class="form-col">
-              <q-input
-                type="textarea"
-                v-model="store.desc"
-                dense
-                outlined
-                label="Description"
-                :rules="[
-                  (val) => (val && val.length > 0) || 'Description is required.',
-                ]"
-                hide-bottom-space
-                class="form-input"
-              />
-            </div>
-          </div>
-
-          <!-- Location Section -->
-          <div class="form-section q-mt-lg">
-            <div class="section-header">
-              <q-icon name="place" color="primary" size="24px" class="q-mr-sm" />
-              <h2 class="section-title">Store Location</h2>
-            </div>
-            
-            <div class="location-info q-mb-md">
-              <q-banner rounded class="bg-blue-1 text-blue-8">
-                <template v-slot:avatar>
-                  <q-icon name="info" color="primary" />
-                </template>
-                Drag the marker on the map to set the store location. The coordinates will update automatically.
-              </q-banner>
-            </div>
-
-            <div class="coordinates-display q-mb-md">
-              <div class="coordinate-item">
-                <q-icon name="my_location" color="primary" size="20px" class="q-mr-sm" />
-                <div>
-                  <div class="coordinate-label">Latitude</div>
-                  <div class="coordinate-value">{{ store.latitude?.toFixed(6) || 'N/A' }}</div>
-                </div>
-              </div>
-              <div class="coordinate-item">
-                <q-icon name="my_location" color="primary" size="20px" class="q-mr-sm" />
-                <div>
-                  <div class="coordinate-label">Longitude</div>
-                  <div class="coordinate-value">{{ store.longitude?.toFixed(6) || 'N/A' }}</div>
-                </div>
-              </div>
-            </div>
-
-            <div class="map-container">
-              <GoogleMap 
-                ref="mapRef" 
-                :api-key="GOOGLE_MAP_API_KEY" 
-                :map-id="GOOGLE_MAP_ID" 
-                class="google-map"
-                :center="{ lat: store.latitude || 14.5995, lng: store.longitude || 120.9842 }" 
-                :zoom="currentZoom" 
-                :draggable="true" 
-                :clickable-icons="false"
-              >
-                <!-- Store Location Marker -->
-                <AdvancedMarker 
-                  :options="getStoreMarkerOptions()" 
-                  @drag="markerDrag"
-                >
-                  <InfoWindow 
-                    v-model="showInfoWindow"
-                    :options="{ 
-                      position: { lat: store.latitude || 14.5995, lng: store.longitude || 120.9842 }, 
-                      headerContent: '&nbsp;&nbsp;&nbsp;' + (store.name || 'Store Location'), 
-                      disableAutoPan: false 
-                    }"
-                  >
-                    <div class="info-window-content">
-                      <div class="info-window-header">
-                        <q-icon name="store" color="primary" size="sm" class="q-mr-xs" />
-                        <span class="text-weight-bold">{{ store.name || 'Store Location' }}</span>
-                      </div>
-                      <div class="info-window-body">
-                        <p class="text-caption text-grey-7 q-ma-none">
-                          Drag the marker to update the store location
-                        </p>
-                        <div class="text-caption q-mt-xs">
-                          <strong>Lat:</strong> {{ store.latitude?.toFixed(6) || 'N/A' }}<br>
-                          <strong>Lng:</strong> {{ store.longitude?.toFixed(6) || 'N/A' }}
-                        </div>
-                      </div>
-                    </div>
-                  </InfoWindow>
-                </AdvancedMarker>
-              </GoogleMap>
-            </div>
-          </div>
-
-          <!-- Action Buttons -->
-          <div class="form-actions q-mt-xl">
-            <q-btn 
-              unelevated 
-              color="primary" 
-              type="submit" 
-              label="Update Store"
-              icon="save"
-              class="submit-btn"
-              :loading="isSubmitting"
-            />
-            <q-btn 
-              flat 
-              color="grey-8" 
-              label="Cancel"
-              icon="cancel"
-              @click="$router.back()"
-              class="cancel-btn"
-            />
-          </div>
-        </q-form>
-      </q-card-section>
-    </q-card>
+    <StoreEditForm :store="store" :is-submitting="isSubmitting" @submit="onSubmit" @cancel="$router.back()" :isActive="true"/>
   </div>
 </template>
-  
-  <script lang="ts" setup>
-  import { GOOGLE_MAP_API_KEY, GOOGLE_MAP_ID } from 'src/boot/constant';
-  import { GoogleMap, AdvancedMarker, InfoWindow } from 'vue3-google-map';
-  import { ref, onBeforeMount, onMounted, nextTick } from 'vue';
-  import { update, show } from 'src/boot/axios-call';
-  import { useRoute } from "vue-router"
-  import type { QForm } from 'quasar';
 
-  const route = useRoute()
-  const store = ref({
-    name: '',
-    desc: '',
-    mobile: '',
-    latitude: 14.5995,
-    longitude: 120.9842,
-    optimus_id: 0,
-  });
+<script lang="ts" setup>
+import { ref, onBeforeMount } from 'vue';
+import { update, show } from 'src/boot/axios-call';
+import { useRoute } from "vue-router";
+import StoreEditForm from 'src/components/StoreEditForm.vue';
 
-  const currentZoom = ref(15)
-  const showInfoWindow = ref(true)
-  const mapRef = ref<any>(null)
-  const isSubmitting = ref(false)
-  
-  // Get store marker options
-  const getStoreMarkerOptions = () => {
-    return {
-      position: { lat: store.value.latitude || 14.5995, lng: store.value.longitude || 120.9842 },
-      gmpDraggable: true,
-      title: store.value.name || 'Store Location',
-      content: createStoreMarkerElement(),
-    }
-  }
-  
-  const myForm = ref<QForm | null>(null);
-  const onSubmit = async () => {
-    myForm.value?.validate().then(async (success: any) => {
-      if (success) {
-        isSubmitting.value = true;
-        try {
-          const result = await update(
-            {
-              entity: 'all_stores',
-              optimus_id: route.params.id, 
-              data: {
-                name: store.value.name,
-                desc: store.value.desc,
-                mobile: store.value.mobile,
-                latitude: store.value.latitude,
-                longitude: store.value.longitude,
-              },
-            },
-            true
-          );
-          // Optionally redirect or show success message
-        } catch (error) {
-          console.error('Error updating store:', error);
-        } finally {
-          isSubmitting.value = false;
-        }
-      }
-    });
-  };
-  
-  // Create store marker element
-  const createStoreMarkerElement = (): HTMLElement => {
-    const markerDiv = document.createElement('div')
-    markerDiv.className = 'custom-marker store-marker'
-    markerDiv.innerHTML = `
-      <div class="marker-pulse"></div>
-      <div class="marker-icon">
-        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M20 4H4c-1.11 0-1.99.89-1.99 2L2 18c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z" fill="#FFFFFF"/>
-        </svg>
-      </div>
-    `
-    return markerDiv
-  }
+interface StoreImage {
+  id: number;
+  path_url: string;
+  path_thumbnail: string;
+  name: string;
+  is_primary: number;
+  optimus_id: number;
+}
 
-  const markerDrag = (e: { latLng: google.maps.LatLng }) => {
-    store.value.latitude = e.latLng.lat();
-    store.value.longitude = e.latLng.lng();
-  };
+interface StoreData {
+  name: string;
+  desc: string;
+  mobile: string;
+  latitude: number;
+  longitude: number;
+  optimus_id: number;
+  is_active: boolean;
+  images?: StoreImage[];
+}
 
-  const zoomIn = () => {
-    const map = mapRef.value?.$mapObject || mapRef.value?.map || mapRef.value?.$map
-    if (map) {
-      const currentZoomLevel = map.getZoom() || currentZoom.value
-      if (currentZoomLevel < 21) {
-        const newZoom = currentZoomLevel + 1
-        map.setZoom(newZoom)
-        currentZoom.value = newZoom
-      }
-    }
-  }
+const route = useRoute();
+const store = ref<StoreData>({
+  name: '',
+  desc: '',
+  mobile: '',
+  latitude: 14.5995,
+  longitude: 120.9842,
+  optimus_id: 0,
+  is_active: false,
+  images: [],
+});
 
-  const zoomOut = () => {
-    const map = mapRef.value?.$mapObject || mapRef.value?.map || mapRef.value?.$map
-    if (map) {
-      const currentZoomLevel = map.getZoom() || currentZoom.value
-      if (currentZoomLevel > 1) {
-        const newZoom = currentZoomLevel - 1
-        map.setZoom(newZoom)
-        currentZoom.value = newZoom
-      }
-    }
-  }
+const isSubmitting = ref(false);
 
-  const waitForGoogleMaps = () => {
-    return new Promise((resolve) => {
-      const checkGoogleMaps = () => {
-        if (window.google &&
-          window.google.maps &&
-          window.google.maps.Map) {
-          resolve(void 0)
-        } else {
-          setTimeout(checkGoogleMaps, 100)
-        }
-      }
-      checkGoogleMaps()
-    })
-  }
-
-  const waitForMapReady = () => {
-    return new Promise((resolve) => {
-      const checkMapReady = () => {
-        // Try different ways to access the map
-        const map = mapRef.value?.$mapObject || mapRef.value?.map || mapRef.value?.$map
-        if (map) {
-          addZoomControls(map)
-          resolve(void 0)
-        } else {
-          setTimeout(checkMapReady, 200)
-        }
-      }
-      checkMapReady()
-    })
-  }
-
-  const addZoomControls = (map: google.maps.Map) => {
-    // Create container for zoom controls
-    const zoomControlDiv = document.createElement('div')
-    zoomControlDiv.style.cssText = `
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-      background: white;
-      border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-      overflow: hidden;
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      z-index: 1000;
-      pointer-events: auto;
-    `
-
-    // Zoom In Button
-    const zoomInButton = document.createElement('button')
-    zoomInButton.style.cssText = `
-      width: 40px;
-      height: 40px;
-      border: none;
-      background: white;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.2s ease;
-      padding: 0;
-      margin: 0;
-      font-size: 20px;
-      font-weight: 600;
-      color: #333;
-      user-select: none;
-      border-bottom: 1px solid #e0e0e0;
-    `
-    zoomInButton.innerHTML = '<span style="display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; line-height: 1;">+</span>'
-    zoomInButton.title = 'Zoom in'
-    zoomInButton.addEventListener('click', (e) => {
-      e.stopPropagation()
-      zoomIn()
-    })
-    zoomInButton.addEventListener('mouseenter', () => {
-      zoomInButton.style.background = '#f5f5f5'
-    })
-    zoomInButton.addEventListener('mouseleave', () => {
-      zoomInButton.style.background = 'white'
-    })
-    zoomInButton.addEventListener('mousedown', () => {
-      zoomInButton.style.background = '#e0e0e0'
-      zoomInButton.style.transform = 'scale(0.95)'
-    })
-    zoomInButton.addEventListener('mouseup', () => {
-      zoomInButton.style.background = '#f5f5f5'
-      zoomInButton.style.transform = 'scale(1)'
-    })
-
-    // Zoom Out Button
-    const zoomOutButton = document.createElement('button')
-    zoomOutButton.style.cssText = `
-      width: 40px;
-      height: 40px;
-      border: none;
-      background: white;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.2s ease;
-      padding: 0;
-      margin: 0;
-      font-size: 20px;
-      font-weight: 600;
-      color: #333;
-      user-select: none;
-    `
-    zoomOutButton.innerHTML = '<span style="display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; line-height: 1;">−</span>'
-    zoomOutButton.title = 'Zoom out'
-    zoomOutButton.addEventListener('click', (e) => {
-      e.stopPropagation()
-      zoomOut()
-    })
-    zoomOutButton.addEventListener('mouseenter', () => {
-      zoomOutButton.style.background = '#f5f5f5'
-    })
-    zoomOutButton.addEventListener('mouseleave', () => {
-      zoomOutButton.style.background = 'white'
-    })
-    zoomOutButton.addEventListener('mousedown', () => {
-      zoomOutButton.style.background = '#e0e0e0'
-      zoomOutButton.style.transform = 'scale(0.95)'
-    })
-    zoomOutButton.addEventListener('mouseup', () => {
-      zoomOutButton.style.background = '#f5f5f5'
-      zoomOutButton.style.transform = 'scale(1)'
-    })
-
-    zoomControlDiv.appendChild(zoomInButton)
-    zoomControlDiv.appendChild(zoomOutButton)
-
-    // Position the control
-    setTimeout(() => {
-      const mapContainer = map.getDiv()
-      if (mapContainer) {
-        mapContainer.appendChild(zoomControlDiv)
-      }
-    }, 200)
-  }
-
-  onBeforeMount(async () => {
-    const result = await show({
-      entity: 'all_stores',
-      optimus_id: Number(route.params.id),
-      query: {
-        show_mobile: 1
+const onSubmit = async (data: StoreData) => {
+  isSubmitting.value = true;
+  try {
+    await update(
+      {
+        entity: 'all_stores',
+        optimus_id: route.params.id,
+        data: {
+          name: data.name,
+          desc: data.desc,
+          mobile: data.mobile,
+          latitude: data.latitude,
+          longitude: data.longitude,
+          is_active: data.is_active ? 1 : 0,
+        },
       },
-    }) as { name: string; mobile: string; desc?: string; latitude: number; longitude: number; optimus_id: number };
-    
-    store.value.name = result.name || '';
+      true
+    );
+  } catch (error) {
+    console.error('Error updating store:', error);
+  } finally {
+    isSubmitting.value = false;
+  }
+};
+
+onBeforeMount(async () => {
+  const result = await show({
+    entity: 'all_stores',
+    optimus_id: Number(route.params.id),
+    query: {
+      with: 'images'
+    },
+  }) as StoreData;
+
+  store.value.name = result.name || '';
   store.value.desc = result.desc || '';
-    store.value.mobile = result.mobile || '';
-    store.value.latitude = result.latitude || 14.5995;
-    store.value.longitude = result.longitude || 120.9842;
-    store.value.optimus_id = result.optimus_id || 0;
-  });
-
-  onMounted(async () => {
-    // Wait for the next tick to ensure the GoogleMap component is mounted
-    await nextTick()
-
-    // Wait for Google Maps API to be fully loaded
-    await waitForGoogleMaps()
-
-    // Wait for the map to be fully initialized
-    await waitForMapReady()
-  });
-  </script>
+  store.value.mobile = result.mobile || '';
+  store.value.latitude = result.latitude || 14.5995;
+  store.value.longitude = result.longitude || 120.9842;
+  store.value.optimus_id = result.optimus_id || 0;
+  store.value.is_active = Boolean(result.is_active);
+  store.value.images = result.images || [];
+});
+</script>
 
 <style scoped lang="scss">
-@import 'src/css/dashboard/all-stores/edit.scss';
+// ── Dark theme tokens (matching DashboardLayout / ProfilePage) ───────────────
+$dark-base: #0f172a;
+$dark-card: #1e293b;
+$dark-elevated: #273549;
+$border: rgba(255, 255, 255, 0.08);
+$accent: #6366f1;
+$accent-2: #7c3aed;
+$green: #10b981;
+$white: #ffffff;
+$muted: rgba(255, 255, 255, 0.5);
+
+// ── Page Container ───────────────────────────────────────────────────────────
+.edit-store-page {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 28px 24px 60px;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  color: $white;
+}
+
+// ── Hero Header ──────────────────────────────────────────────────────────────
+.page-hero {
+  position: relative;
+  background: $dark-card;
+  border-radius: 20px;
+  border: 1px solid $border;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+}
+
+.hero-accent-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba($accent, 0.18) 0%, rgba($accent-2, 0.10) 60%, transparent 100%);
+  pointer-events: none;
+}
+
+.hero-inner {
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding: 32px 36px;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.hero-back-btn {
+  background: rgba(255, 255, 255, 0.1) !important;
+  flex-shrink: 0;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.2) !important;
+  }
+}
+
+.hero-icon-wrap {
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, $accent 0%, $accent-2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 24px rgba($accent, 0.4);
+  flex-shrink: 0;
+}
+
+.hero-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.hero-title {
+  font-size: 26px;
+  font-weight: 800;
+  color: $white !important;
+  margin: 0 0 4px;
+  letter-spacing: -0.3px;
+  line-height: 1.2;
+}
+
+.hero-subtitle {
+  font-size: 14px;
+  color: $muted;
+  font-weight: 500;
+}
+
+.hero-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, $green 0%, darken($green, 8%) 100%);
+  color: $white;
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+  box-shadow: 0 6px 20px rgba($green, 0.35);
+  transition: all 0.25s ease;
+  flex-shrink: 0;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 28px rgba($green, 0.45);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+// ── Responsive ───────────────────────────────────────────────────────────────
+@media (max-width: 768px) {
+  .edit-store-page {
+    padding: 16px 12px 48px;
+  }
+
+  .hero-inner {
+    padding: 24px 20px;
+    gap: 14px;
+  }
+
+  .hero-title {
+    font-size: 22px;
+  }
+
+  .hero-action-btn {
+    width: 100%;
+    justify-content: center;
+    padding: 14px 20px;
+  }
+}
+
+@media (max-width: 600px) {
+  .edit-store-page {
+    padding: 10px 8px 40px;
+  }
+
+  .hero-inner {
+    padding: 20px 16px;
+    gap: 12px;
+  }
+
+  .hero-icon-wrap {
+    width: 46px;
+    height: 46px;
+    border-radius: 13px;
+  }
+
+  .hero-title {
+    font-size: 20px;
+  }
+
+  .hero-action-btn {
+    font-size: 13px;
+    padding: 12px 18px;
+  }
+}
 </style>
-  

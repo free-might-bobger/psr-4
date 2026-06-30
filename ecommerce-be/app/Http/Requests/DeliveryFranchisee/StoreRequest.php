@@ -4,7 +4,7 @@ namespace App\Http\Requests\DeliveryFranchisee;
 
 use App\Traits\Requests\RequestValidation;
 use App\Http\Requests\BaseRequest;
-use App\Traits\Obfuscate\OptimusRequiredToModel;
+use App\Traits\Obfuscate\OptimusId;
 use Auth;
 class StoreRequest extends BaseRequest
 {

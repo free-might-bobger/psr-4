@@ -7,37 +7,27 @@ use App\Http\Requests\TransactionRequest;
 use App\Models\Transaction;
 use App\Http\Requests\BaseIndexRequest;
 use App\Http\Requests\Transaction\UpdateRequest;
-use App\Http\Resources\BaseResource;
+use App\Http\Resources\CustomerTransaction\IndexResource;
 
 class TransactionController extends ApiController {
 
-    protected $model;
+    protected string $model;
     public function __construct( TransactionRepository $repository ) {
         $this->model =  Transaction::class;
         $this->repository = $repository;
         $this->indexRequest = BaseIndexRequest::class;
+        $this->showRequest = BaseIndexRequest::class;
         $this->storeRequest    = TransactionRequest::class;
         $this->updateRequest    = UpdateRequest::class;
     }
 
-    public function isPublicRoute( string $routeName ): Bool {
-        return true;
-    }
+   public function getResource(): IndexResource {
+    return new IndexResource($this->result);
+   }
 
-    public function store(): BaseResource {
-        
-        $request = app($this->storeRequest);
-        $this->result = $this->repository
-            ->createTransaction( 
-                $request->store_id,
-                $request->items, 
-                $request->deliveryCharge, 
-                $request->selectedReceiveMethod, $request->selectedPaymenthMethod, 
-                $request->lat, 
-                $request->lng,
-                $request->total
-             );
+   public function showResource(): IndexResource {
+    return new IndexResource($this->result);
+   }
 
-        return $this->getResource();
-    }
+    
 }

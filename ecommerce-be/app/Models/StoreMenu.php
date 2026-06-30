@@ -4,12 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Traits\Models\LabelValue;
 use OwenIt\Auditing\Contracts\Auditable;
-
+use App\Traits\Obfuscate\OptimusId;
 class StoreMenu extends Model implements Auditable
 {
-    use HasFactory, LabelValue;
+    use HasFactory,OptimusId;
     use \OwenIt\Auditing\Auditable;
 
     protected $table = 'store_menus';
@@ -18,5 +17,5 @@ class StoreMenu extends Model implements Auditable
         'name'
     ];
 
-    protected $appends = ['label', 'value'];
+    protected $appends = ['label', 'value', 'optimus_id'];
 }

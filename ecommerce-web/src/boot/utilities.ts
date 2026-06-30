@@ -1,12 +1,6 @@
 
 import moment from 'moment';
 
-interface Result {
-  error: string;
-  status: boolean;
-}
-
-
 export const getAge = (birthDate: string): number => {
   return moment().diff(moment(birthDate, 'YYYYMMDD'), 'years');
 };
@@ -43,7 +37,7 @@ export const getPriceRange = (priceArray: Array<PriceItem>) => {
   return `₱ ${minPrice.toFixed(2)}`;
 };
 
-export const capitalizeWord = (string) => {
+export const capitalizeWord = (string: string): string => {
   if (string) {
     return string.replace(/(^\w|\s\w)/g, (m) => m.toUpperCase());
   }
@@ -65,7 +59,6 @@ export const currency = (): string =>  {
 
 export const formatMoney = (money: number) :string => {
   return (
-    '₱ ' +
     money?.toLocaleString('en-US', {
       maximumFractionDigits: 2,
       minimumFractionDigits: 2,
@@ -86,16 +79,16 @@ export const computePrice = (price: number, qty: number): number => {
 };
 
 export const getOrderDetail = (
-  itemPrice: Array<{ item_price: Array<{ unit_id: number; price: number; unit: object }> }>,
+  itemPrice: Array<{ unit_id: number; online_price?: number; price: number; unit: { id: number; name: string } }>,
   variations: Array<{ unit: number; count: number }>
-): Array<{ unit_id: number; count: number; price: number,  unit_name: string;  }> => {
+): Array<{ unit_id: number; count: number; price: number; unit_name: string; }> => {
   const result: Array<{ unit_id: number; count: number; price: number; unit_name: string; }> = [];
 
   // Iterate over each variation to find the corresponding price
   variations.forEach(variation => {
       // Look through all itemPrice entries to find a matching unit_id
-      for (const item of itemPrice) {
-          const matchingPrice = item.unit_id === variation.unit;
+      for (const priceItem of itemPrice) {
+          const matchingPrice = priceItem.unit_id === variation.unit;
           if (matchingPrice) {
             //find it in the result and add the count because it is already exist.
              const unitExist = result.find(v => v.unit_id === variation.unit)
@@ -103,21 +96,25 @@ export const getOrderDetail = (
               unitExist.count += variation.count;
               return
              }
-              // Add the result with the found price
+              // Add the result with the found price (use online_price if available, otherwise price)
               result.push({
                   unit_id: variation.unit,
-                  count: parseInt(variation.count),
-                  price: item.online_price,
-                  unit_name: item.unit.name
+                  count: variation.count,
+                  price: priceItem.online_price ?? priceItem.price,
+                  unit_name: priceItem.unit.name
               });
-              break; // Exit the loop once a matching price is found
+              return; // Exit the loop once a matching price is found
           }
       }
   });
   return result;
 };
 
-export const getStoreName = (stores: Array<{ store: object} >):string  => {
+interface Store {
+  name: string;
+}
+
+export const getStoreName = (stores: Array<{ store: Store} >):string  => {
   return stores[0]?.store?.name
 }
 
@@ -125,7 +122,7 @@ export function getLocation(): Promise<GeolocationPosition> {
   const timeoutVal = 10 * 1000 * 1000;
   return new Promise((resolve, reject) => {
     if (!navigator.geolocation) {
-      return reject(new Error("Geolocation is not supported by this browser."));
+      return reject(new Error('Geolocation is not supported by this browser.'));
     }
 
     navigator.geolocation.getCurrentPosition(
@@ -135,3 +132,30 @@ export function getLocation(): Promise<GeolocationPosition> {
     );
   });
 }
+
+export function watchLocation(
+  onSuccess: (position: GeolocationPosition) => void,
+  onError?: (error: GeolocationPositionError) => void
+): number {
+  const timeoutVal = 10 * 1000 * 1000;
+  if (!navigator.geolocation) {
+    if (onError) {
+      onError(new Error('Geolocation is not supported by this browser.') as unknown as GeolocationPositionError);
+    }
+    return -1;
+  }
+
+  return navigator.geolocation.watchPosition(
+    onSuccess,
+    onError,
+    { enableHighAccuracy: true, timeout: timeoutVal, maximumAge: 0 }
+  );
+}
+
+export function clearWatch(watchId: number): void {
+  if (navigator.geolocation && watchId !== -1) {
+    navigator.geolocation.clearWatch(watchId);
+  }
+}
+
+

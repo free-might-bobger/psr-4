@@ -5,12 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Carbon\Carbon;
-use App\Traits\Obfuscate\OptimusRequiredToModel;
+use App\Traits\Obfuscate\OptimusId;
 use OwenIt\Auditing\Contracts\Auditable;
 
 class StoreAdvertisement extends Model implements Auditable
 {
-    use HasFactory, OptimusRequiredToModel;
+    use HasFactory, OptimusId;
     use \OwenIt\Auditing\Auditable;
 
     protected $table = 'store_advertisements';

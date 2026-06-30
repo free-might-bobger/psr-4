@@ -3,25 +3,28 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\BaseResource;
+use App\Http\Resources\ShowResource;
 abstract class ApiController extends Controller {
 
-    protected $model, $repository, $indexRequest, $storeRequest, $updateRequest, $result, $params;
-    /**
-     * Index the resource
-     * @return BaseResource
-     */
-    public function index() : BaseResource {
+    protected string $model;
+    protected object $repository;
+    protected string $indexRequest;
+    protected string $showRequest;
+    protected string $storeRequest;
+    protected string $updateRequest;
+    protected mixed $result;
+    protected array $params;
+    protected string $baseResourceClass;
+    protected string $showResourceClass;
+
+    public function index() {
 
         $this->params = app( $this->indexRequest )->all();
         $this->result = $this->repository->filterQuery($this->params)->getResults();
         return $this->getResource();
     }
 
-    /**
-     * Store the resource
-     * @return BaseResource
-     */
-    public function store(): BaseResource {
+    public function store(){
 
         $this->params = app( $this->storeRequest )->all();
         $this->result = $this->repository->setParameters( $this->params )->create();
@@ -31,32 +34,30 @@ abstract class ApiController extends Controller {
     /**
      * Show the resource
      * @param int $id
-     * @return BaseResource
      */
-    public function show( int $id ) : BaseResource {
-        $this->result = $this->repository->where( 'id', $id );
-        return $this->getResource();
+    public function show( int $id ) {
+        $this->params = app( $this->showRequest )->all();
+        $this->result = $this->repository->filterQuery($this->params)->findOrFail( $id );
+        return $this->showResource();
     }
 
     /**
      * Edit the resource
      * @param int $id
-     * @return BaseResource
      */
-    public function edit( int $id ) : BaseResource {
-        $this->params = app( $this->indexRequest )->all();
+    public function edit( int $id ){
+        $this->params = app( $this->editRequest )->all();
         $this->result = $this->repository->filterQuery( $this->params )->where( 'id', $id )->first();
         return $this->getResource();
     }
     /**
      * Update the resource
      * @param int $id
-     * @return BaseResource
      */
-    public function update( int $id ) : BaseResource {
+    public function update( int $id ) {
         $this->params = app( $this->updateRequest )->all();
-        $result = $this->repository->where( 'id', $id );
-        $this->result = tap( $result )->update( $this->params );
+        $this->repository->where( 'id', $id )->update( $this->params );
+        $this->result = $this->repository->findOrFail( $id );
         return $this->getResource();
     }
 
@@ -69,30 +70,11 @@ abstract class ApiController extends Controller {
         $this->result = $this->repository->where( 'id', $id )->delete();
     }
 
-    /**
-     * Check if the route is public
-     * @param string $routeName
-     * @return Bool
-     */
-    public function isPublicRoute(string $routeName): Bool
-    {
-        $publicRoute = [
-            'index', 'view'
-        ];
-        if (in_array($routeName, $publicRoute)) {
-            return true;
-        }
-
-        return false;
+    public function restore($id): void {
+        $this->result = $this->repository->where('id', $id)->restore();
     }
 
-    /**
-     * Get the resource
-     * @return BaseResource
-     */
-    public function getResource(): BaseResource
-    {
-        return new BaseResource($this->result);
-    }
+  abstract public function getResource();
 
+  abstract public function showResource();
 }

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Repositories\PaymentMethodRepository;
 use App\Http\Requests\BaseIndexRequest;
 use App\Models\PaymentMethod;
+use App\Http\Resources\PaymentMethod\IndexResource;
 
 class PaymentMethodController extends ApiController
 {
@@ -12,11 +13,16 @@ class PaymentMethodController extends ApiController
         $this->model =  PaymentMethod::class;
         $this->repository = $repository;
         $this->indexRequest = BaseIndexRequest::class;
+        $this->showRequest = BaseIndexRequest::class;
         $this->storeRequest    = BaseIndexRequest::class;
         $this->updateRequest    = BaseIndexRequest::class;
     }
 
-    public function isPublicRoute(string $routeName): Bool {
-        return true;
+   public function getResource(){
+        return new IndexResource($this->result);
+    }
+
+    public function showResource(){
+        return new IndexResource($this->result);
     }
 }

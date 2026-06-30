@@ -25,7 +25,7 @@ class MyStoreMiddleware {
         * result is limited to this user_id only.
         */
         $request->merge([
-            'filters' => 'user_id:' . Auth::user()->id
+            'filters' => 'user_id:' . Auth::user()->id . ',is_active:1'
         ]);
 
         return $next( $request );
